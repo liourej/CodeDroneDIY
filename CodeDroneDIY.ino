@@ -105,7 +105,7 @@ void setup()
     idleESC();
     delay(10);
   }
- // g_FlyingMode = Rx.GetFlyingMode();
+  g_FlyingMode = Rx.GetFlyingMode();
   if( g_FlyingMode == FLYING_MODE_ANGLE){
     Serial.println("FLYING_MODE_ANGLE");
     rollPID.SetPIDCoef(0.0012, 90, 60, 0.05); // G, Kp, Kd, Ki
@@ -165,10 +165,10 @@ void PlusConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _roll
 void XConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _rollPIDOutput)
 {
    // Pitch correction
-   ESC0.write( _throttle + _pitchPIDOutput/2 +_rollPIDOutput/2 + _YawPIDOutput); 
-   ESC1.write( _throttle + _pitchPIDOutput/2 - _rollPIDOutput/2 - _YawPIDOutput);
-   ESC2.write( _throttle - _pitchPIDOutput/2 - _rollPIDOutput/2 + _YawPIDOutput); 
-   ESC3.write( _throttle - _pitchPIDOutput/2 +_rollPIDOutput/2  - _YawPIDOutput);
+   ESC0.write( _throttle - _pitchPIDOutput/2 +_rollPIDOutput/2 + _YawPIDOutput); 
+   ESC1.write( _throttle - _pitchPIDOutput/2 - _rollPIDOutput/2 - _YawPIDOutput);
+   ESC2.write( _throttle + _pitchPIDOutput/2 - _rollPIDOutput/2 + _YawPIDOutput); 
+   ESC3.write( _throttle + _pitchPIDOutput/2 +_rollPIDOutput/2  - _YawPIDOutput);
 }
 
 void loop() {
