@@ -139,21 +139,22 @@ int g_iloop = 0;
 float g_MeanLoop = 0;
 
 //    + configuration:
-//        ESC1
-//         |
-//  ESC3 -- --  ESC2
-//         |
-//        ESC0
+//         ESC0
+//          ^
+//          |
+//  ESC3 <-- --  ESC1
+//          |
+//         ESC2
 //   
 void PlusConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _rollPIDOutput)
 {
    // Pitch correction
-   ESC0.write( _throttle - _pitchPIDOutput - _YawPIDOutput); 
-   ESC1.write( _throttle + _pitchPIDOutput - _YawPIDOutput);
+   ESC0.write( _throttle - _pitchPIDOutput - _YawPIDOutput);
+   ESC2.write( _throttle + _pitchPIDOutput - _YawPIDOutput); 
     
    // Roll correction
-   ESC2.write( _throttle - _rollPIDOutput + _YawPIDOutput); 
-   ESC3.write( _throttle + _rollPIDOutput + _YawPIDOutput);
+   ESC1.write( _throttle + _rollPIDOutput + _YawPIDOutput); 
+   ESC3.write( _throttle - _rollPIDOutput + _YawPIDOutput);
 }
 
 //    X configuration:
@@ -198,7 +199,7 @@ void loop() {
       if( throttle > 1100 )
       {
         rollPIDOutput = rollPID.GetPIDOutput( Rx.GetAileronsSpeed(), speedCurr[0], loop_time );
-        pitchPIDOutput = pitchPID.GetPIDOutput( Rx.GetElevatorSpeed(), -speedCurr[1], loop_time );
+        pitchPIDOutput = pitchPID.GetPIDOutput( Rx.GetElevatorSpeed(), speedCurr[1], loop_time );
         YawPIDOutput = yawPID.GetPIDOutput( Rx.GetRudder(), speedCurr[2], loop_time );
       Serial.print(speedCurr[2]);Serial.print("\t"); Serial.print(Rx.GetRudder());Serial.print("\t");Serial.println(YawPIDOutput); 
       }else{
@@ -209,7 +210,7 @@ void loop() {
     }
        
   XConfig(throttle, pitchPIDOutput, YawPIDOutput, rollPIDOutput);
-  
+
   wdt_reset();
 }
 
