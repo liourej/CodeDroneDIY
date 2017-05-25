@@ -72,7 +72,7 @@ inline void GetPosition::Normalize( float _acc[] )
 }
 
 // Get rotation speed using only gyro
-void GetPosition::GetCurrSpeed(const MPU6050 _accelgyro, float _speed[])
+void GetPosition::GetCurrSpeed(MPU6050 _accelgyro, float _speed[])
 {
  // float roll, pitch = 0;
   float accGyroRaw[6]={0, 0, 0, 0, 0, 0};
@@ -86,7 +86,7 @@ void GetPosition::GetCurrSpeed(const MPU6050 _accelgyro, float _speed[])
 }
 
 // Get position combining acc + gyro
-void GetPosition::GetCurrPos(const MPU6050 _accelgyro, float _pos[], const float _loop_time)
+void GetPosition::GetCurrPos(MPU6050 _accelgyro, float _pos[], float _loop_time)
 {
  // float roll, pitch = 0;
 	float accGyroRaw[6]={0, 0, 0, 0, 0, 0};

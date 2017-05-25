@@ -121,15 +121,14 @@ void setup()
   }
 
   time.Init();
-  
+
+  Serial.print("MAX_POWER:\t");Serial.println(MAX_POWER);
+  Serial.print("Kp:\t");Serial.println(analogRead(2));
   Serial.println("Setup Finished");
   digitalWrite(INTEGRATED_LED, HIGH);
 
   pinMode(0, OUTPUT);
   digitalWrite(0, HIGH);
-
-  Serial.println(analogRead(2));
-
 }
 
 float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
@@ -158,18 +157,18 @@ void PlusConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _roll
 }
 
 //    X configuration:
-//     ESC0    ESC1
+//  ESC0(CCW)  ESC1
 //         \  /
 //         /  \
-//     ESC3   ESC2
+//     ESC3   ESC2(CCW)
+//
 
 void XConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _rollPIDOutput)
 {
-   // Pitch correction
-   ESC0.write( _throttle - _pitchPIDOutput/2 +_rollPIDOutput/2 + _YawPIDOutput); 
-   ESC1.write( _throttle - _pitchPIDOutput/2 - _rollPIDOutput/2 - _YawPIDOutput);
-   ESC2.write( _throttle + _pitchPIDOutput/2 - _rollPIDOutput/2 + _YawPIDOutput); 
-   ESC3.write( _throttle + _pitchPIDOutput/2 +_rollPIDOutput/2  - _YawPIDOutput);
+  ESC0.write( _throttle - _pitchPIDOutput/2 +_rollPIDOutput/2 - _YawPIDOutput); 
+  ESC1.write( _throttle - _pitchPIDOutput/2 - _rollPIDOutput/2 + _YawPIDOutput);
+  ESC2.write( _throttle + _pitchPIDOutput/2 - _rollPIDOutput/2 - _YawPIDOutput); 
+  ESC3.write( _throttle + _pitchPIDOutput/2 +_rollPIDOutput/2  + _YawPIDOutput);
 }
 
 void loop() {
@@ -180,7 +179,7 @@ void loop() {
     // Get throttle and current position
     throttle = Rx.GetThrottle();
 
-    if( g_FlyingMode == FLYING_MODE_ANGLE )
+   if( g_FlyingMode == FLYING_MODE_ANGLE )
     {
       Position.GetCurrPos(accelgyro, posCurr, loop_time);
       if( throttle > 1100 )
@@ -194,21 +193,21 @@ void loop() {
         pitchPID.Reset();
         yawPID.Reset();
       }
-    }else{ // FLYING_MODE_ACCRO
+    }else{ // FLYING_MODE_ACCRO*/
       Position.GetCurrSpeed(accelgyro, speedCurr);
       if( throttle > 1100 )
       {
         rollPIDOutput = rollPID.GetPIDOutput( Rx.GetAileronsSpeed(), speedCurr[0], loop_time );
         pitchPIDOutput = pitchPID.GetPIDOutput( Rx.GetElevatorSpeed(), speedCurr[1], loop_time );
         YawPIDOutput = yawPID.GetPIDOutput( Rx.GetRudder(), speedCurr[2], loop_time );
-      Serial.print(speedCurr[2]);Serial.print("\t"); Serial.print(Rx.GetRudder());Serial.print("\t");Serial.println(YawPIDOutput); 
+       // Serial.print(speedCurr[1]);Serial.print("\t"); Serial.print(speedCurr[0]);Serial.print("\t"); Serial.println(Rx.GetAileronsSpeed()); 
       }else{
-        pitchPIDOutput = rollPIDOutput = YawPIDOutput = 0; // No correction if throttle put to min
-        rollPID.Reset();
-        yawPID.Reset();
-      }
-    }
-       
+       pitchPIDOutput = rollPIDOutput = YawPIDOutput = 0; // No correction if throttle put to min
+       rollPID.Reset();
+       yawPID.Reset();
+     }
+   }
+
   XConfig(throttle, pitchPIDOutput, YawPIDOutput, rollPIDOutput);
 
   wdt_reset();

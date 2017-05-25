@@ -27,11 +27,11 @@ public:
 
   // Angle Mode:
   inline float GetAileronsAngle(){ return -(map(cPPM[0], 1080, 1900, MIN_ANGLE, MAX_ANGLE)); };
-  inline float GetElevatorAngle(){ return -(map(cPPM[1], 1080, 1900, MIN_ANGLE, MAX_ANGLE)); };
+  inline float GetElevatorAngle(){ return (map(cPPM[1], 1080, 1900, MIN_ANGLE, MAX_ANGLE)); };
 
   // Accro mode:
   inline float GetAileronsSpeed(){ return -(map(cPPM[0], 1080, 1900, MIN_SPEED_ROT, MAX_SPEED_ROT)); };
-  inline float GetElevatorSpeed(){ return -(map(cPPM[1], 1080, 1900, MIN_SPEED_ROT, MAX_SPEED_ROT)); };
+  inline float GetElevatorSpeed(){ return (map(cPPM[1], 1080, 1900, MIN_SPEED_ROT, MAX_SPEED_ROT)); };
   
   inline int GetThrottle(){  return map(cPPM[2], 1080, 1900, MIN_POWER, MAX_POWER); };
   inline int GetRudder(){ return map(cPPM[3], 1080, 1900, -100, 100); };

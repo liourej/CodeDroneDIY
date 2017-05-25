@@ -22,7 +22,7 @@ private:
 
 public:    
   void ComputeOffsets(MPU6050 _accelgyro);
-  void GetCurrPos(const MPU6050 _accelgyro, float _pos[], const float _loop_time);
-  void GetCurrSpeed(const MPU6050 _accelgyro, float speedCurr[]);
+  void GetCurrPos(MPU6050 _accelgyro, float _pos[], float _loop_time);
+  void GetCurrSpeed(MPU6050 _accelgyro, float speedCurr[]);
 };
 
