@@ -1,8 +1,3 @@
-#define MIN_ANGLE -30
-#define MAX_ANGLE 30
-#define MIN_SPEED_ROT -135
-#define MAX_SPEED_ROT 135 // 90°/s
-
 #define FLYING_MODE_ANGLE 0
 #define FLYING_MODE_ACCRO 1
 
@@ -12,7 +7,6 @@ class Reception
   // Channel 2: Prof 1.09 to 1.90 ms
   // Channel 3: Throttle 1.09 to 1.90 ms
   // Channel 4: Rudder 1.09 to 1.90 ms
-
 private:
   // PWM computation
   bool initialized = false;
@@ -26,18 +20,16 @@ public:
   bool  IsReady() { return  initialized; };
 
   // Angle Mode:
-  inline float GetAileronsAngle(){ return -(map(cPPM[0], 1080, 1900, MIN_ANGLE, MAX_ANGLE)); };
-  inline float GetElevatorAngle(){ return (map(cPPM[1], 1080, 1900, MIN_ANGLE, MAX_ANGLE)); };
+  inline float GetAileronsAngle(){ return -(map(cPPM[0], 1080, 1900, -MAX_ANGLE, MAX_ANGLE)); };
+  inline float GetElevatorAngle(){ return (map(cPPM[1], 1080, 1900, -MAX_ANGLE, MAX_ANGLE)); };
 
   // Accro mode:
-  inline float GetAileronsSpeed(){ return -(map(cPPM[0], 1080, 1900, MIN_SPEED_ROT, MAX_SPEED_ROT)); };
-  inline float GetElevatorSpeed(){ return (map(cPPM[1], 1080, 1900, MIN_SPEED_ROT, MAX_SPEED_ROT)); };
-  
+  inline float GetAileronsSpeed(){ return -(map(cPPM[0], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED)); };
+  inline float GetElevatorSpeed(){ return (map(cPPM[1], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED)); };
   inline int GetThrottle(){  return map(cPPM[2], 1080, 1900, MIN_POWER, MAX_POWER); };
-  inline int GetRudder(){ return map(cPPM[3], 1080, 1900, -100, 100); };
+  inline int GetRudder(){ return map(cPPM[3], 1080, 1900, -MAX_YAW_SPEED, MAX_YAW_SPEED); };
+  
   inline int GetFlyingMode(){ if (cPPM[4] > 1500) return FLYING_MODE_ACCRO; else return FLYING_MODE_ANGLE; }; //1900 inter H en bas, 1090 inter H en haut
-  inline int GetGyroGain1(){ return cPPM[5]; };
-  inline int GetGyroGain2(){ return cPPM[4]; };
 
   inline void GetWidth(void){
     PWM_Stop = micros();

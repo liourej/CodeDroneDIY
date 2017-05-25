@@ -1,5 +1,6 @@
 #include <math.h>
 #include <avr/wdt.h>
+#include "Settings.h"
 #include "GetPosition.h"
 #include "ESC.h"
 #include "Reception.h"
@@ -17,8 +18,7 @@ PID pitchPID;
 PID yawPID;
 GetPosition Position;
 
-void idleESC()
-{
+void idleESC(){
     ESC0.write( MIN_POWER); 
     ESC1.write( MIN_POWER); 
     ESC2.write( MIN_POWER); 
@@ -30,24 +30,20 @@ void idleESC()
     g_NewVal = true;
 }
 
-static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t *TCNTn, volatile uint16_t* OCRnA)
-{
+static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t *TCNTn, volatile uint16_t* OCRnA){
  // SetPWM_f4(TCNTn, OCRnA);
   SetPWM_f5(TCNTn, OCRnA);
 }
 
-SIGNAL (TIMER1_COMPA_vect)
-{
+SIGNAL (TIMER1_COMPA_vect){
   handle_interrupts(_timer1, &TCNT1, &OCR1A);
 }
 
-void RxInterrupt()
-{
+void RxInterrupt(){
   Rx.GetWidth();
 }
 
-void InitTimer1()
-{
+void InitTimer1(){
   // Timer
   TCCR1A = 0;             // normal counting mode
   TCCR1B = _BV(CS10);     // no prescaler
@@ -62,12 +58,7 @@ int g_Throttle[10] = { MIN_POWER, MIN_POWER, MIN_POWER, MIN_POWER, MIN_POWER, MI
 int g_FlyingMode = FLYING_MODE_ACCRO;
 int g_Kp = 0;
 
-#define INTEGRATED_LED 13
-void setup() 
-{
-   pinMode(INTEGRATED_LED, OUTPUT); // Arduino integrated led
-   digitalWrite(INTEGRATED_LED, LOW);
-   
+void setup() {
   // Set watchdog reset
   wdt_enable(WDTO_250MS);
 
@@ -100,35 +91,34 @@ void setup()
   Serial.println("Computing offsets...");
   Position.ComputeOffsets(accelgyro);
 
-  while( !Rx.IsReady() )
-  {
+  while( !Rx.IsReady() ){
     idleESC();
     delay(10);
   }
   g_FlyingMode = Rx.GetFlyingMode();
   if( g_FlyingMode == FLYING_MODE_ANGLE){
     Serial.println("FLYING_MODE_ANGLE");
-    rollPID.SetPIDCoef(0.0012, 90, 60, 0.05); // G, Kp, Kd, Ki
-    pitchPID.SetPIDCoef(0.0012, 90, 90, 0.05);
+    rollPID.SetPIDCoef(GAIN, ANGLE_ROLLPITCH_KP, ANGLE_ROLLPITCH_KD, ANGLE_ROLLPITCH_KI); // G, Kp, Kd, Ki
+    pitchPID.SetPIDCoef(GAIN, ANGLE_ROLLPITCH_KP, ANGLE_ROLLPITCH_KD, ANGLE_ROLLPITCH_KI);
   }else{
     Serial.println("FLYING_MODE_ACCRO");
-    rollPID.SetPIDCoef(0.0012, 300, 5, 0.01); // G, Kp, Kd, Ki
-    pitchPID.SetPIDCoef(0.0012, 300, 5, 0.01); 
+    rollPID.SetPIDCoef(GAIN, ACCRO_ROLLPITCH_KP, ACCRO_ROLLPITCH_KD, ACCRO_ROLLPITCH_KI); // G, Kp, Kd, Ki
+    pitchPID.SetPIDCoef(GAIN, ACCRO_ROLLPITCH_KP, ACCRO_ROLLPITCH_KD, ACCRO_ROLLPITCH_KI); 
 
     g_Kp =  map(analogRead(2), 0, 1023, 0, 500);
-    Serial.println(g_Kp); //0 à 1023
-    yawPID.SetPIDCoef(0.0012, g_Kp, 0, 0); // G, Kp, Kd, Ki
+    yawPID.SetPIDCoef(GAIN, g_Kp, 0, 0); // G, Kp, Kd, Ki
   }
 
   time.Init();
 
   Serial.print("MAX_POWER:\t");Serial.println(MAX_POWER);
-  Serial.print("Kp:\t");Serial.println(analogRead(2));
+  if( g_FlyingMode == FLYING_MODE_ANGLE){
+    Serial.print("Angle PID:\t");
+    Serial.print(GAIN);Serial.print("\t");Serial.print(ANGLE_ROLLPITCH_KP);Serial.print("\t");Serial.print(ANGLE_ROLLPITCH_KD);Serial.print("\t"); Serial.println(ANGLE_ROLLPITCH_KI);
+  }else
+    Serial.print(GAIN);Serial.print("\t");Serial.print(ACCRO_ROLLPITCH_KP);Serial.print("\t");Serial.print(ACCRO_ROLLPITCH_KD);Serial.print("\t"); Serial.println(ACCRO_ROLLPITCH_KI);
+  
   Serial.println("Setup Finished");
-  digitalWrite(INTEGRATED_LED, HIGH);
-
-  pinMode(0, OUTPUT);
-  digitalWrite(0, HIGH);
 }
 
 float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
@@ -138,15 +128,14 @@ int g_iloop = 0;
 float g_MeanLoop = 0;
 
 //    + configuration:
-//         ESC0
+//         ESC0(CCW)
 //          ^
 //          |
 //  ESC3 <-- --  ESC1
 //          |
-//         ESC2
+//         ESC2(CCW)
 //   
-void PlusConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _rollPIDOutput)
-{
+void PlusConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _rollPIDOutput){
    // Pitch correction
    ESC0.write( _throttle - _pitchPIDOutput - _YawPIDOutput);
    ESC2.write( _throttle + _pitchPIDOutput - _YawPIDOutput); 
@@ -163,8 +152,7 @@ void PlusConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _roll
 //     ESC3   ESC2(CCW)
 //
 
-void XConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _rollPIDOutput)
-{
+void XConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _rollPIDOutput){
   ESC0.write( _throttle - _pitchPIDOutput/2 +_rollPIDOutput/2 - _YawPIDOutput); 
   ESC1.write( _throttle - _pitchPIDOutput/2 - _rollPIDOutput/2 + _YawPIDOutput);
   ESC2.write( _throttle + _pitchPIDOutput/2 - _rollPIDOutput/2 - _YawPIDOutput); 
@@ -179,11 +167,9 @@ void loop() {
     // Get throttle and current position
     throttle = Rx.GetThrottle();
 
-   if( g_FlyingMode == FLYING_MODE_ANGLE )
-    {
+   if( g_FlyingMode == FLYING_MODE_ANGLE ){
       Position.GetCurrPos(accelgyro, posCurr, loop_time);
-      if( throttle > 1100 )
-      {
+      if( throttle > 1100 ){
         rollPIDOutput = rollPID.GetPIDOutput( Rx.GetAileronsAngle(), posCurr[0], loop_time );
         pitchPIDOutput = pitchPID.GetPIDOutput( Rx.GetElevatorAngle(), posCurr[1], loop_time );
         YawPIDOutput = yawPID.GetPIDOutput( Rx.GetRudder(), speedCurr[2], loop_time ); 
@@ -195,8 +181,7 @@ void loop() {
       }
     }else{ // FLYING_MODE_ACCRO*/
       Position.GetCurrSpeed(accelgyro, speedCurr);
-      if( throttle > 1100 )
-      {
+      if( throttle > 1100 ){
         rollPIDOutput = rollPID.GetPIDOutput( Rx.GetAileronsSpeed(), speedCurr[0], loop_time );
         pitchPIDOutput = pitchPID.GetPIDOutput( Rx.GetElevatorSpeed(), speedCurr[1], loop_time );
         YawPIDOutput = yawPID.GetPIDOutput( Rx.GetRudder(), speedCurr[2], loop_time );

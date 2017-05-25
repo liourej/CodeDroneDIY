@@ -1,9 +1,6 @@
 #define usToTicks(_us)    (( clockCyclesPerMicrosecond()* _us) )     // converts microseconds to tick (assumes prescale of 8)  // 12 Aug 2009
 #define ticksToUs(_ticks) (( (unsigned)_ticks )/ clockCyclesPerMicrosecond() ) // converts from ticks back to microseconds
 
-#define MIN_POWER 1060
-#define MAX_POWER 1860 // Set to 1860 later to reach max power
-
 class ESC
 {
 public:
