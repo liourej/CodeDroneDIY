@@ -28,7 +28,7 @@ public:
   inline float GetElevatorSpeed(){ return (map(cPPM[1], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED)); };
   inline int GetThrottle(){  return map(cPPM[2], 1080, 1900, MIN_POWER, MAX_POWER); };
   inline int GetRudder(){ return map(cPPM[3], 1080, 1900, -MAX_YAW_SPEED, MAX_YAW_SPEED); };
-  
+  inline int GetSwitchH(){ if (cPPM[4] > 1500) return true; else return false; }; //1900 inter H en bas, 1090 inter H en haut
   inline int GetFlyingMode(){ if (cPPM[4] > 1500) return FLYING_MODE_ACCRO; else return FLYING_MODE_ANGLE; }; //1900 inter H en bas, 1090 inter H en haut
 
   inline void GetWidth(void){
