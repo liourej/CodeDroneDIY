@@ -1,6 +1,6 @@
 // Power setup
 #define MIN_POWER 1060
-#define MAX_POWER 1300 // Set to 1860 later to reach max power
+#define MAX_POWER 1860 // Set to 1860 later to reach max power
 
 // PID setup
 #define GAIN 0.0012
@@ -14,6 +14,7 @@
 #define ACCRO_ROLLPITCH_KD 5
 #define ACCRO_ROLLPITCH_KI 0.01
 #define ACCRO_YAW_KP 0 // Not used for now
+#define MIXING 0.75
 
 // Command setup
 #define MAX_ANGLE  30 // °
