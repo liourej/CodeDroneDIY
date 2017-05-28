@@ -29,7 +29,7 @@ public:
   inline int GetThrottle(){  return map(cPPM[2], 1080, 1900, MIN_POWER, MAX_POWER); };
   inline int GetRudder(){ return map(cPPM[3], 1080, 1900, -MAX_YAW_SPEED, MAX_YAW_SPEED); };
   inline int GetSwitchH(){ if (cPPM[4] > 1500) return true; else return false; }; //1900 inter H en bas, 1090 inter H en haut
-  inline int GetFlyingMode(){ if (cPPM[4] > 1500) return FLYING_MODE_ACCRO; else return FLYING_MODE_ANGLE; }; //1900 inter H en bas, 1090 inter H en haut
+  inline int GetFlyingMode(){ if (cPPM[5] > 1500) return FLYING_MODE_ACCRO; else return FLYING_MODE_ANGLE; }; //1900 inter H en bas, 1090 inter H en haut
 
   inline void GetWidth(void){
     PWM_Stop = micros();
@@ -43,6 +43,7 @@ public:
     {
       channel = 0;
       initialized = true;
+     // Serial.print("\t");Serial.print(cPPM[0]); Serial.print("\t");Serial.print(cPPM[1]); Serial.print("\t");Serial.print(cPPM[2]); Serial.print("\t");Serial.println(cPPM[3]);
     }else
       channel++;
    }
