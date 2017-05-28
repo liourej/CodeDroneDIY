@@ -120,7 +120,7 @@ void setup() {
     Serial.print("Angle PID:\t");Serial.print(ANGLE_GAIN, 4);Serial.print("\t");Serial.print(ANGLE_ROLLPITCH_KP);Serial.print("\t");Serial.print(ANGLE_ROLLPITCH_KD);Serial.print("\t"); Serial.println(ANGLE_ROLLPITCH_KI);
   }else{
     Serial.println("FLYING_MODE_ACCRO");
-    Serial.print("Accro PID:\t");Serial.print(ACCRO_GAIN, 4);Serial.print("\t");Serial.print(ACCRO_ROLLPITCH_KP);Serial.print("\t");Serial.print(ACCRO_ROLLPITCH_KD);Serial.print("\t"); Serial.println(ACCRO_ROLLPITCH_KI);
+    Serial.print("Accro PID:\t");Serial.print(ACCRO_GAIN, 2);Serial.print("\t");Serial.print(ACCRO_ROLLPITCH_KP);Serial.print("\t");Serial.print(ACCRO_ROLLPITCH_KD);Serial.print("\t"); Serial.println(ACCRO_ROLLPITCH_KI);
     Serial.println("Speed commands received:\t");
     Serial.print("Aile:\t"); Serial.print(Rx.GetAileronsSpeed());Serial.print("\tElev:\t"); Serial.print(Rx.GetElevatorSpeed());Serial.print("\tThrot:\t"); Serial.print(Rx.GetThrottle());Serial.print("\tRudd:\t"); Serial.println(Rx.GetRudder());
   }
@@ -179,7 +179,11 @@ void PlusConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _roll
   ESC3.write(MIN_POWER);
 }*/
 
+int loopNb = 0;
+float meanLoopTime =  0;
+  
 void loop() {
+
   int throttle, rudder= 0;
   float loop_time = time.GetloopTime();
   int rollPIDOutput, pitchPIDOutput, YawPIDOutput = 0;
@@ -221,6 +225,17 @@ void loop() {
 
   PlusConfig(throttle, pitchPIDOutput, YawPIDOutput, rollPIDOutput);
 
+  if( loopNb > 1000)
+  {
+    meanLoopTime = meanLoopTime/loopNb;
+    Serial.println(meanLoopTime*1000, 2);
+    meanLoopTime = 0;
+    loopNb = 0;    
+ }else{
+    meanLoopTime += loop_time;
+    loopNb++;   
+  }
+  
   wdt_reset();
 }
 
