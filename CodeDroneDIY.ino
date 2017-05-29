@@ -105,7 +105,7 @@ void setup() {
     rollPID.SetPIDCoef(ACCRO_GAIN, ACCRO_ROLLPITCH_KP, ACCRO_ROLLPITCH_KD, ACCRO_ROLLPITCH_KI); // G, Kp, Kd, Ki
     pitchPID.SetPIDCoef(ACCRO_GAIN, ACCRO_ROLLPITCH_KP, ACCRO_ROLLPITCH_KD, ACCRO_ROLLPITCH_KI); 
 
-    g_Kp =  map(analogRead(2), 0, 1023, 0, 500);
+    g_Kp =  map(analogRead(2), 0, 1023, 0, 300);
     yawPID.SetPIDCoef(ACCRO_GAIN, g_Kp, 0, 0); // G, Kp, Kd, Ki
   }
 
@@ -197,6 +197,7 @@ void loop() {
         rollPIDOutput = rollPID.GetPIDOutput( Rx.GetAileronsAngle(), posCurr[0], loop_time );
         pitchPIDOutput = pitchPID.GetPIDOutput( Rx.GetElevatorAngle(), posCurr[1], loop_time );
         YawPIDOutput = Rx.GetRudder();
+        
       }else{
         pitchPIDOutput = rollPIDOutput = YawPIDOutput = 0; // No correction if throttle put to min
         rollPID.Reset();
@@ -224,7 +225,7 @@ void loop() {
    }
 
   PlusConfig(throttle, pitchPIDOutput, YawPIDOutput, rollPIDOutput);
-
+ 
   if( loopNb > 1000)
   {
     meanLoopTime = meanLoopTime/loopNb;

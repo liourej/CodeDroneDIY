@@ -4,10 +4,10 @@
 
 // PID setup
 // Angle mode
-#define ANGLE_GAIN 0.0012
-#define ANGLE_ROLLPITCH_KP 90
-#define ANGLE_ROLLPITCH_KD 60
-#define ANGLE_ROLLPITCH_KI 0.05
+#define ANGLE_GAIN 0.0010
+#define ANGLE_ROLLPITCH_KP 400//320
+#define ANGLE_ROLLPITCH_KD 100//160
+#define ANGLE_ROLLPITCH_KI 0 //0.05
 
 // Accro mode
 #define ACCRO_GAIN 0.010
