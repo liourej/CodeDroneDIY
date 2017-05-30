@@ -86,13 +86,17 @@ void GetPosition::GetCurrSpeed(MPU6050 _accelgyro, float _speed[])
 }
 
 // Get position combining acc + gyro
-void GetPosition::GetCurrPos(MPU6050 _accelgyro, float _pos[], float _loop_time)
+void GetPosition::GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], float _loop_time)
 {
  // float roll, pitch = 0;
 	float accGyroRaw[6]={0, 0, 0, 0, 0, 0};
 	  
   // Get corrected data from gyro and accelero
   GetCorrectedAccelGyro(_accelgyro, accGyroRaw);
+
+   _speed[0] = accGyroRaw[0+3]/GyroSensitivity;
+   _speed[1] = accGyroRaw[1+3]/GyroSensitivity;
+   _speed[2] = accGyroRaw[2+3]/GyroSensitivity;
  
   // Use complementary filter to merge gyro and accelerometer data
   _pos[0] = HighPassFilterCoeff*(_pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time) + LowPassFilterCoeff*((atan(accGyroRaw[1]/accGyroRaw[2]))*57.2957795130823);  // High pass filter on gyro, and low pass filter on accelerometer

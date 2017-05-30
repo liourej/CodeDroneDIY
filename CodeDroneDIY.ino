@@ -192,10 +192,10 @@ void loop() {
     throttle = Rx.GetThrottle();
 
    if( g_FlyingMode == FLYING_MODE_ANGLE ){
-      Position.GetCurrPos(accelgyro, posCurr, loop_time);
-      if( throttle > 1100 ){
-        rollPIDOutput = rollPID.GetPIDOutput( Rx.GetAileronsAngle(), posCurr[0], loop_time );
-        pitchPIDOutput = pitchPID.GetPIDOutput( Rx.GetElevatorAngle(), posCurr[1], loop_time );
+      Position.GetCurrPos(accelgyro, posCurr, speedCurr, loop_time);
+        if( throttle > 1100 ){
+        rollPIDOutput = rollPID.GetWaterFallPID( Rx.GetAileronsAngle(), posCurr[0], speedCurr[0], loop_time );
+        pitchPIDOutput = pitchPID.GetWaterFallPID( Rx.GetElevatorAngle(), posCurr[1], speedCurr[1], loop_time );
         YawPIDOutput = Rx.GetRudder();
         
       }else{
@@ -216,7 +216,7 @@ void loop() {
            YawPIDOutput = Rx.GetRudder();
         }
        //Serial.println(YawPIDOutput);
-       //Serial.print(speedCurr[1]);Serial.print("\t"); Serial.println(speedCurr[0]);
+       Serial.print(speedCurr[1]);Serial.print("\t"); Serial.println(speedCurr[0]);
       }else{
        pitchPIDOutput = rollPIDOutput = YawPIDOutput = 0; // No correction if throttle put to min
        rollPID.Reset();
