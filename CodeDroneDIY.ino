@@ -62,6 +62,28 @@ int g_FlyingMode = FLYING_MODE_ACCRO;
 int g_Kp = 0;
 bool g_YawPIDActivated = false;
 
+void PrintSettings(void) {
+  Serial.print("MAX_POWER:\t"); Serial.println(MAX_POWER);
+  if ( g_FlyingMode == FLYING_MODE_ANGLE) {
+    Serial.println("FLYING_MODE_ANGLE");
+    rollPosPID.PrintGains();
+    pitchPosPID.PrintGains();
+
+    rollSpeedPID.PrintGains();
+    pitchSpeedPID.PrintGains();
+    yawSpeedPID.PrintGains();
+  } else {
+    Serial.println("FLYING_MODE_ACCRO");
+    rollSpeedPID.PrintGains();
+    pitchSpeedPID.PrintGains();
+    yawSpeedPID.PrintGains();
+  }
+  Rx.PrintCmd();
+  Serial.print("Yaw PID activation:\t"); Serial.println(g_YawPIDActivated);
+
+  Serial.print("MIXING:\t"); Serial.println(MIXING, 2);
+}
+
 void setup() {
   // Set watchdog reset
   wdt_enable(WDTO_250MS);
@@ -102,38 +124,24 @@ void setup() {
 
   g_FlyingMode = Rx.GetFlyingMode(); // Forced to accro
   if ( g_FlyingMode == FLYING_MODE_ANGLE) {
-    rollPosPID.SetPIDCoef(GAIN, ANGLE_POS_KP, ANGLE_POS_KD, ANGLE_POS_KI);
-    rollSpeedPID.SetPIDCoef(GAIN, ANGLE_SPEED_KP, ANGLE_SPEED_KD, ANGLE_SPEED_KI);
+    rollPosPID.SetGains(GAIN, ANGLE_POS_KP, ANGLE_POS_KD, ANGLE_POS_KI);
+    pitchPosPID.SetGains(GAIN, ANGLE_POS_KP, ANGLE_POS_KD, ANGLE_POS_KI);
 
-    pitchPosPID.SetPIDCoef(GAIN, ANGLE_POS_KP, ANGLE_POS_KD, ANGLE_POS_KI);
-    pitchSpeedPID.SetPIDCoef(GAIN, ANGLE_SPEED_KP, ANGLE_SPEED_KD, ANGLE_SPEED_KI);
+    rollSpeedPID.SetGains(GAIN, ANGLE_SPEED_KP, ANGLE_SPEED_KD, ANGLE_SPEED_KI);
+    pitchSpeedPID.SetGains(GAIN, ANGLE_SPEED_KP, ANGLE_SPEED_KD, ANGLE_SPEED_KI);
   } else {
-    rollSpeedPID.SetPIDCoef(GAIN, ACCRO_SPEED_KP, ACCRO_SPEED_KD, ACCRO_SPEED_KI);
-    pitchSpeedPID.SetPIDCoef(GAIN, ACCRO_SPEED_KP, ACCRO_SPEED_KD, ACCRO_SPEED_KI);
+    rollSpeedPID.SetGains(GAIN, ACCRO_SPEED_KP, ACCRO_SPEED_KD, ACCRO_SPEED_KI);
+    pitchSpeedPID.SetGains(GAIN, ACCRO_SPEED_KP, ACCRO_SPEED_KD, ACCRO_SPEED_KI);
 
     g_Kp =  map(analogRead(2), 0, 1023, 0, 300);
-    yawSpeedPID.SetPIDCoef(GAIN, g_Kp, 0, 0); // G, Kp, Kd, Ki
+    yawSpeedPID.SetGains(GAIN, g_Kp, 0, 0); // G, Kp, Kd, Ki
   }
 
   time.Init();
 
   g_YawPIDActivated = Rx.GetSwitchH();
 
-  // Print setup
-  Serial.print("MAX_POWER:\t"); Serial.println(MAX_POWER);
-  if ( g_FlyingMode == FLYING_MODE_ANGLE) {
-    Serial.println("FLYING_MODE_ANGLE");
-    Serial.print("Angle pos PID:\t"); Serial.print(GAIN, 4); Serial.print("\t"); Serial.print(ANGLE_POS_KP); Serial.print("\t"); Serial.print(ANGLE_POS_KD); Serial.print("\t"); Serial.println(ANGLE_POS_KI);
-    Serial.print("Angle speed PID:\t"); Serial.print(GAIN, 4); Serial.print("\t"); Serial.print(ANGLE_SPEED_KP); Serial.print("\t"); Serial.print(ANGLE_SPEED_KD); Serial.print("\t"); Serial.println(ANGLE_SPEED_KI);
-  } else {
-    Serial.println("FLYING_MODE_ACCRO");
-    Serial.print("Accro PID:\t"); Serial.print(GAIN, 2); Serial.print("\t"); Serial.print(ACCRO_SPEED_KP); Serial.print("\t"); Serial.print(ACCRO_SPEED_KD); Serial.print("\t"); Serial.println(ACCRO_SPEED_KI);
-    Serial.println("Speed commands received:\t");
-    Serial.print("Aile:\t"); Serial.print(Rx.GetAileronsSpeed()); Serial.print("\tElev:\t"); Serial.print(Rx.GetElevatorSpeed()); Serial.print("\tThrot:\t"); Serial.print(Rx.GetThrottle()); Serial.print("\tRudd:\t"); Serial.println(Rx.GetRudder());
-  }
-  Serial.print("Yaw PID activation:\t"); Serial.println(g_YawPIDActivated);
-
-  Serial.print("MIXING:\t"); Serial.println(MIXING, 2);
+  PrintSettings();
 
   Serial.println("Setup Finished");
 }
@@ -155,9 +163,7 @@ float g_MeanLoop = 0;
 void PlusConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotorPwr) {
   // Pitch correction
   ESC0.write( _throttle - _pitchMotorPwr - _YawMotorPwr);
-  //ESC0.write(MIN_POWER);
   ESC2.write( _throttle + _pitchMotorPwr - _YawMotorPwr);
-  //ESC2.write(MIN_POWER);
 
   // Roll correction
   ESC1.write( _throttle - _rollMotorPwr + _YawMotorPwr);
@@ -202,11 +208,11 @@ void loop() {
   if ( g_FlyingMode == FLYING_MODE_ANGLE ) {
     Position.GetCurrPos(accelgyro, posCurr, speedCurr, loop_time);
     if ( throttle > 1100 ) {
-      rollPosCmd = rollPosPID.GetPIDOutput( Rx.GetAileronsAngle(), posCurr[0], loop_time );
-      rollMotorPwr = rollSpeedPID.GetPIDOutput( rollPosCmd, speedCurr[0], loop_time );
+      rollPosCmd = rollPosPID.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loop_time );
+      rollMotorPwr = rollSpeedPID.ComputeCorrection( rollPosCmd, speedCurr[0], loop_time );
 
-      pitchPosCmd = pitchPosPID.GetPIDOutput( Rx.GetElevatorAngle(), posCurr[1], loop_time );
-      pitchMotorPwr = pitchSpeedPID.GetPIDOutput( pitchPosCmd, speedCurr[1], loop_time );
+      pitchPosCmd = pitchPosPID.ComputeCorrection( Rx.GetElevatorAngle(), posCurr[1], loop_time );
+      pitchMotorPwr = pitchSpeedPID.ComputeCorrection( pitchPosCmd, speedCurr[1], loop_time );
       yawMotorPwr = Rx.GetRudder();
     } else {
       pitchMotorPwr = rollMotorPwr = yawMotorPwr = 0; // No correction if throttle put to min
@@ -219,11 +225,11 @@ void loop() {
   } else { // FLYING_MODE_ACCRO*/
     Position.GetCurrSpeed(accelgyro, speedCurr);
     if ( throttle > 1100 ) {
-      rollMotorPwr = rollSpeedPID.GetPIDOutput( Rx.GetAileronsSpeed(), speedCurr[0], loop_time );
-      pitchMotorPwr = pitchSpeedPID.GetPIDOutput( Rx.GetElevatorSpeed(), speedCurr[1], loop_time );
+      rollMotorPwr = rollSpeedPID.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loop_time );
+      pitchMotorPwr = pitchSpeedPID.ComputeCorrection( Rx.GetElevatorSpeed(), speedCurr[1], loop_time );
 
       if ( g_YawPIDActivated ) { // Activate PID on yaw axis
-        yawMotorPwr = yawSpeedPID.GetPIDOutput( Rx.GetRudder(), speedCurr[2], loop_time );
+        yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
       } else {
         yawMotorPwr = Rx.GetRudder();
       }

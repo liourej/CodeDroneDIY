@@ -1,7 +1,7 @@
 #include "PID.h"
 #include "Settings.h"
 
-void PID::SetPIDCoef(float _G, float _Kp, float _Kd, float _Ki) {
+void PID::SetGains(float _G, float _Kp, float _Kd, float _Ki) {
   G = _G;
   Kp = _Kp;
   Kd = _Kd;
@@ -13,7 +13,7 @@ void PID::Reset() {
   integrator = 0;
 };
 
-int PID::GetPIDOutput( float _cmd, float _pos, float _loopTime ) {
+int PID::ComputeCorrection( float _cmd, float _pos, float _loopTime ) {
   float correction = 0;
   error = _cmd - _pos;
   integrator = integrator + error;
@@ -23,4 +23,8 @@ int PID::GetPIDOutput( float _cmd, float _pos, float _loopTime ) {
 
   // Correction in us
   return correction;
+};
+
+void PID::PrintGains(void) {
+  Serial.print("G: "); Serial.print(G); Serial.print("\tKp: "); Serial.print(Kp); Serial.print("\tKd: "); Serial.print(Kd); Serial.print("\tKi: "); Serial.println(Ki);
 };

@@ -1,3 +1,5 @@
+#include "Arduino.h"
+
 class PID {
   private:
     float G = 0;
@@ -12,7 +14,8 @@ class PID {
     float integrator = 0;
 
   public:
-    void SetPIDCoef(float _G, float _Kp, float _Kd, float _Ki);
+    void SetGains(float _G, float _Kp, float _Kd, float _Ki);
     void Reset();
-    int GetPIDOutput( float _cmd, float _pos, float _loopTime );
+    int ComputeCorrection( float _cmd, float _pos, float _loopTime );
+    void PrintGains(void);
 };
