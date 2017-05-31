@@ -3,32 +3,40 @@
 
 class ESC
 {
-public:
-  int pin = 0;
-  int PORTBPin = 0;
-  float PWM = MIN_POWER;
-  uint16_t ticks = 0;
-  
-public:
-  void attach (int _pin ){  pin = _pin; PORTBPin = _pin-8; pinMode( _pin, OUTPUT); }; // set servo pin to output};
-  inline void write (float _PWM){
-    if( _PWM < MIN_POWER )
-      _PWM = MIN_POWER;
-    else if( _PWM > MAX_POWER) // Check max power
-    {
-      Serial.println("WARNING, MAX POWER REACHED!!");
-      PWM = MAX_POWER;
-    }else
-      PWM = _PWM;
+  public:
+    int pin = 0;
+    int PORTBPin = 0;
+    float PWM = MIN_POWER;
+    uint16_t ticks = 0;
 
-    // Last power check
-    if( PWM > MAX_POWER)
-    {
-      PWM = MAX_POWER;
-      Serial.println("WARNING, MAX POWER REACHED!!");
-    }
-     ticks = usToTicks(PWM);
-  };
-  inline float GetPWM() { return PWM; };
-  inline uint16_t GetTicks() { return ticks; };
+  public:
+    void attach (int _pin ) {
+      pin = _pin;
+      PORTBPin = _pin - 8;
+      pinMode( _pin, OUTPUT);
+    }; // set servo pin to output};
+    inline void write (float _PWM) {
+      if ( _PWM < MIN_POWER )
+        _PWM = MIN_POWER;
+      else if ( _PWM > MAX_POWER) // Check max power
+      {
+        Serial.println("WARNING, MAX POWER REACHED!!");
+        PWM = MAX_POWER;
+      } else
+        PWM = _PWM;
+
+      // Last power check
+      if ( PWM > MAX_POWER)
+      {
+        PWM = MAX_POWER;
+        Serial.println("WARNING, MAX POWER REACHED!!");
+      }
+      ticks = usToTicks(PWM);
+    };
+    inline float GetPWM() {
+      return PWM;
+    };
+    inline uint16_t GetTicks() {
+      return ticks;
+    };
 };

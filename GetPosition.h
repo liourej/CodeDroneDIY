@@ -8,21 +8,21 @@
 
 class GetPosition
 {
-private:
-  const float HighPassFilterCoeff = 0.98;
-  const float LowPassFilterCoeff = 0.02;
-  const float GyroSensitivity = 65.5; // 131 or 65.5 or 32.8 or 16.4
-  
-  float offset[6] = {0, 0, 0, 0, 0, 0};
+  private:
+    const float HighPassFilterCoeff = 0.98;
+    const float LowPassFilterCoeff = 0.02;
+    const float GyroSensitivity = 65.5; // 131 or 65.5 or 32.8 or 16.4
 
-private:
-  void GetAccelGyro(MPU6050 _accelgyro, float _data[]);
-  void GetCorrectedAccelGyro(MPU6050 _accelgyro, float _data[]);
-  void Normalize( float _acc[] );
+    float offset[6] = {0, 0, 0, 0, 0, 0};
 
-public:    
-  void ComputeOffsets(MPU6050 _accelgyro);
-  void GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], float _loop_time);
-  void GetCurrSpeed(MPU6050 _accelgyro, float speedCurr[]);
+  private:
+    void GetAccelGyro(MPU6050 _accelgyro, float _data[]);
+    void GetCorrectedAccelGyro(MPU6050 _accelgyro, float _data[]);
+    void Normalize( float _acc[] );
+
+  public:
+    void ComputeOffsets(MPU6050 _accelgyro);
+    void GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], float _loop_time);
+    void GetCurrSpeed(MPU6050 _accelgyro, float speedCurr[]);
 };
 
