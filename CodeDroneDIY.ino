@@ -120,14 +120,18 @@ void loop() {
 
       pitchPosCmd = pitchPosPID.ComputeCorrection( Rx.GetElevatorAngle(), posCurr[1], loop_time );
       pitchMotorPwr = pitchSpeedPID.ComputeCorrection( pitchPosCmd, speedCurr[1], loop_time );
-      yawMotorPwr = Rx.GetRudder();
+      if ( g_YawPIDActivated ) { // Activate PID on yaw axis
+        yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
+      } else {
+        yawMotorPwr = Rx.GetRudder();
+      }
     } else {
       pitchMotorPwr = rollMotorPwr = yawMotorPwr = 0; // No correction if throttle put to min
       rollPosPID.Reset();
       pitchPosPID.Reset();
       rollSpeedPID.Reset();
       pitchSpeedPID.Reset();
-      // yawPID.Reset();
+      yawSpeedPID.Reset();
     }
   } else { // FLYING_MODE_ACCRO*/
     Position.GetCurrSpeed(accelgyro, speedCurr);
@@ -145,6 +149,7 @@ void loop() {
     } else {
       pitchMotorPwr = rollMotorPwr = yawMotorPwr = 0; // No correction if throttle put to min
       rollSpeedPID.Reset();
+      pitchSpeedPID.Reset();
       yawSpeedPID.Reset();
     }
   }
