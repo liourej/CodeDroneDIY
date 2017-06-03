@@ -50,7 +50,7 @@ void setup() {
     pitchSpeedPID.SetGains(accroSpeedPIDParams);  
   }
 
-  yawSpeedPIDParams[1] =  map(analogRead(2), 0, 1023, 0, 300);
+  yawSpeedPIDParams[1] =  map(analogRead(2), 0, 1023, 0, 300); // Flight test succeed with yaw kp=300
   yawSpeedPID.SetGains(yawSpeedPIDParams);
 
   time.Init();
