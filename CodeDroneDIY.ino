@@ -40,18 +40,18 @@ void setup() {
 
   g_FlyingMode = Rx.GetFlyingMode(); // Forced to accro
   if ( g_FlyingMode == FLYING_MODE_ANGLE) {
-    rollPosPID.SetGains(GAIN, ANGLE_POS_KP, ANGLE_POS_KD, ANGLE_POS_KI);
-    pitchPosPID.SetGains(GAIN, ANGLE_POS_KP, ANGLE_POS_KD, ANGLE_POS_KI);
+    rollPosPID.SetGains(anglePosPIDParams);
+    pitchPosPID.SetGains(anglePosPIDParams);
 
-    rollSpeedPID.SetGains(GAIN, ANGLE_SPEED_KP, ANGLE_SPEED_KD, ANGLE_SPEED_KI);
-    pitchSpeedPID.SetGains(GAIN, ANGLE_SPEED_KP, ANGLE_SPEED_KD, ANGLE_SPEED_KI);
+    rollSpeedPID.SetGains(angleSpeedPIDParams);
+    pitchSpeedPID.SetGains(angleSpeedPIDParams);
   } else {
-    rollSpeedPID.SetGains(GAIN, ACCRO_SPEED_KP, ACCRO_SPEED_KD, ACCRO_SPEED_KI);
-    pitchSpeedPID.SetGains(GAIN, ACCRO_SPEED_KP, ACCRO_SPEED_KD, ACCRO_SPEED_KI);
-
-    g_Kp =  map(analogRead(2), 0, 1023, 0, 300);
-    yawSpeedPID.SetGains(GAIN, g_Kp, 0, 0); // G, Kp, Kd, Ki
+    rollSpeedPID.SetGains(accroSpeedPIDParams);
+    pitchSpeedPID.SetGains(accroSpeedPIDParams);  
   }
+
+  yawSpeedPIDParams[1] =  map(analogRead(2), 0, 1023, 0, 300);
+  yawSpeedPID.SetGains(yawSpeedPIDParams);
 
   time.Init();
 
@@ -118,8 +118,9 @@ void loop() {
       rollPosCmd = rollPosPID.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loop_time );
       rollMotorPwr = rollSpeedPID.ComputeCorrection( rollPosCmd, speedCurr[0], loop_time );
 
-      pitchPosCmd = pitchPosPID.ComputeCorrection( Rx.GetElevatorAngle(), posCurr[1], loop_time );
-      pitchMotorPwr = pitchSpeedPID.ComputeCorrection( pitchPosCmd, speedCurr[1], loop_time );
+      pitchPosCmd = pitchPosPID.ComputeCorrection( -Rx.GetElevatorAngle(), posCurr[1], loop_time );
+      pitchMotorPwr = pitchSpeedPID.ComputeCorrection( -pitchPosCmd, speedCurr[1], loop_time );
+    
       if ( g_YawPIDActivated ) { // Activate PID on yaw axis
         yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
       } else {
@@ -145,7 +146,7 @@ void loop() {
         yawMotorPwr = Rx.GetRudder();
       }
       //Serial.println(YawPIDOutput);
-      Serial.print(speedCurr[1]); Serial.print("\t"); Serial.println(speedCurr[0]);
+      //Serial.print(speedCurr[1]); Serial.print("\t"); Serial.println(speedCurr[0]);
     } else {
       pitchMotorPwr = rollMotorPwr = yawMotorPwr = 0; // No correction if throttle put to min
       rollSpeedPID.Reset();

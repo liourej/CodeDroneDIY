@@ -1,27 +1,20 @@
 // Power setup
 #define MIN_POWER 1060
-#define MAX_POWER 1400 // Set to 1860 later to reach max power
+#define MAX_POWER 1860 // Set to 1860 later to reach max power
 
 // PID setup
 #define GAIN 0.010
 
 // Angle mode
-#define ANGLE_POS_KP 260 //240
-#define ANGLE_POS_KD 0.5 //0.5
-#define ANGLE_POS_KI 0.3
-
-#define ANGLE_SPEED_KP 100//160 192
-#define ANGLE_SPEED_KD 0.25
-#define ANGLE_SPEED_KI 0
-
-#define ANGLE_ROLLPITCH_MAXERROR 60
+float anglePosPIDParams[4] = { 0.010, 260, 0.5, 0.3};
+float angleSpeedPIDParams[4] = { 0.010, 100, 0.25, 0.0};
 
 // Accro mode
-#define ACCRO_SPEED_KP 192
-#define ACCRO_SPEED_KD 0.25
-#define ACCRO_SPEED_KI 0
+float accroSpeedPIDParams[4] = { 0.010, 192, 0.25, 0.0};
 #define ACCRO_YAW_KP 0 // Not used for now
-#define MIXING 0.75
+
+//Yaw PID
+float yawSpeedPIDParams[4] = { 0.010, 0.0, 0.0, 0.0};// G, Kp, Kd, Ki
 
 // Command setup
 #define MAX_ANGLE  45 // °

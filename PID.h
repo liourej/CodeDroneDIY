@@ -14,7 +14,7 @@ class PID {
     float integrator = 0;
 
   public:
-    void SetGains(float _G, float _Kp, float _Kd, float _Ki);
+    void SetGains(float _params[4]);
     void Reset();
     int ComputeCorrection( float _cmd, float _pos, float _loopTime );
     void PrintGains(void);

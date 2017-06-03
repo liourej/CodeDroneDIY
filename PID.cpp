@@ -1,11 +1,10 @@
 #include "PID.h"
-#include "Settings.h"
 
-void PID::SetGains(float _G, float _Kp, float _Kd, float _Ki) {
-  G = _G;
-  Kp = _Kp;
-  Kd = _Kd;
-  Ki = _Ki;
+void PID::SetGains(float _params[4]) {
+  G = _params[0];
+  Kp = _params[1];
+  Kd = _params[2];
+  Ki = _params[3];
 };
 
 void PID::Reset() {
