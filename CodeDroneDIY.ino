@@ -87,20 +87,13 @@ void PlusConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMo
 //     ESC3   ESC2(CCW)
 //
 
-/*void XConfig(int _throttle, int _pitchPIDOutput, int _YawPIDOutput, int _rollPIDOutput){
+void XConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotorPwr){
 
-  ESC0.write( _throttle - _pitchPIDOutput*MIXING +_rollPIDOutput*MIXING - _YawPIDOutput);
-  // ESC0.write(MIN_POWER);
-
-  // ESC1.write( _throttle - _pitchPIDOutput*MIXING - _rollPIDOutput*MIXING + _YawPIDOutput);
-  ESC1.write(MIN_POWER);
-
-  ESC2.write( _throttle + _pitchPIDOutput*MIXING - _rollPIDOutput*MIXING - _YawPIDOutput);
-  //ESC2.write(MIN_POWER);
-
-  // ESC3.write( _throttle + _pitchPIDOutput*MIXING +_rollPIDOutput*MIXING  + _YawPIDOutput);
-  ESC3.write(MIN_POWER);
-  }*/
+  ESC0.write( _throttle - _pitchMotorPwr*MIXING + _rollMotorPwr*MIXING - _YawMotorPwr*MIXING);
+  ESC1.write( _throttle - _pitchMotorPwr*MIXING - _rollMotorPwr*MIXING + _YawMotorPwr*MIXING);
+  ESC2.write( _throttle + _pitchMotorPwr*MIXING - _rollMotorPwr*MIXING - _YawMotorPwr*MIXING);
+  ESC3.write( _throttle + _pitchMotorPwr*MIXING + _rollMotorPwr*MIXING  + _YawMotorPwr*MIXING);
+}
 
 void loop() {
 
@@ -155,8 +148,9 @@ void loop() {
     }
   }
 
-  PlusConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
-
+  //PlusConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
+    XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
+  
   if ( loopNb > 1000)
   {
     meanLoopTime = meanLoopTime / loopNb;

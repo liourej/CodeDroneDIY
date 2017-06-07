@@ -1,6 +1,6 @@
 // Power setup
 #define MIN_POWER 1060
-#define MAX_POWER 1860 // Set to 1860 later to reach max power
+#define MAX_POWER 1400 // Set to 1860 later to reach max power
 
 // PID setup
 #define GAIN 0.010
@@ -15,6 +15,7 @@ float accroSpeedPIDParams[4] = { 0.010, 192, 0.25, 0.0};
 
 //Yaw PID
 float yawSpeedPIDParams[4] = { 0.010, 0.0, 0.0, 0.0};// G, Kp, Kd, Ki
+#define MIXING 1 //0.75
 
 // Command setup
 #define MAX_ANGLE  45 // °
