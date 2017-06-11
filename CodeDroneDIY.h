@@ -18,7 +18,6 @@ PID rollSpeedPID, pitchSpeedPID, yawSpeedPID;
 GetPosition Position;
 int g_FlyingMode = FLYING_MODE_ACCRO;
 int g_Kp = 0;
-bool g_YawPIDActivated = false;
 float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
 float posCurr[3] = { 0.0, 0.0, 0.0 }; // Teta position (°) (use gyro + accelero)
 int g_iloop = 0;
@@ -80,7 +79,6 @@ void PrintSettings(void) {
     pitchSpeedPID.PrintGains();
     yawSpeedPID.PrintGains();
   }
-  Serial.print("Yaw PID activation:\t"); Serial.println(g_YawPIDActivated);
   Serial.print("Mixing:\t"); Serial.println(mixing);
   Serial.println("/********* Receiver settings *********/");
   Rx.PrintCmd();

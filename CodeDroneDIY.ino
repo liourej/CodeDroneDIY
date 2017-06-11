@@ -47,19 +47,12 @@ void setup() {
     pitchSpeedPID.SetGains(angleSpeedPIDParams);
   } else {
     rollSpeedPID.SetGains(accroSpeedPIDParams);
-    pitchSpeedPID.SetGains(accroSpeedPIDParams);  
+    pitchSpeedPID.SetGains(accroSpeedPIDParams);
   }
 
- // yawSpeedPIDParams[1] =  map(analogRead(2), 0, 1023, 0, 300); // (Flight test succeed with yaw kp=300)
-
- // mixing = map(analogRead(2), 0, 1023, 0, 100);
- // mixing = mixing / 100; //(50% working fine)
   yawSpeedPID.SetGains(yawSpeedPIDParams);
 
   time.Init();
-
-  //g_YawPIDActivated = Rx.GetSwitchH();
-  g_YawPIDActivated = true;
 
   PrintSettings();
 
@@ -91,12 +84,12 @@ void PlusConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMo
 //     ESC3   ESC2(CCW)
 //
 
-void XConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotorPwr){
+void XConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotorPwr) {
 
-  ESC0.write( _throttle - _pitchMotorPwr*mixing + _rollMotorPwr*mixing - _YawMotorPwr*mixing);
-  ESC1.write( _throttle - _pitchMotorPwr*mixing - _rollMotorPwr*mixing + _YawMotorPwr*mixing);
-  ESC2.write( _throttle + _pitchMotorPwr*mixing - _rollMotorPwr*mixing - _YawMotorPwr*mixing);
-  ESC3.write( _throttle + _pitchMotorPwr*mixing + _rollMotorPwr*mixing  + _YawMotorPwr*mixing);
+  ESC0.write( _throttle - _pitchMotorPwr * mixing + _rollMotorPwr * mixing - _YawMotorPwr * mixing);
+  ESC1.write( _throttle - _pitchMotorPwr * mixing - _rollMotorPwr * mixing + _YawMotorPwr * mixing);
+  ESC2.write( _throttle + _pitchMotorPwr * mixing - _rollMotorPwr * mixing - _YawMotorPwr * mixing);
+  ESC3.write( _throttle + _pitchMotorPwr * mixing + _rollMotorPwr * mixing  + _YawMotorPwr * mixing);
 }
 
 void loop() {
@@ -117,12 +110,7 @@ void loop() {
 
       pitchPosCmd = pitchPosPID.ComputeCorrection( -Rx.GetElevatorAngle(), posCurr[1], loop_time );
       pitchMotorPwr = pitchSpeedPID.ComputeCorrection( -pitchPosCmd, speedCurr[1], loop_time );
-    
-      if ( g_YawPIDActivated ) { // Activate PID on yaw axis
-        yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
-      } else {
-        yawMotorPwr = Rx.GetRudder();
-      }
+      yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
     } else {
       pitchMotorPwr = rollMotorPwr = yawMotorPwr = 0; // No correction if throttle put to min
       rollPosPID.Reset();
@@ -136,14 +124,7 @@ void loop() {
     if ( throttle > 1100 ) {
       rollMotorPwr = rollSpeedPID.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loop_time );
       pitchMotorPwr = pitchSpeedPID.ComputeCorrection( Rx.GetElevatorSpeed(), speedCurr[1], loop_time );
-
-      if ( g_YawPIDActivated ) { // Activate PID on yaw axis
-        yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
-      } else {
-        yawMotorPwr = Rx.GetRudder();
-      }
-      //Serial.println(YawPIDOutput);
-      //Serial.print(speedCurr[1]); Serial.print("\t"); Serial.println(speedCurr[0]);
+      yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
     } else {
       pitchMotorPwr = rollMotorPwr = yawMotorPwr = 0; // No correction if throttle put to min
       rollSpeedPID.Reset();
@@ -152,9 +133,16 @@ void loop() {
     }
   }
 
-  //PlusConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
+  if ( Rx.GetSwitchH() ) {
+    //PlusConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
     XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
-  
+  } else {
+    ESC0.Idle();
+    ESC1.Idle();
+    ESC2.Idle();
+    ESC3.Idle();
+  }
+
   if ( loopNb > 1000)
   {
     meanLoopTime = meanLoopTime / loopNb;

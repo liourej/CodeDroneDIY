@@ -33,6 +33,10 @@ class ESC
       }
       ticks = usToTicks(PWM);
     };
+
+    inline void Idle(){
+      ticks = PWM = 0;
+    }
     
     inline float GetPWM() {
       return PWM;
