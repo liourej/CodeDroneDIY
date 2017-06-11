@@ -10,11 +10,12 @@ float anglePosPIDParams[4] = { 0.010, 260, 0.5, 0.3};
 float angleSpeedPIDParams[4] = { 0.010, 100, 0.25, 0.0};
 
 // Accro mode
-float accroSpeedPIDParams[4] = { 0.010, 192, 0.25, 0.0};
+//float accroSpeedPIDParams[4] = { 0.010, 192, 0.25, 0.0}; // Tested during flight test: OK
+float accroSpeedPIDParams[4] = { 0.010, 192, 0.0, 0.0};
 #define ACCRO_YAW_KP 0 // Not used for now
 
 //Yaw PID
-float yawSpeedPIDParams[4] = { 0.010, 300.0, 0.0, 0.0};// G, Kp, Kd, Ki
+float yawSpeedPIDParams[4] = { 0.010, 150.0, 0.0, 0.0};// G, Kp, Kd, Ki
 float mixing = 0.5; //0.75
 
 // Command setup

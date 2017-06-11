@@ -15,6 +15,7 @@ class ESC
       PORTBPin = _pin - 8;
       pinMode( _pin, OUTPUT);
     }; // set servo pin to output};
+    
     inline void write (float _PWM) {
       if ( _PWM < MIN_POWER )
         _PWM = MIN_POWER;
@@ -29,13 +30,14 @@ class ESC
       if ( PWM > MAX_POWER)
       {
         PWM = MAX_POWER;
-        Serial.println("WARNING, MAX POWER REACHED!!");
       }
       ticks = usToTicks(PWM);
     };
+    
     inline float GetPWM() {
       return PWM;
     };
+    
     inline uint16_t GetTicks() {
       return ticks;
     };

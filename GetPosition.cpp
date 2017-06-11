@@ -18,7 +18,7 @@ inline void GetPosition::GetCorrectedAccelGyro(MPU6050 _accelgyro, float _data[]
   int16_t ax, ay, az, gx, gy, gz;
 
   _accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);   // 2ms !!
-
+  
   // Correct raw data with offset
   //for( int i= 0; i < 6; i++)
   _data[0] = (ax - offset[0] );
@@ -29,6 +29,18 @@ inline void GetPosition::GetCorrectedAccelGyro(MPU6050 _accelgyro, float _data[]
   _data[5] = (gz - offset[5] );
 
   Normalize(_data); // Normalize 3 first array cases (acceleration)
+}
+
+inline void GetPosition::GetCorrectedGyro(MPU6050 _gyro, float _data[])
+{
+  int16_t gx, gy, gz;
+
+  _gyro.getRotation(&gx, &gy, &gz);   // 2ms !!
+  
+  // Correct raw data with offset
+  _data[0] = (gx - offset[3] );
+  _data[1] = (gy - offset[4] );
+  _data[2] = (gz - offset[5] );
 }
 
 // Compute accelerometer and gyroscope offsets
@@ -75,14 +87,14 @@ inline void GetPosition::Normalize( float _acc[] )
 void GetPosition::GetCurrSpeed(MPU6050 _accelgyro, float _speed[])
 {
   // float roll, pitch = 0;
-  float accGyroRaw[6] = {0, 0, 0, 0, 0, 0};
+  float gyroRaw[3] = {0, 0, 0};
 
   // Get corrected data from gyro and accelero
-  GetCorrectedAccelGyro(_accelgyro, accGyroRaw);
-
-  _speed[0] = accGyroRaw[0 + 3] / GyroSensitivity;
-  _speed[1] = accGyroRaw[1 + 3] / GyroSensitivity;
-  _speed[2] = accGyroRaw[2 + 3] / GyroSensitivity;
+  GetCorrectedGyro(_accelgyro, gyroRaw);
+ 
+  _speed[0] = gyroRaw[0] / GyroSensitivity;
+  _speed[1] = gyroRaw[1] / GyroSensitivity;
+  _speed[2] = gyroRaw[2] / GyroSensitivity;
 }
 
 // Get position combining acc + gyro

@@ -11,13 +11,14 @@ class GetPosition
   private:
     const float HighPassFilterCoeff = 0.98;
     const float LowPassFilterCoeff = 0.02;
-    const float GyroSensitivity = 65.5; // 131 or 65.5 or 32.8 or 16.4
+    const float GyroSensitivity = 32.8; // 250=>131 or 500=>65.5 or 1000=>32.8 or 2000=>16.4
 
     float offset[6] = {0, 0, 0, 0, 0, 0};
 
   private:
     void GetAccelGyro(MPU6050 _accelgyro, float _data[]);
     void GetCorrectedAccelGyro(MPU6050 _accelgyro, float _data[]);
+    void GetCorrectedGyro(MPU6050 _gyro, float _data[]);
     void Normalize( float _acc[] );
 
   public:

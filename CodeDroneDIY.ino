@@ -22,10 +22,10 @@ void setup() {
   // initialize serial communication
   Serial.begin(250000);
 
-  // initialize device
+  // initialize MPU6050 device
   accelgyro.initialize();
-  accelgyro.setFullScaleGyroRange( MPU6050_GYRO_FS_500); //  +-500°s max  /!\ Be carrefull when changing this parameter: "GyroSensitivity" must be updated accordingly !!!
-  accelgyro.setFullScaleAccelRange( MPU6050_ACCEL_FS_2 );//  +-2g max
+  accelgyro.setFullScaleGyroRange( MPU6050_GYRO_FS_1000); //  +-1000°s max  /!\ Be carrefull when changing this parameter: "GyroSensitivity" must be updated accordingly !!!
+  accelgyro.setFullScaleAccelRange( MPU6050_ACCEL_FS_8 );//  +-8g max
 
   if ( !accelgyro.testConnection())
     Serial.println("Test failed");
@@ -50,7 +50,7 @@ void setup() {
     pitchSpeedPID.SetGains(accroSpeedPIDParams);  
   }
 
-  //yawSpeedPIDParams[1] =  map(analogRead(2), 0, 1023, 0, 300); // (Flight test succeed with yaw kp=300)
+ // yawSpeedPIDParams[1] =  map(analogRead(2), 0, 1023, 0, 300); // (Flight test succeed with yaw kp=300)
 
  // mixing = map(analogRead(2), 0, 1023, 0, 100);
  // mixing = mixing / 100; //(50% working fine)

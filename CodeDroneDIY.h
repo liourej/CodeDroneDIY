@@ -66,6 +66,7 @@ void PrintSettings(void) {
   Serial.print("MAX_POWER:\t"); Serial.println(MAX_POWER);
   if ( g_FlyingMode == FLYING_MODE_ANGLE) {
     Serial.println("FLYING_MODE_ANGLE");
+    Serial.println("/********* PID settings *********/");
     rollPosPID.PrintGains();
     pitchPosPID.PrintGains();
 
@@ -74,11 +75,15 @@ void PrintSettings(void) {
     yawSpeedPID.PrintGains();
   } else {
     Serial.println("FLYING_MODE_ACCRO");
+    Serial.println("/********* PID settings *********/");
     rollSpeedPID.PrintGains();
     pitchSpeedPID.PrintGains();
     yawSpeedPID.PrintGains();
   }
-  Rx.PrintCmd();
   Serial.print("Yaw PID activation:\t"); Serial.println(g_YawPIDActivated);
   Serial.print("Mixing:\t"); Serial.println(mixing);
+  Serial.println("/********* Receiver settings *********/");
+  Rx.PrintCmd();
+  Serial.println("/********* MPU 6050 Configuration *********/");
+  Serial.print("Gyroscope range:\t"); Serial.print(accelgyro.getFullScaleGyroRange()); Serial.print("\tAccelerometer range:\t");  Serial.println(accelgyro.getFullScaleAccelRange());
 }
