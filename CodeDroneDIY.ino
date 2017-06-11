@@ -38,7 +38,7 @@ void setup() {
     delay(10);
   }
 
-  g_FlyingMode = Rx.GetFlyingMode(); // Forced to accro
+  g_FlyingMode = FLYING_MODE_ACCRO;//Rx.GetFlyingMode(); // Forced to accro TODO: restaure selection using switch
   if ( g_FlyingMode == FLYING_MODE_ANGLE) {
     rollPosPID.SetGains(anglePosPIDParams);
     pitchPosPID.SetGains(anglePosPIDParams);
@@ -50,12 +50,16 @@ void setup() {
     pitchSpeedPID.SetGains(accroSpeedPIDParams);  
   }
 
-  yawSpeedPIDParams[1] =  map(analogRead(2), 0, 1023, 0, 300); // Flight test succeed with yaw kp=300
+  //yawSpeedPIDParams[1] =  map(analogRead(2), 0, 1023, 0, 300); // (Flight test succeed with yaw kp=300)
+
+ // mixing = map(analogRead(2), 0, 1023, 0, 100);
+ // mixing = mixing / 100; //(50% working fine)
   yawSpeedPID.SetGains(yawSpeedPIDParams);
 
   time.Init();
 
-  g_YawPIDActivated = Rx.GetSwitchH();
+  //g_YawPIDActivated = Rx.GetSwitchH();
+  g_YawPIDActivated = true;
 
   PrintSettings();
 
@@ -89,10 +93,10 @@ void PlusConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMo
 
 void XConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotorPwr){
 
-  ESC0.write( _throttle - _pitchMotorPwr*MIXING + _rollMotorPwr*MIXING - _YawMotorPwr*MIXING);
-  ESC1.write( _throttle - _pitchMotorPwr*MIXING - _rollMotorPwr*MIXING + _YawMotorPwr*MIXING);
-  ESC2.write( _throttle + _pitchMotorPwr*MIXING - _rollMotorPwr*MIXING - _YawMotorPwr*MIXING);
-  ESC3.write( _throttle + _pitchMotorPwr*MIXING + _rollMotorPwr*MIXING  + _YawMotorPwr*MIXING);
+  ESC0.write( _throttle - _pitchMotorPwr*mixing + _rollMotorPwr*mixing - _YawMotorPwr*mixing);
+  ESC1.write( _throttle - _pitchMotorPwr*mixing - _rollMotorPwr*mixing + _YawMotorPwr*mixing);
+  ESC2.write( _throttle + _pitchMotorPwr*mixing - _rollMotorPwr*mixing - _YawMotorPwr*mixing);
+  ESC3.write( _throttle + _pitchMotorPwr*mixing + _rollMotorPwr*mixing  + _YawMotorPwr*mixing);
 }
 
 void loop() {

@@ -80,4 +80,5 @@ void PrintSettings(void) {
   }
   Rx.PrintCmd();
   Serial.print("Yaw PID activation:\t"); Serial.println(g_YawPIDActivated);
+  Serial.print("Mixing:\t"); Serial.println(mixing);
 }
