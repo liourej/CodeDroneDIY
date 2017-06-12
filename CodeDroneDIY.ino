@@ -38,8 +38,9 @@ void setup() {
     delay(10);
   }
 
-  g_FlyingMode = FLYING_MODE_ACCRO;//Rx.GetFlyingMode(); // Forced to accro TODO: restaure selection using switch
-  if ( g_FlyingMode == FLYING_MODE_ANGLE) {
+  ArmingSequence();
+
+  if ( g_FlyingMode == angle) {
     rollPosPID.SetGains(anglePosPIDParams);
     pitchPosPID.SetGains(anglePosPIDParams);
 
@@ -85,7 +86,6 @@ void PlusConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMo
 //
 
 void XConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotorPwr) {
-
   ESC0.write( _throttle - _pitchMotorPwr * mixing + _rollMotorPwr * mixing - _YawMotorPwr * mixing);
   ESC1.write( _throttle - _pitchMotorPwr * mixing - _rollMotorPwr * mixing + _YawMotorPwr * mixing);
   ESC2.write( _throttle + _pitchMotorPwr * mixing - _rollMotorPwr * mixing - _YawMotorPwr * mixing);
@@ -102,7 +102,40 @@ void loop() {
   // Get throttle and current position
   throttle = Rx.GetThrottle();
 
-  if ( g_FlyingMode == FLYING_MODE_ANGLE ) {
+  // Safety cut management: set safety cut after 20 s without power.
+  if ( throttle < 1100 ) {
+    if ( firstTime ) {
+      Serial.println("First Time!");
+      safetyCut.Init();
+      firstTime = false;
+    } else if ( (g_FlyingMode != safety) &&
+                (g_FlyingMode != disarmed) &&
+                (safetyCut.GetExecutionTime() > 5) )
+    {
+      g_FlyingMode = safety;
+      Serial.println("5 sec without power, DISARMED!");
+    }
+    else if ( (g_FlyingMode == safety) || (Rx.GetFlyingMode() == disarmed ))
+    {
+      ArmingSequence();
+      firstTime = true;
+    }
+  } else {
+    firstTime = true;
+  }
+
+  if ( loopNb % 500 == 0) {
+    if ( g_FlyingMode == safety)
+      Serial.println("safety");
+    if ( g_FlyingMode == disarmed)
+      Serial.println("disarmed");
+    if ( g_FlyingMode == accro)
+      Serial.println("accro");
+    if ( g_FlyingMode == angle)
+      Serial.println("angle");
+  }
+
+  if ( g_FlyingMode == angle ) {
     Position.GetCurrPos(accelgyro, posCurr, speedCurr, loop_time);
     if ( throttle > 1100 ) {
       rollPosCmd = rollPosPID.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loop_time );
@@ -133,7 +166,7 @@ void loop() {
     }
   }
 
-  if ( Rx.GetSwitchH() ) {
+  if ( Rx.GetFlyingMode() != disarmed) {
     //PlusConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
     XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
   } else {

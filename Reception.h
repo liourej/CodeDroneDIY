@@ -1,6 +1,7 @@
 #define FLYING_MODE_ANGLE 0
 #define FLYING_MODE_ACCRO 1
 
+enum Mode { safety, disarmed, accro, angle};
 class Reception
 {
     // Channel 1: Ailerons 1.09 to 1.90 ms
@@ -15,6 +16,7 @@ class Reception
     float PWM_Stop = 0;
     float PWM_Width = 0;
     int cPPM[7] = {0, 0, 0, 0, 0, 0, 0}; // 6 channels plus separation
+    int flyingModePrev = disarmed;
 
   public:
     void PrintCmd(void) {
@@ -26,6 +28,14 @@ class Reception
     bool  IsReady() {
       return  initialized;
     };
+
+    inline void SetFlyingModePrev(int _flyingModeCurr) {
+      flyingModePrev = _flyingModeCurr;
+    }
+
+    inline int GetFlyingModePrev() {
+      return flyingModePrev;
+    }
 
     // Angle Mode:
     inline float GetAileronsAngle() {
@@ -49,13 +59,19 @@ class Reception
       return map(cPPM[3], 1080, 1900, -MAX_YAW_SPEED, MAX_YAW_SPEED);
     };
     inline int GetSwitchH() {
-      if (cPPM[4] > 1500) return true;
+      if (cPPM[5] > 1500) return true;
       else return false;
     }; //1900 inter H en bas, 1090 inter H en haut
+
+
     inline int GetFlyingMode() {
-      if (cPPM[5] > 1500) return FLYING_MODE_ACCRO;
-      else return FLYING_MODE_ANGLE;
-    }; //1900 inter H en bas, 1090 inter H en haut
+      if (cPPM[4] > 1800)
+        return disarmed;
+      else if (cPPM[4] < 1200)
+        return accro;
+      else
+        return angle;
+    }; //G switch: pos0=1900, pos1=1500, pos2=1092
 
     inline void GetWidth(void) {
       PWM_Stop = micros();
