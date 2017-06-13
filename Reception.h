@@ -59,9 +59,9 @@ class Reception
       if (cPPM[4] > 1800)
         return disarmed;
       else if (cPPM[4] < 1200)
-        return accro;
-      else
         return angle;
+      else
+        return accro;
     }; //G switch: pos0=1900, pos1=1500, pos2=1092
 
     inline void GetWidth(void) {

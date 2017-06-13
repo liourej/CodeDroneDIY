@@ -19,6 +19,7 @@ PID rollPosPID, pitchPosPID, yawPosPID;
 PID rollSpeedPID, pitchSpeedPID, yawSpeedPID;
 GetPosition Position;
 MPU6050 accelgyro;
+StateMachine stateMachine;
 //float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
 //float posCurr[3] = { 0.0, 0.0, 0.0 }; // Teta position (°) (use gyro + accelero)
 //int g_iloop = 0;
@@ -26,7 +27,14 @@ MPU6050 accelgyro;
 //int loopNb = 0;
 //float meanLoopTime =  0;
 
-void idleESC() {
+void IdleAllESC(){
+    ESC0.Idle();
+    ESC1.Idle();
+    ESC2.Idle();
+    ESC3.Idle();
+}
+
+/*void idleESC() {
   ESC0.write(MIN_POWER);
   ESC1.write(MIN_POWER);
   ESC2.write(MIN_POWER);
@@ -36,7 +44,7 @@ void idleESC() {
   ESCList[2] = ESC2;
   ESCList[3] = ESC3;
   g_NewVal = true;
-}
+}*/
 
 static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t *TCNTn, volatile uint16_t* OCRnA) {
   // SetPWM_f4(TCNTn, OCRnA);

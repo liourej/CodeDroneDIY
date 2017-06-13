@@ -8,7 +8,7 @@ void setup() {
   ESC1.attach(9);
   ESC2.attach(10);
   ESC3.attach(11);
-  idleESC();
+  IdleAllESC();
 
   InitTimer1();
 
@@ -34,11 +34,10 @@ void setup() {
   Position.ComputeOffsets(accelgyro);
 
   while ( !Rx.IsReady() ) {
-    idleESC();
+    IdleAllESC();
     delay(10);
   }
 
-  StateMachine stateMachine;
   stateMachine.ArmingSequence();
 
   if ( stateMachine.mode == angle) {
@@ -100,7 +99,6 @@ void loop() {
   static float g_MeanLoop = 0;
   static int loopNb = 0;
   static float meanLoopTime =  0;
-  static StateMachine stateMachine;
   int throttle = 0;
   float loop_time = time.GetloopTime();
   int rollPosCmd, pitchPosCmd, yawPosCmd = 0;
@@ -109,16 +107,16 @@ void loop() {
   // Get throttle and current position
   throttle = Rx.GetThrottle();
 
-  if ( loopNb % 500 == 0) {
-    if ( stateMachine.mode == safety)
-      Serial.println(F("safety"));
-    if ( stateMachine.mode == disarmed)
-      Serial.println(F("disarmed"));
-    if ( stateMachine.mode == accro)
-      Serial.println(F("accro"));
-    if ( stateMachine.mode == angle)
-      Serial.println(F("angle"));
-  }
+  /* if ( loopNb % 500 == 0) {
+     if ( stateMachine.mode == safety)
+       Serial.println(F("safety"));
+     if ( stateMachine.mode == disarmed)
+       Serial.println(F("disarmed"));
+     if ( stateMachine.mode == accro)
+       Serial.println(F("accro"));
+     if ( stateMachine.mode == angle)
+       Serial.println(F("angle"));
+    }*/
 
   if ( stateMachine.mode == angle ) {
     Position.GetCurrPos(accelgyro, posCurr, speedCurr, loop_time);
@@ -161,12 +159,8 @@ void loop() {
   if ( (stateMachine.mode != disarmed) && (stateMachine.mode != safety) ) {
     //PlusConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
     XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
-  } else {
-    ESC0.Idle();
-    ESC1.Idle();
-    ESC2.Idle();
-    ESC3.Idle();
-  }
+  } else
+    IdleAllESC();
 
   if ( loopNb > 1000)
   {

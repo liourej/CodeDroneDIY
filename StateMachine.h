@@ -7,16 +7,13 @@ class StateMachine {
 
     Time elapsedTime;
   public:
-    int  mode = disarmed;
+    int mode = disarmed;
     int modePrev = disarmed;
     bool throttleWasHigh = true;
 
-    void Init() {
-      elapsedTime.Init();
-    }
+    void Init() { elapsedTime.Init();}
 
     void RefreshState(){
-      mode = Rx.GetFlyingMode();
       if ( throttleWasHigh ) {
         Serial.println(F("Throttle just setted low!"));
         Init();
@@ -58,8 +55,7 @@ class StateMachine {
           wdt_reset();
         }
         mode = Rx.GetFlyingMode();
-        if ( !throttleWasHigh && (mode != modePrev) )
-        {
+        if ( !throttleWasHigh && (mode != modePrev) ){
           mode  = disarmed;
           Serial.println(F("Choose same mode than previous used"));
         }
