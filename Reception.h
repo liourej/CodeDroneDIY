@@ -16,26 +16,17 @@ class Reception
     float PWM_Stop = 0;
     float PWM_Width = 0;
     int cPPM[7] = {0, 0, 0, 0, 0, 0, 0}; // 6 channels plus separation
-    int flyingModePrev = disarmed;
 
   public:
     void PrintCmd(void) {
-      Serial.print("Aile: "); Serial.print(cPPM[0]); Serial.print("\tElev: "); Serial.print(cPPM[1]);
-      Serial.print("\tThrot: "); Serial.print(cPPM[2]); Serial.print("\tRudd: "); Serial.println(cPPM[3]);
-      Serial.print("Switch1: "); Serial.print(cPPM[4]); Serial.print("\tSwitch2: "); Serial.println(cPPM[5]);
+      Serial.print(F("Aile: ")); Serial.print(cPPM[0]); Serial.print(F("\tElev: ")); Serial.print(cPPM[1]);
+      Serial.print(F("\tThrot: ")); Serial.print(cPPM[2]); Serial.print(F("\tRudd: ")); Serial.println(cPPM[3]);
+      Serial.print(F("Switch1: ")); Serial.print(cPPM[4]); Serial.print(F("\tSwitch2: ")); Serial.println(cPPM[5]);
     }
 
     bool  IsReady() {
       return  initialized;
     };
-
-    inline void SetFlyingModePrev(int _flyingModeCurr) {
-      flyingModePrev = _flyingModeCurr;
-    }
-
-    inline int GetFlyingModePrev() {
-      return flyingModePrev;
-    }
 
     // Angle Mode:
     inline float GetAileronsAngle() {

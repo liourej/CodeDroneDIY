@@ -28,9 +28,9 @@ void setup() {
   accelgyro.setFullScaleAccelRange( MPU6050_ACCEL_FS_8 );//  +-8g max
 
   if ( !accelgyro.testConnection())
-    Serial.println("Test failed");
+    Serial.println(F("Test failed"));
 
-  Serial.println("Computing offsets...");
+  Serial.println(F("Computing offsets..."));
   Position.ComputeOffsets(accelgyro);
 
   while ( !Rx.IsReady() ) {
@@ -38,9 +38,10 @@ void setup() {
     delay(10);
   }
 
-  ArmingSequence();
+  StateMachine stateMachine;
+  stateMachine.ArmingSequence();
 
-  if ( g_FlyingMode == angle) {
+  if ( stateMachine.mode == angle) {
     rollPosPID.SetGains(anglePosPIDParams);
     pitchPosPID.SetGains(anglePosPIDParams);
 
@@ -55,9 +56,9 @@ void setup() {
 
   time.Init();
 
-  PrintSettings();
+  PrintSettings(stateMachine);
 
-  Serial.println("Setup Finished");
+  Serial.println(F("Setup Finished"));
 }
 
 //    + configuration:
@@ -93,7 +94,13 @@ void XConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotor
 }
 
 void loop() {
-
+  static float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
+  static float posCurr[3] = { 0.0, 0.0, 0.0 }; // Teta position (°) (use gyro + accelero)
+  static int g_iloop = 0;
+  static float g_MeanLoop = 0;
+  static int loopNb = 0;
+  static float meanLoopTime =  0;
+  static StateMachine stateMachine;
   int throttle = 0;
   float loop_time = time.GetloopTime();
   int rollPosCmd, pitchPosCmd, yawPosCmd = 0;
@@ -102,42 +109,21 @@ void loop() {
   // Get throttle and current position
   throttle = Rx.GetThrottle();
 
-  // Safety cut management: set safety cut after 20 s without power.
-  if ( throttle < 1100 ) {
-    if ( firstTime ) {
-      Serial.println("First Time!");
-      safetyCut.Init();
-      firstTime = false;
-    } else if ( (g_FlyingMode != safety) &&
-                (g_FlyingMode != disarmed) &&
-                (safetyCut.GetExecutionTime() > 5) )
-    {
-      g_FlyingMode = safety;
-      Serial.println("5 sec without power, DISARMED!");
-    }
-    else if ( (g_FlyingMode == safety) || (Rx.GetFlyingMode() == disarmed ))
-    {
-      ArmingSequence();
-      firstTime = true;
-    }
-  } else {
-    firstTime = true;
-  }
-
   if ( loopNb % 500 == 0) {
-    if ( g_FlyingMode == safety)
-      Serial.println("safety");
-    if ( g_FlyingMode == disarmed)
-      Serial.println("disarmed");
-    if ( g_FlyingMode == accro)
-      Serial.println("accro");
-    if ( g_FlyingMode == angle)
-      Serial.println("angle");
+    if ( stateMachine.mode == safety)
+      Serial.println(F("safety"));
+    if ( stateMachine.mode == disarmed)
+      Serial.println(F("disarmed"));
+    if ( stateMachine.mode == accro)
+      Serial.println(F("accro"));
+    if ( stateMachine.mode == angle)
+      Serial.println(F("angle"));
   }
 
-  if ( g_FlyingMode == angle ) {
+  if ( stateMachine.mode == angle ) {
     Position.GetCurrPos(accelgyro, posCurr, speedCurr, loop_time);
     if ( throttle > 1100 ) {
+      stateMachine.throttleWasHigh = true;
       rollPosCmd = rollPosPID.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loop_time );
       rollMotorPwr = rollSpeedPID.ComputeCorrection( rollPosCmd, speedCurr[0], loop_time );
 
@@ -145,6 +131,9 @@ void loop() {
       pitchMotorPwr = pitchSpeedPID.ComputeCorrection( -pitchPosCmd, speedCurr[1], loop_time );
       yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
     } else {
+
+      stateMachine.RefreshState();// Safety cut management: set safety cut after 20 s without power.
+
       pitchMotorPwr = rollMotorPwr = yawMotorPwr = 0; // No correction if throttle put to min
       rollPosPID.Reset();
       pitchPosPID.Reset();
@@ -155,10 +144,13 @@ void loop() {
   } else { // FLYING_MODE_ACCRO*/
     Position.GetCurrSpeed(accelgyro, speedCurr);
     if ( throttle > 1100 ) {
+      stateMachine.throttleWasHigh = true;
       rollMotorPwr = rollSpeedPID.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loop_time );
       pitchMotorPwr = pitchSpeedPID.ComputeCorrection( Rx.GetElevatorSpeed(), speedCurr[1], loop_time );
       yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
     } else {
+      stateMachine.RefreshState();// Safety cut management: set safety cut after 5 s without power.
+
       pitchMotorPwr = rollMotorPwr = yawMotorPwr = 0; // No correction if throttle put to min
       rollSpeedPID.Reset();
       pitchSpeedPID.Reset();
@@ -166,7 +158,7 @@ void loop() {
     }
   }
 
-  if ( Rx.GetFlyingMode() != disarmed) {
+  if ( (stateMachine.mode != disarmed) && (stateMachine.mode != safety) ) {
     //PlusConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
     XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
   } else {

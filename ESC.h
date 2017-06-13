@@ -21,7 +21,7 @@ class ESC
         _PWM = MIN_POWER;
       else if ( _PWM > MAX_POWER) // Check max power
       {
-        Serial.println("WARNING, MAX POWER REACHED!!");
+        Serial.println(F("WARNING, MAX POWER REACHED!!"));
         PWM = MAX_POWER;
       } else
         PWM = _PWM;

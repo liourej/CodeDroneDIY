@@ -70,7 +70,7 @@ void GetPosition::ComputeOffsets(MPU6050 _accelgyro)
   //accScale =  offset[2]/9.81;
   offset[2] = 0;
 
-  Serial.println("Offsets Computed");
+  Serial.println(F("Offsets Computed"));
   // printCoord(_offsets);
 }
 
