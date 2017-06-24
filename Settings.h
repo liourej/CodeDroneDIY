@@ -1,6 +1,6 @@
 // Power setup
 #define MIN_POWER 1060
-#define MAX_POWER 1860 // Set to 1860 later to reach max power
+#define MAX_POWER 1300 // Set to 1860 later to reach max power
 
 // PID setup
 #define GAIN 0.010

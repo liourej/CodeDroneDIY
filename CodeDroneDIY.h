@@ -15,6 +15,7 @@ Time time;
 
 Reception Rx;
 
+float g_Kp = 0;
 PID rollPosPID, pitchPosPID, yawPosPID;
 PID rollSpeedPID, pitchSpeedPID, yawSpeedPID;
 GetPosition Position;

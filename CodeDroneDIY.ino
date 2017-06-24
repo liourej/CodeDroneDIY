@@ -4,6 +4,8 @@ void setup() {
   // Set watchdog reset
   wdt_enable(WDTO_250MS);
 
+  pinMode(12, OUTPUT);
+
   ESC0.attach(8);
   ESC1.attach(9);
   ESC2.attach(10);
@@ -22,6 +24,8 @@ void setup() {
   // initialize serial communication
   Serial.begin(250000);
 
+  stateMachine.ArmingSequence();
+
   // initialize MPU6050 device
   accelgyro.initialize();
   accelgyro.setFullScaleGyroRange( MPU6050_GYRO_FS_1000); //  +-1000°s max  /!\ Be carrefull when changing this parameter: "GyroSensitivity" must be updated accordingly !!!
@@ -38,9 +42,11 @@ void setup() {
     delay(10);
   }
 
-  stateMachine.ArmingSequence();
-
   if ( stateMachine.mode == angle) {
+    g_Kp = map(analogRead(2), 0, 1023, 100, 500);
+    Serial.println(g_Kp);
+    anglePosPIDParams[1] = g_Kp;
+
     rollPosPID.SetGains(anglePosPIDParams);
     pitchPosPID.SetGains(anglePosPIDParams);
 
@@ -107,17 +113,6 @@ void loop() {
   // Get throttle and current position
   throttle = Rx.GetThrottle();
 
-  /* if ( loopNb % 500 == 0) {
-     if ( stateMachine.mode == safety)
-       Serial.println(F("safety"));
-     if ( stateMachine.mode == disarmed)
-       Serial.println(F("disarmed"));
-     if ( stateMachine.mode == accro)
-       Serial.println(F("accro"));
-     if ( stateMachine.mode == angle)
-       Serial.println(F("angle"));
-    }*/
-
   if ( stateMachine.mode == angle ) {
     Position.GetCurrPos(accelgyro, posCurr, speedCurr, loop_time);
     if ( throttle > 1100 ) {
@@ -159,8 +154,10 @@ void loop() {
   if ( (stateMachine.mode != disarmed) && (stateMachine.mode != safety) ) {
     //PlusConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
     XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
-  } else
+  }else{
     IdleAllESC();
+  }
+
 
   if ( loopNb > 1000)
   {

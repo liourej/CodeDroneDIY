@@ -11,9 +11,24 @@ class StateMachine {
     int modePrev = disarmed;
     bool throttleWasHigh = true;
 
-    void Init() { elapsedTime.Init();}
+    void Init() {
+      elapsedTime.Init();
+    }
 
-    void RefreshState(){
+    void ActivateBuzzer(float _frequency, int _duration) {
+      Time time;
+      time.Init();
+      while ( (time.GetExecutionTime() * 1000) < _duration) {
+        //digitalWrite(12, HIGH);
+        delay(1 / (2 * _frequency) );
+        digitalWrite(12, LOW);
+        delay(1 / (2 * _frequency) );
+        wdt_reset();
+        Serial.println(F("BUZZZZZ"));
+      }
+    }
+
+    void RefreshState() {
       if ( throttleWasHigh ) {
         Serial.println(F("Throttle just setted low!"));
         Init();
@@ -44,6 +59,8 @@ class StateMachine {
         mode = Rx.GetFlyingMode();
         delay(200);
         wdt_reset();
+        if ( Rx.GetSwitchH() )
+          ActivateBuzzer(0.005, 500);
       }
 
       Serial.println(F("Select flying mode"));
@@ -55,7 +72,7 @@ class StateMachine {
           wdt_reset();
         }
         mode = Rx.GetFlyingMode();
-        if ( !throttleWasHigh && (mode != modePrev) ){
+        if ( !throttleWasHigh && (mode != modePrev) ) {
           mode  = disarmed;
           Serial.println(F("Choose same mode than previous used"));
         }
@@ -64,6 +81,9 @@ class StateMachine {
         ESC2.Idle();
         ESC3.Idle();
         wdt_reset();
+
+        if ( Rx.GetSwitchH() )
+          ActivateBuzzer(0.005, 500);
       }
       modePrev = mode;
     };
