@@ -1,7 +1,8 @@
 #define FLYING_MODE_ANGLE 0
 #define FLYING_MODE_ACCRO 1
 
-enum Mode { safety, disarmed, accro, angle};
+enum Mode { initialization, starting, safety, disarmed, accro, angle};
+
 class Reception
 {
     // Channel 1: Ailerons 1.09 to 1.90 ms

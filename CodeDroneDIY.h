@@ -27,7 +27,19 @@ StateMachine stateMachine;
 //float g_MeanLoop = 0;
 //int loopNb = 0;
 //float meanLoopTime =  0;
-
+ void ActivateBuzzer(float _frequency, int _duration) {
+      Time time;
+      time.Init();
+      while ( (time.GetExecutionTime() * 1000) < _duration) {
+        //digitalWrite(12, HIGH);
+        delay(1 / (2 * _frequency) );
+        digitalWrite(12, LOW);
+        delay(1 / (2 * _frequency) );
+        wdt_reset();
+        Serial.println(F("BUZZZZZ"));
+      }
+ }
+ 
 void IdleAllESC(){
     ESC0.Idle();
     ESC1.Idle();
@@ -73,7 +85,7 @@ void InitTimer1() {
 
 void PrintSettings(StateMachine _stateMachine) {
   Serial.print(F("MAX_POWER:\t")); Serial.println(MAX_POWER);
-  if ( _stateMachine.mode == angle) {
+  if ( _stateMachine.state == angle) {
     Serial.println(F("FLYING_MODE_ANGLE"));
     Serial.println(F("/********* PID settings *********/"));
     rollPosPID.PrintGains();
@@ -82,15 +94,15 @@ void PrintSettings(StateMachine _stateMachine) {
     rollSpeedPID.PrintGains();
     pitchSpeedPID.PrintGains();
     yawSpeedPID.PrintGains();
-  } else if ( _stateMachine.mode == accro) {
+  } else if ( _stateMachine.state == accro) {
     Serial.println(F("FLYING_MODE_ACCRO"));
     Serial.println(F("/********* PID settings *********/"));
     rollSpeedPID.PrintGains();
     pitchSpeedPID.PrintGains();
     yawSpeedPID.PrintGains();
-  } else if ( _stateMachine.mode == disarmed) {
+  } else if ( _stateMachine.state == disarmed) {
     Serial.println(F("DISARMED"));
-  } else if ( _stateMachine.mode == safety) {
+  } else if ( _stateMachine.state == safety) {
     Serial.println(F("SAFETY"));
   }
 

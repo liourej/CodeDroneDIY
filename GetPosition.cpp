@@ -72,6 +72,7 @@ void GetPosition::ComputeOffsets(MPU6050 _accelgyro)
 
   Serial.println(F("Offsets Computed"));
   // printCoord(_offsets);
+  offsetComputed = true;
 }
 
 inline void GetPosition::Normalize( float _acc[] )

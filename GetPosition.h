@@ -13,6 +13,7 @@ class GetPosition
     const float LowPassFilterCoeff = 0.02;
     const float GyroSensitivity = 32.8; // 250=>131 or 500=>65.5 or 1000=>32.8 or 2000=>16.4
 
+    bool offsetComputed = false;
     float offset[6] = {0, 0, 0, 0, 0, 0};
 
   private:
@@ -22,6 +23,9 @@ class GetPosition
     void Normalize( float _acc[] );
 
   public:
+    bool AreOffsetComputed(void) {
+      return offsetComputed;
+    }
     void ComputeOffsets(MPU6050 _accelgyro);
     void GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], float _loop_time);
     void GetCurrSpeed(MPU6050 _accelgyro, float speedCurr[]);
