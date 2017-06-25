@@ -21,17 +21,12 @@ PID rollSpeedPID, pitchSpeedPID, yawSpeedPID;
 GetPosition Position;
 MPU6050 accelgyro;
 StateMachine stateMachine;
-//float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
-//float posCurr[3] = { 0.0, 0.0, 0.0 }; // Teta position (°) (use gyro + accelero)
-//int g_iloop = 0;
-//float g_MeanLoop = 0;
-//int loopNb = 0;
-//float meanLoopTime =  0;
- void ActivateBuzzer(float _frequency, int _duration) {
+
+void ActivateBuzzer(float _frequency, int _duration) {
       Time time;
       time.Init();
       while ( (time.GetExecutionTime() * 1000) < _duration) {
-        //digitalWrite(12, HIGH);
+        digitalWrite(12, HIGH);
         delay(1 / (2 * _frequency) );
         digitalWrite(12, LOW);
         delay(1 / (2 * _frequency) );
