@@ -27,7 +27,7 @@ void setup() {
   // initialize MPU6050 device
   accelgyro.initialize();
   accelgyro.setFullScaleGyroRange( MPU6050_GYRO_FS_1000); //  +-1000°s max  /!\ Be carrefull when changing this parameter: "GyroSensitivity" must be updated accordingly !!!
-  accelgyro.setFullScaleAccelRange( MPU6050_ACCEL_FS_8 );//  +-8g max
+  accelgyro.setFullScaleAccelRange( MPU6050_ACCEL_FS_8 );//  +-8g max /!\ Be carrefull when changing this parameter: "AcceleroSensitivity" must be updated accordingly !!!
 
   if ( !accelgyro.testConnection())
     Serial.println(F("Test failed"));

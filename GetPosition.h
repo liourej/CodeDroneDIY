@@ -9,18 +9,18 @@
 class GetPosition
 {
   private:
-    const float HighPassFilterCoeff = 0.98;
-    const float LowPassFilterCoeff = 0.02;
-    const float GyroSensitivity = 32.8; // 250=>131 or 500=>65.5 or 1000=>32.8 or 2000=>16.4
+    float HighPassFilterCoeff = 0.98;
+    const float AcceleroSensitivity = 4096; // LSB/g at -+8g sensitivity
+    const float GyroSensitivity = 32.8; // LSB/°/s  250=>131 or 500=>65.5 or 1000=>32.8 or 2000=>16.4
 
     bool offsetComputed = false;
     float offset[6] = {0, 0, 0, 0, 0, 0};
 
   private:
     void GetAccelGyro(MPU6050 _accelgyro, float _data[]);
-    void GetCorrectedAccelGyro(MPU6050 _accelgyro, float _data[]);
+    void GetCorrectedAccelGyro(MPU6050 _accelgyro, float _accMeasures[], float _gyroMeasures[]);
     void GetCorrectedGyro(MPU6050 _gyro, float _data[]);
-    void Normalize( float _acc[] );
+    //void Normalize( float _acc[] );
 
   public:
     bool AreOffsetComputed(void) {
