@@ -108,7 +108,7 @@ void loop() {
   switch ( stateMachine.state )
   {
     case angle:
-       throttle = Rx.GetThrottle();
+      throttle = Rx.GetThrottle();
       Position.GetCurrPos(accelgyro, posCurr, speedCurr, loop_time);
       if ( throttle > 1100 ) {
         stateMachine.throttleWasHigh = true;
@@ -156,6 +156,9 @@ void loop() {
         IdleAllESC();
         stateMachine.state = safety;
       }
+
+      if ( Rx.GetSwitchH() )
+        ActivateBuzzer(0.005, 500);
       break;
     case disarmed:
       stateMachine.state = Rx.GetFlyingMode();
@@ -168,6 +171,9 @@ void loop() {
         stateMachine.statePrev = stateMachine.state;
         stateMachine.throttleWasHigh = true;
       }
+
+      if ( Rx.GetSwitchH() )
+        ActivateBuzzer(0.005, 500);
       break;
     case initialization:
       IdleAllESC();
@@ -179,6 +185,8 @@ void loop() {
         stateMachine.state = initialization;
       else
         stateMachine.state =  starting;
+      if ( Rx.GetSwitchH() )
+        ActivateBuzzer(0.005, 500);
       break;
     case starting:
       IdleAllESC();
@@ -187,13 +195,12 @@ void loop() {
         stateMachine.statePrev = stateMachine.state;
       else
         stateMachine.state = starting;
+      if ( Rx.GetSwitchH() )
+        ActivateBuzzer(0.005, 500);
       break;
     default:
       break;
   }
-
-  if ( Rx.GetSwitchH() )
-    ActivateBuzzer(0.005, 500);
 
   if ( loopNb > 1000)
   {
