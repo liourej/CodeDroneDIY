@@ -32,33 +32,38 @@ void setup() {
   if ( !accelgyro.testConnection())
     Serial.println(F("Test failed"));
 
-  while ( !Rx.IsReady() ) {
-    IdleAllESC();
-    delay(10);
-  }
+  if ( !CheckIMU(accelgyro, Position) )
+    Serial.print("IMU self test failed");
+  else
+    Serial.print("IMU self test succeed");
 
-  if ( stateMachine.state == angle) { // TODO: state not choosen at this step!!!
-    g_Kp = map(analogRead(2), 0, 1023, 100, 500);
-    Serial.println(g_Kp);
-    anglePosPIDParams[1] = g_Kp;
+while ( !Rx.IsReady() ) {
+  IdleAllESC();
+  delay(10);
+}
 
-    rollPosPID.SetGains(anglePosPIDParams);
-    pitchPosPID.SetGains(anglePosPIDParams);
+if ( stateMachine.state == angle) { // TODO: state not choosen at this step!!!
+  g_Kp = map(analogRead(2), 0, 1023, 100, 500);
+  Serial.println(g_Kp);
+  anglePosPIDParams[1] = g_Kp;
 
-    rollSpeedPID.SetGains(angleSpeedPIDParams);
-    pitchSpeedPID.SetGains(angleSpeedPIDParams);
-  } else {
-    rollSpeedPID.SetGains(accroSpeedPIDParams);
-    pitchSpeedPID.SetGains(accroSpeedPIDParams);
-  }
+  rollPosPID.SetGains(anglePosPIDParams);
+  pitchPosPID.SetGains(anglePosPIDParams);
 
-  yawSpeedPID.SetGains(yawSpeedPIDParams);
+  rollSpeedPID.SetGains(angleSpeedPIDParams);
+  pitchSpeedPID.SetGains(angleSpeedPIDParams);
+} else {
+  rollSpeedPID.SetGains(accroSpeedPIDParams);
+  pitchSpeedPID.SetGains(accroSpeedPIDParams);
+}
 
-  time.Init();
+yawSpeedPID.SetGains(yawSpeedPIDParams);
 
-  PrintSettings(stateMachine);
+time.Init();
 
-  Serial.println(F("Setup Finished"));
+PrintSettings(stateMachine);
+
+Serial.println(F("Setup Finished"));
 }
 
 //    + configuration:

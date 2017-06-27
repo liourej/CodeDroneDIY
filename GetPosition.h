@@ -17,7 +17,6 @@ class GetPosition
     float offset[6] = {0, 0, 0, 0, 0, 0};
 
   private:
-    void GetAccelGyro(MPU6050 _accelgyro, float _data[]);
     void GetCorrectedAccelGyro(MPU6050 _accelgyro, float _accMeasures[], float _gyroMeasures[]);
     void GetCorrectedGyro(MPU6050 _gyro, float _data[]);
     //void Normalize( float _acc[] );
@@ -27,6 +26,7 @@ class GetPosition
       return offsetComputed;
     }
     void ComputeOffsets(MPU6050 _accelgyro);
+    void GetAccelGyro(MPU6050 _accelgyro, float _data[]);
     void GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], float _loop_time);
     void GetCurrSpeed(MPU6050 _accelgyro, float speedCurr[]);
 };
