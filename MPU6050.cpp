@@ -300,6 +300,26 @@ bool MPU6050::getAccelZSelfTest() {
 void MPU6050::setAccelZSelfTest(bool enabled) {
     I2Cdev::writeBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_ZA_ST_BIT, enabled);
 }
+
+// Julien
+uint8_t MPU6050::getAccelXSelfTestVal() {
+    I2Cdev::readByte(devAddr, MPU6050_SELFTEST_XVAL, buffer);
+    return buffer[0];
+}
+uint8_t MPU6050::getAccelYSelfTestVal() {
+    I2Cdev::readByte(devAddr, MPU6050_SELFTEST_YVAL, buffer);
+    return buffer[0];
+}
+uint8_t MPU6050::getAccelZSelfTestVal() {
+    I2Cdev::readByte(devAddr, MPU6050_SELFTEST_ZVAL, buffer);
+    return buffer[0];
+}
+
+uint8_t MPU6050::getAccelMixedSelfTestVal(){
+	I2Cdev::readByte(devAddr, MPU6050_SELFTEST_MIXEDVAL, buffer);
+    return buffer[0];
+}
+
 /** Get full-scale accelerometer range.
  * The FS_SEL parameter allows setting the full-scale range of the accelerometer
  * sensors, as described in the table below.

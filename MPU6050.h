@@ -58,6 +58,13 @@ THE SOFTWARE.
 #define MPU6050_RA_YA_OFFS_L_TC     0x09
 #define MPU6050_RA_ZA_OFFS_H        0x0A //[15:0] ZA_OFFS
 #define MPU6050_RA_ZA_OFFS_L_TC     0x0B
+
+// Julien
+#define MPU6050_SELFTEST_XVAL		0x0D
+#define MPU6050_SELFTEST_YVAL		0x0E
+#define MPU6050_SELFTEST_ZVAL		0x0F
+#define MPU6050_SELFTEST_MIXEDVAL	0x10
+
 #define MPU6050_RA_XG_OFFS_USRH     0x13 //[15:0] XG_OFFS_USR
 #define MPU6050_RA_XG_OFFS_USRL     0x14
 #define MPU6050_RA_YG_OFFS_USRH     0x15 //[15:0] YG_OFFS_USR
@@ -435,6 +442,11 @@ class MPU6050 {
         void setFullScaleAccelRange(uint8_t range);
         uint8_t getDHPFMode();
         void setDHPFMode(uint8_t mode);
+		// Julien
+		uint8_t getAccelXSelfTestVal();
+		uint8_t getAccelYSelfTestVal();
+		uint8_t getAccelZSelfTestVal();
+		uint8_t getAccelMixedSelfTestVal();
 
         // FF_THR register
         uint8_t getFreefallDetectionThreshold();
