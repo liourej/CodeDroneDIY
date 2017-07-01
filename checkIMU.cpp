@@ -19,8 +19,8 @@ float ComputeGyroFactoryTrimValue(float _gyroTestVal, bool _isYcoord) {
 }
 
 bool CheckGyro(MPU6050 _accelgyro, GetPosition _Position) {
-  float dataTestEnabled[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  float dataTestDisabled[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  int16_t dataTestEnabled[6] = {0, 0, 0, 0, 0, 0};
+  int16_t dataTestDisabled[6] = {0, 0, 0, 0, 0, 0};
   float STR[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   float FT[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   float trimChange[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -31,14 +31,14 @@ bool CheckGyro(MPU6050 _accelgyro, GetPosition _Position) {
   _accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
   
    delay(1000);
-  _Position.GetAccelGyro(_accelgyro, dataTestDisabled);
+   _accelgyro.getMotion6(&dataTestDisabled[0], &dataTestDisabled[1], &dataTestDisabled[2], &dataTestDisabled[3], &dataTestDisabled[4], &dataTestDisabled[5]);
   
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, true);
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, true);
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, true);
 
   delay(1000);
-  _Position.GetAccelGyro(_accelgyro, dataTestEnabled);
+  _accelgyro.getMotion6(&dataTestEnabled[0], &dataTestEnabled[1], &dataTestEnabled[2], &dataTestEnabled[3], &dataTestEnabled[4], &dataTestEnabled[5]);
   for (int axis = 3; axis < 6; axis ++) { // Gyro data
     if ( axis == 4) // if axis is Y, computation is different (negative sign)
       FT[axis] = ComputeGyroFactoryTrimValue( dataTestEnabled[axis], true );
@@ -60,8 +60,8 @@ bool CheckGyro(MPU6050 _accelgyro, GetPosition _Position) {
 }
 
 bool CheckAccelero(MPU6050 _accelgyro, GetPosition _Position) {
-  float dataTestEnabled[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  float dataTestDisabled[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  int16_t dataTestEnabled[6] = {0, 0, 0, 0, 0, 0};
+  int16_t dataTestDisabled[6] = {0, 0, 0, 0, 0, 0};
   float STR[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   float FT[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   float trimChange[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -72,14 +72,14 @@ bool CheckAccelero(MPU6050 _accelgyro, GetPosition _Position) {
   _accelgyro.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
 
   delay(1000);
-  _Position.GetAccelGyro(_accelgyro, dataTestDisabled);
+  _accelgyro.getMotion6(&dataTestDisabled[0], &dataTestDisabled[1], &dataTestDisabled[2], &dataTestDisabled[3], &dataTestDisabled[4], &dataTestDisabled[5]);
 
   _accelgyro.setAccelXSelfTest(true);
   _accelgyro.setAccelYSelfTest(true);
   _accelgyro.setAccelZSelfTest(true);
 
   delay(1000);
-  _Position.GetAccelGyro(_accelgyro, dataTestEnabled);
+   _accelgyro.getMotion6(&dataTestEnabled[0], &dataTestEnabled[1], &dataTestEnabled[2], &dataTestEnabled[3], &dataTestEnabled[4], &dataTestEnabled[5]);
 
   for (int axis = 0; axis < 3; axis ++) {
     FT[axis] = ComputeAccFactoryTrimValue( dataTestEnabled[axis] );

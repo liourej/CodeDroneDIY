@@ -43,20 +43,7 @@ void IdleAllESC(){
     ESC3.Idle();
 }
 
-/*void idleESC() {
-  ESC0.write(MIN_POWER);
-  ESC1.write(MIN_POWER);
-  ESC2.write(MIN_POWER);
-  ESC3.write(MIN_POWER);
-  ESCList[0] = ESC0;
-  ESCList[1] = ESC1;
-  ESCList[2] = ESC2;
-  ESCList[3] = ESC3;
-  g_NewVal = true;
-}*/
-
 static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t *TCNTn, volatile uint16_t* OCRnA) {
-  // SetPWM_f4(TCNTn, OCRnA);
   SetPWM_f5(TCNTn, OCRnA);
 }
 

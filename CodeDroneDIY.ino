@@ -188,7 +188,7 @@ void loop() {
       stateMachine.state = Rx.GetFlyingMode();
       if ( stateMachine.state != disarmed )
         stateMachine.state = initialization;
-      else
+      else if( Position.AreOffsetComputed())
         stateMachine.state =  starting;
       if ( Rx.GetSwitchH() )
         ActivateBuzzer(0.005, 500);

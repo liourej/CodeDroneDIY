@@ -14,7 +14,7 @@ class GetPosition
     const float GyroSensitivity = 32.8; // LSB/°/s  250=>131 or 500=>65.5 or 1000=>32.8 or 2000=>16.4
 
     bool offsetComputed = false;
-    float offset[6] = {0, 0, 0, 0, 0, 0};
+    int16_t offset[6] = {0, 0, 0, 0, 0, 0};
 
   private:
     void GetCorrectedAccelGyro(MPU6050 _accelgyro, float _accMeasures[], float _gyroMeasures[]);
@@ -26,7 +26,6 @@ class GetPosition
       return offsetComputed;
     }
     void ComputeOffsets(MPU6050 _accelgyro);
-    void GetAccelGyro(MPU6050 _accelgyro, float _data[]);
     void GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], float _loop_time);
     void GetCurrSpeed(MPU6050 _accelgyro, float speedCurr[]);
 };
