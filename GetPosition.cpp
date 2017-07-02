@@ -53,7 +53,9 @@ void GetPosition::ComputeOffsets(MPU6050 _accelgyro)
       if ( accGyroRaw[coord] < minVal[coord])
         minVal[coord] = accGyroRaw[coord];
       offsetSum[coord] = offsetSum[coord] + accGyroRaw[coord];
+      Serial.print(accGyroRaw[coord]); Serial.print("\t");
     }
+    Serial.print("\n");
     wdt_reset();
     delay(200);
   }
@@ -79,9 +81,15 @@ void GetPosition::ComputeOffsets(MPU6050 _accelgyro)
   // Zacc is gravity, it should be 1G ie 4096 LSB/g at -+8g sensitivity
   offset[2] = offset[2] - AcceleroSensitivity;
 
-  if (offsetComputed)
-    Serial.println(F("Offsets Computed"));
-  else
+
+
+  if (offsetComputed) {
+    Serial.print(F("Offsets Computed :"));
+    for (int i = 0; i < 6; i++) {
+      Serial.print(offset[i]); Serial.print("\t");
+    }
+    Serial.print("\n");
+  } else
     Serial.println(F("ERROR DURING OFFSETS COMPUTATION !!"));
 };
 

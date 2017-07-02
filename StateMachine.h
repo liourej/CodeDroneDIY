@@ -10,7 +10,34 @@ class StateMachine {
     int state = initialization;
     int statePrev = initialization;
     bool throttleWasHigh = true;
+    int printedState = -1;
 
+    void Print() {
+      if( state == printedState )
+      return;
+      switch (state) {
+        case initialization:
+          Serial.println(F("initialization"));
+          break;
+        case starting:
+          Serial.println(F("starting"));
+          break;
+        case safety:
+          Serial.println(F("safety"));
+          break;
+        case disarmed:
+          Serial.println(F("disarmed"));
+          break;
+        case accro:
+          Serial.println(F("accro"));
+          break;
+        case angle:
+          Serial.println(F("angle"));
+          break;
+      }
+      printedState = state;
+      
+    }
     void Init() {
       elapsedTime.Init();
     }

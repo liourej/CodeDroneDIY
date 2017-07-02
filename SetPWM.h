@@ -82,29 +82,38 @@ inline void SetPWM_f4(volatile uint16_t *TCNTn, volatile uint16_t* OCRnA)
 
 inline void SetPWM_f5(volatile uint16_t *TCNTn, volatile uint16_t* OCRnA)
 {
+  static bool firstLoop = true;
+  if ( firstLoop) {
+    PORTB = B00000001;
+    firstLoop = false;
+  }
+
   if ( g_currESC == 0 ) {
-    PORTB ^= B00000010; // Reset pin 0 and set pin 1 using XOR
+    PORTB = B00000010; // Reset pin 0 and set pin 1 using XOR
+    //PORTB ^= B00000011; // Reset pin 0 and set pin 1 using XOR
     //ESC0.reset();
     //ESC1.set();
     *OCRnA = ESC1.GetTicks();
   } else if ( g_currESC == 1 ) {
-     PORTB ^= B00000100; // Reset pin 1 and set pin 0 using XOR
+    PORTB = B00000100;
+   // PORTB ^= B00000110; // Reset pin 1 and set pin 0 using XOR
     //ESC1.reset();
     //ESC2.set();
     *OCRnA = ESC2.GetTicks();
   } else if ( g_currESC == 2 ) {
-     PORTB ^= B00001000; // Reset pin 2 and set pin 1 using XOR
+    PORTB = B00001000;
+   // PORTB ^= B00001100; // Reset pin 2 and set pin 1 using XOR
     //ESC2.reset();
     //ESC3.set();
     *OCRnA = ESC3.GetTicks();
   } else {
-     PORTB ^= B00000001; // Reset pin 3 and set pin 0 using XOR
+    PORTB = B00000001;
+   // PORTB ^= B00001001; // Reset pin 3 and set pin 0 using XOR
     //  ESC3.reset();
     g_currESC = -1;
     //  ESC0.set();
     *OCRnA = ESC0.GetTicks();
   }
-
   *TCNTn = 0; // Reset timer
   g_currESC++;
 }

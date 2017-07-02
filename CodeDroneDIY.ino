@@ -28,42 +28,44 @@ void setup() {
   accelgyro.initialize();
   accelgyro.setFullScaleGyroRange( MPU6050_GYRO_FS_1000); //  +-1000°s max  /!\ Be carrefull when changing this parameter: "GyroSensitivity" must be updated accordingly !!!
   accelgyro.setFullScaleAccelRange( MPU6050_ACCEL_FS_8 );//  +-8g max /!\ Be carrefull when changing this parameter: "AcceleroSensitivity" must be updated accordingly !!!
-
+  wdt_reset();
   if ( !accelgyro.testConnection())
     Serial.println(F("Test failed"));
 
-  if ( !CheckIMU(accelgyro, Position) )
-    Serial.print("IMU self test failed");
-  else
-    Serial.print("IMU self test succeed");
+  wdt_reset();
+  /* if ( !CheckIMU(accelgyro, Position) )
+     Serial.print("IMU self test failed");
+    else
+     Serial.print("IMU self test succeed");
+  */
+  while ( !Rx.IsReady() ) {
+    IdleAllESC();
+    delay(10);
+    wdt_reset();
+  }
 
-while ( !Rx.IsReady() ) {
-  IdleAllESC();
-  delay(10);
-}
+  if ( stateMachine.state == angle) { // TODO: state not choosen at this step!!!
+    g_Kp = map(analogRead(2), 0, 1023, 100, 500);
+    Serial.println(g_Kp);
+    anglePosPIDParams[1] = g_Kp;
 
-if ( stateMachine.state == angle) { // TODO: state not choosen at this step!!!
-  g_Kp = map(analogRead(2), 0, 1023, 100, 500);
-  Serial.println(g_Kp);
-  anglePosPIDParams[1] = g_Kp;
+    rollPosPID.SetGains(anglePosPIDParams);
+    pitchPosPID.SetGains(anglePosPIDParams);
 
-  rollPosPID.SetGains(anglePosPIDParams);
-  pitchPosPID.SetGains(anglePosPIDParams);
+    rollSpeedPID.SetGains(angleSpeedPIDParams);
+    pitchSpeedPID.SetGains(angleSpeedPIDParams);
+  } else {
+    rollSpeedPID.SetGains(accroSpeedPIDParams);
+    pitchSpeedPID.SetGains(accroSpeedPIDParams);
+  }
 
-  rollSpeedPID.SetGains(angleSpeedPIDParams);
-  pitchSpeedPID.SetGains(angleSpeedPIDParams);
-} else {
-  rollSpeedPID.SetGains(accroSpeedPIDParams);
-  pitchSpeedPID.SetGains(accroSpeedPIDParams);
-}
+  yawSpeedPID.SetGains(yawSpeedPIDParams);
 
-yawSpeedPID.SetGains(yawSpeedPIDParams);
+  time.Init();
 
-time.Init();
+  PrintSettings(stateMachine);
 
-PrintSettings(stateMachine);
-
-Serial.println(F("Setup Finished"));
+  Serial.println(F("Setup Finished"));
 }
 
 //    + configuration:
@@ -188,7 +190,7 @@ void loop() {
       stateMachine.state = Rx.GetFlyingMode();
       if ( stateMachine.state != disarmed )
         stateMachine.state = initialization;
-      else if( Position.AreOffsetComputed())
+      else if ( Position.AreOffsetComputed())
         stateMachine.state =  starting;
       if ( Rx.GetSwitchH() )
         ActivateBuzzer(0.005, 500);
@@ -210,7 +212,7 @@ void loop() {
   if ( loopNb > 1000)
   {
     meanLoopTime = meanLoopTime / loopNb;
-    Serial.println(meanLoopTime * 1000, 2);
+    // Serial.println(meanLoopTime * 1000, 2);
     meanLoopTime = 0;
     loopNb = 0;
   } else {
