@@ -93,14 +93,14 @@ void GetPosition::ComputeOffsets(MPU6050 _accelgyro)
     Serial.println(F("ERROR DURING OFFSETS COMPUTATION !!"));
 };
 
-/*inline void GetPosition::Normalize( float _acc[] )
-  {
+inline void GetPosition::Normalize( float _acc[] )
+{
   float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
 
   _acc[0] = _acc[0] / norm;
   _acc[1] = _acc[1] / norm;
   _acc[2] = _acc[2] / norm;
-  }*/
+}
 
 bool IsVectorNormalized( float _acc[], float _epsilon ) {
   float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
@@ -136,17 +136,20 @@ void GetPosition::GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], f
   GetCorrectedAccelGyro(_accelgyro, accRaw, gyroRaw);
 
   // Compute rotation speed using gyroscopes
-  _speed[0] = gyroRaw[0] / GyroSensitivity;
-  _speed[1] = gyroRaw[1] / GyroSensitivity;
-  _speed[2] = gyroRaw[2] / GyroSensitivity;
+  _speed[0] = gyroRaw[0];
+  _speed[1] = gyroRaw[1];
+  _speed[2] = gyroRaw[2];
 
   // If accereleration norm is > 1g, device is moving, do not use acceleration data
-  if ( IsVectorNormalized(accRaw, 0.05) )
+  if ( IsVectorNormalized(accRaw, 0.05) ) {
     HighPassFilterCoeff = 0.98;
-  else
+    Normalize(accRaw);
+  } else
     HighPassFilterCoeff = 1.0;
 
   // Use complementary filter to merge gyro and accelerometer data
-  _pos[0] = HighPassFilterCoeff * (_pos[0] + (gyroRaw[0] / GyroSensitivity) * _loop_time) + (1 - HighPassFilterCoeff) * ((atan(accRaw[1] / accRaw[2])) * 57.2957795130823); // High pass filter on gyro, and low pass filter on accelerometer
-  _pos[1] = HighPassFilterCoeff * (_pos[1] + (gyroRaw[1] / GyroSensitivity) * _loop_time) + (1 - HighPassFilterCoeff) * ((atan(accRaw[0] / accRaw[2])) * 57.2957795130823); // High pass filter on gyro, and low pass filter on accelerometer
+  _pos[0] = HighPassFilterCoeff * (_pos[0] + (gyroRaw[0]) * _loop_time) + (1 - HighPassFilterCoeff) * ((atan(accRaw[1] / accRaw[2])) * 57.2957795130823); // High pass filter on gyro, and low pass filter on accelerometer
+  _pos[1] = HighPassFilterCoeff * (_pos[1] + (gyroRaw[1]) * _loop_time) + (1 - HighPassFilterCoeff) * ((-atan(accRaw[0] / accRaw[2])) * 57.2957795130823); // High pass filter on gyro, and low pass filter on accelerometer
+
+  // Serial.print( _pos[0] ); Serial.print( "\t" );Serial.print( (atan(accRaw[1] / accRaw[2])) * 57.2957795130823 ); Serial.print( "\t" );Serial.print( _pos[1] ); Serial.print( "\t" );Serial.println( (-atan(accRaw[0] / accRaw[2])) * 57.2957795130823 );
 }

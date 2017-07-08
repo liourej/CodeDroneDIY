@@ -120,9 +120,10 @@ void loop() {
         stateMachine.throttleWasHigh = true;
         rollPosCmd = rollPosPID.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loop_time );
         rollMotorPwr = rollSpeedPID.ComputeCorrection( rollPosCmd, speedCurr[0], loop_time );
-
-        pitchPosCmd = pitchPosPID.ComputeCorrection( -Rx.GetElevatorAngle(), posCurr[1], loop_time );
-        pitchMotorPwr = pitchSpeedPID.ComputeCorrection( -pitchPosCmd, speedCurr[1], loop_time );
+      
+        pitchPosCmd = pitchPosPID.ComputeCorrection( Rx.GetElevatorAngle(), posCurr[1], loop_time );
+        pitchMotorPwr = pitchSpeedPID.ComputeCorrection( pitchPosCmd, speedCurr[1], loop_time );
+        
         yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 20 s without power.

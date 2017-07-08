@@ -19,7 +19,7 @@ class GetPosition
   private:
     void GetCorrectedAccelGyro(MPU6050 _accelgyro, float _accMeasures[], float _gyroMeasures[]);
     void GetCorrectedGyro(MPU6050 _gyro, float _data[]);
-    //void Normalize( float _acc[] );
+    void Normalize( float _acc[] );
 
   public:
     bool AreOffsetComputed(void) {
