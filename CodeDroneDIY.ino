@@ -161,12 +161,19 @@ void loop() {
     /*********** DISARMED STATE ***********/
     case disarmed:
       stateMachine.state = Rx.GetFlyingMode();
-      if ( (stateMachine.state != disarmed) &&
-           (stateMachine.state != stateMachine.statePrev) ) {
-        stateMachine.state  = safety;
-        Serial.println(F("Choose same state than previous used"));
-        IdleAllESC();
-      } else if (stateMachine.state != disarmed) {
+      delay(200);
+      wdt_reset();
+      delay(200);
+      wdt_reset();
+      if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
+        stateMachine.state = disarmed;
+      /* if ( (stateMachine.state != disarmed) &&
+            (stateMachine.state != stateMachine.statePrev) ) {
+         stateMachine.state  = safety;
+         Serial.println(F("Choose same state than previous used"));
+         IdleAllESC();
+        } else*/
+      if (stateMachine.state != disarmed) {
         stateMachine.statePrev = stateMachine.state;
         stateMachine.throttleWasHigh = true;
       }
@@ -193,12 +200,15 @@ void loop() {
       IdleAllESC();
       stateMachine.state = Rx.GetFlyingMode();
       delay(200);
+      wdt_reset();
+      delay(200);
+      wdt_reset();
       if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
         stateMachine.state = starting;
 
       if ( (stateMachine.state != disarmed) && ( stateMachine.state == angle ) ) {
         g_Kp = map(analogRead(2), 0, 1023, 100, 500);
-        Serial.println(g_Kp);
+        Serial.print("g_Kp:\t"); Serial.println(g_Kp);
         anglePosPIDParams[1] = g_Kp;
         rollPosPID.SetGains(anglePosPIDParams);
         pitchPosPID.SetGains(anglePosPIDParams);

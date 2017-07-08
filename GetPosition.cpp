@@ -141,11 +141,12 @@ void GetPosition::GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], f
   _speed[2] = gyroRaw[2];
 
   // If accereleration norm is > 1g, device is moving, do not use acceleration data
-  if ( IsVectorNormalized(accRaw, 0.05) ) {
+  if ( IsVectorNormalized(accRaw, 0.2) ) {
     HighPassFilterCoeff = 0.98;
     Normalize(accRaw);
-  } else
+  } else{
     HighPassFilterCoeff = 1.0;
+  }
 
   // Use complementary filter to merge gyro and accelerometer data
   _pos[0] = HighPassFilterCoeff * (_pos[0] + (gyroRaw[0]) * _loop_time) + (1 - HighPassFilterCoeff) * ((atan(accRaw[1] / accRaw[2])) * 57.2957795130823); // High pass filter on gyro, and low pass filter on accelerometer
