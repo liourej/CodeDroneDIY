@@ -8,7 +8,7 @@
 
 class GetPosition
 {
-  private:
+  public:
     float HighPassFilterCoeff = 0.98;
     const float AcceleroSensitivity = 4096; // LSB/g at -+8g sensitivity
     const float GyroSensitivity = 32.8; // LSB/°/s  250=>131 or 500=>65.5 or 1000=>32.8 or 2000=>16.4

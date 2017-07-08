@@ -1,9 +1,7 @@
 #include "CodeDroneDIY.h"
 
 void setup() {
-  // Set watchdog reset
-  wdt_enable(WDTO_250MS);
-
+ 
   // Buzzer
   pinMode(12, OUTPUT);
 
@@ -13,7 +11,7 @@ void setup() {
   ESC2.attach(10);
   ESC3.attach(11);
   IdleAllESC();
- 
+
   InitTimer1();
 
   // Receiver
@@ -25,7 +23,7 @@ void setup() {
   // MPU6050: join I2C bus
   Wire.begin();
   Wire.setClock(400000L); // Communication with MPU-6050 at 400KHz
-  
+
   // MPU6050: initialize MPU6050 device
   accelgyro.initialize();
   accelgyro.setFullScaleGyroRange( MPU6050_GYRO_FS_1000); //  +-1000°s max  /!\ Be carrefull when changing this parameter: "GyroSensitivity" must be updated accordingly !!!
@@ -34,25 +32,26 @@ void setup() {
   if ( !accelgyro.testConnection())
     Serial.println(F("Test failed"));
 
-  wdt_reset();
-  
-  /* TODO: restore IMU check
+  // IMU check
+  Serial.println(F("/********* IMU self-test *********/"));
   if ( !CheckIMU(accelgyro, Position) )
-     Serial.print("IMU self test failed");
-    else
-     Serial.print("IMU self test succeed");
-  */
-  
+    Serial.println("IMU SELF TEST FAILED !!!!!");
+  else
+    Serial.println("IMU self test succeed");
+
+
   while ( !Rx.IsReady() ) {
     IdleAllESC();
     delay(10);
-    wdt_reset();
   }
 
   time.Init();
 
   PrintSettings(stateMachine);
 
+ // Set watchdog reset
+  wdt_enable(WDTO_250MS);
+  
   Serial.println(F("Setup Finished"));
 }
 
@@ -87,13 +86,13 @@ void XConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotor
   ESC3.write( _throttle + _pitchMotorPwr * mixing + _rollMotorPwr * mixing  + _YawMotorPwr * mixing);
 }
 
-void ResetPIDCommand(){
-	pitchMotorPwr = rollMotorPwr = yawMotorPwr = 0; // No correction if throttle put to min
-    rollPosPID.Reset();
-    pitchPosPID.Reset();
-    rollSpeedPID.Reset();
-    pitchSpeedPID.Reset();
-    yawSpeedPID.Reset();
+void ResetPIDCommand( int _rollMotorPwr, int _pitchMotorPwr, int _yawMotorPwr ) {
+  _pitchMotorPwr = _rollMotorPwr = _yawMotorPwr = 0; // No correction if throttle put to min
+  rollPosPID.Reset();
+  pitchPosPID.Reset();
+  rollSpeedPID.Reset();
+  pitchSpeedPID.Reset();
+  yawSpeedPID.Reset();
 }
 
 void loop() {
@@ -110,10 +109,10 @@ void loop() {
 
   // State Machine
   // initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
-  
+
   switch ( stateMachine.state )
   {
-	/*********** ANGLE STATE ***********/
+    /*********** ANGLE STATE ***********/
     case angle:
       throttle = Rx.GetThrottle();
       Position.GetCurrPos(accelgyro, posCurr, speedCurr, loop_time);
@@ -127,11 +126,11 @@ void loop() {
         yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 20 s without power.
-		ResetPIDCommand();
+        ResetPIDCommand(rollMotorPwr, pitchMotorPwr, yawMotorPwr);
       }
       XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
       break;
-	/*********** ACCRO STATE ***********/
+    /*********** ACCRO STATE ***********/
     case accro:
       throttle = Rx.GetThrottle();
       Position.GetCurrSpeed(accelgyro, speedCurr);
@@ -143,11 +142,11 @@ void loop() {
 
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 5 s without power.
-        ResetPIDCommand();
+        ResetPIDCommand(rollMotorPwr, pitchMotorPwr, yawMotorPwr);
       }
       XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
       break;
-	/*********** SAFETY STATE ***********/
+    /*********** SAFETY STATE ***********/
     case safety:
       stateMachine.state = Rx.GetFlyingMode();
       if ( stateMachine.state != disarmed ) {
@@ -158,7 +157,7 @@ void loop() {
       if ( Rx.GetSwitchH() )
         ActivateBuzzer(0.005, 500);
       break;
-	/*********** DISARMED STATE ***********/
+    /*********** DISARMED STATE ***********/
     case disarmed:
       stateMachine.state = Rx.GetFlyingMode();
       if ( (stateMachine.state != disarmed) &&
@@ -174,7 +173,7 @@ void loop() {
       if ( Rx.GetSwitchH() )
         ActivateBuzzer(0.005, 500);
       break;
-	/*********** INITIALIZATION STATE ***********/
+    /*********** INITIALIZATION STATE ***********/
     case initialization:
       IdleAllESC();
       if (!Position.AreOffsetComputed())
@@ -188,34 +187,34 @@ void loop() {
       if ( Rx.GetSwitchH() )
         ActivateBuzzer(0.005, 500);
       break;
-	/*********** STARTING STATE ***********/
+    /*********** STARTING STATE ***********/
     case starting:
       IdleAllESC();
       stateMachine.state = Rx.GetFlyingMode();
-      if ( (stateMachine.state != disarmed) && ( stateMachine.state== angle ) ){
-		g_Kp = map(analogRead(2), 0, 1023, 100, 500);
-		Serial.println(g_Kp);
-		anglePosPIDParams[1] = g_Kp;
-		rollPosPID.SetGains(anglePosPIDParams);
-		pitchPosPID.SetGains(anglePosPIDParams);
-		rollSpeedPID.SetGains(angleSpeedPIDParams);
-		pitchSpeedPID.SetGains(angleSpeedPIDParams);
-		yawSpeedPID.SetGains(yawSpeedPIDParams);
-		
+      if ( (stateMachine.state != disarmed) && ( stateMachine.state == angle ) ) {
+        g_Kp = map(analogRead(2), 0, 1023, 100, 500);
+        Serial.println(g_Kp);
+        anglePosPIDParams[1] = g_Kp;
+        rollPosPID.SetGains(anglePosPIDParams);
+        pitchPosPID.SetGains(anglePosPIDParams);
+        rollSpeedPID.SetGains(angleSpeedPIDParams);
+        pitchSpeedPID.SetGains(angleSpeedPIDParams);
+        yawSpeedPID.SetGains(yawSpeedPIDParams);
+
         stateMachine.statePrev = stateMachine.state;
-	  }else if( (stateMachine.state != disarmed) && ( stateMachine.state== accro ) ){
+      } else if ( (stateMachine.state != disarmed) && ( stateMachine.state == accro ) ) {
         rollSpeedPID.SetGains(accroSpeedPIDParams);
-		pitchSpeedPID.SetGains(accroSpeedPIDParams);
-		yawSpeedPID.SetGains(yawSpeedPIDParams);
-		
-	    stateMachine.statePrev = stateMachine.state;
-	  }else
+        pitchSpeedPID.SetGains(accroSpeedPIDParams);
+        yawSpeedPID.SetGains(yawSpeedPIDParams);
+
+        stateMachine.statePrev = stateMachine.state;
+      } else
         stateMachine.state = starting;
       if ( Rx.GetSwitchH() )
         ActivateBuzzer(0.005, 500);
       break;
     default:
-		Serial.print("UNDEFINED STATE!");
+      Serial.print("UNDEFINED STATE!");
       break;
   }
 

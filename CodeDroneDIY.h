@@ -24,23 +24,23 @@ MPU6050 accelgyro;
 StateMachine stateMachine;
 
 void ActivateBuzzer(float _frequency, int _duration) {
-      Time time;
-      time.Init();
-      while ( (time.GetExecutionTime() * 1000) < _duration) {
-        digitalWrite(12, HIGH);
-        delay(1 / (2 * _frequency) );
-        digitalWrite(12, LOW);
-        delay(1 / (2 * _frequency) );
-        wdt_reset();
-        Serial.println(F("BUZZZZZ"));
-      }
- }
- 
-void IdleAllESC(){
-    ESC0.Idle();
-    ESC1.Idle();
-    ESC2.Idle();
-    ESC3.Idle();
+  Time time;
+  time.Init();
+  while ( (time.GetExecutionTime() * 1000) < _duration) {
+    digitalWrite(12, HIGH);
+    delay(1 / (2 * _frequency) );
+    digitalWrite(12, LOW);
+    delay(1 / (2 * _frequency) );
+    wdt_reset();
+    Serial.println(F("BUZZZZZ"));
+  }
+}
+
+void IdleAllESC() {
+  ESC0.Idle();
+  ESC1.Idle();
+  ESC2.Idle();
+  ESC3.Idle();
 }
 
 static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t *TCNTn, volatile uint16_t* OCRnA) {
@@ -67,6 +67,7 @@ void InitTimer1() {
 }
 
 void PrintSettings(StateMachine _stateMachine) {
+  Serial.println(F("/********* settings *********/"));
   Serial.print(F("MAX_POWER:\t")); Serial.println(MAX_POWER);
   if ( _stateMachine.state == angle) {
     Serial.println(F("FLYING_MODE_ANGLE"));

@@ -6,7 +6,8 @@ float ComputeAccFactoryTrimValue(float _accTestVal) {
   if ( _accTestVal == 0 )
     return 0;
   else
-    return (4096 * 0.34 * pow(0.92, ( (_accTestVal - 1) / (pow(2, 5) - 2))) / 0.34);
+    //       (4096 * 0.34)*(pow( (0.92/0.34) , (((float)selfTest[0] - 1.0)/30.0))); // FT[Xa] factory trim calculation
+    return (4096 * 0.34 * pow(0.92,          ((_accTestVal - 1) / (pow(2, 5) - 2))) / 0.34);
 }
 
 float ComputeGyroFactoryTrimValue(float _gyroTestVal, bool _isYcoord) {
@@ -19,7 +20,7 @@ float ComputeGyroFactoryTrimValue(float _gyroTestVal, bool _isYcoord) {
 }
 
 bool CheckGyro(MPU6050 _accelgyro, GetPosition _Position) {
-  int16_t dataTestEnabled[6] = {0, 0, 0, 0, 0, 0};
+  float dataTestEnabled[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   int16_t dataTestDisabled[6] = {0, 0, 0, 0, 0, 0};
   float STR[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   float FT[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -29,26 +30,45 @@ bool CheckGyro(MPU6050 _accelgyro, GetPosition _Position) {
 
   storeGyroSensitivity = _accelgyro.getFullScaleGyroRange();
   _accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
-  
-   delay(1000);
-   _accelgyro.getMotion6(&dataTestDisabled[0], &dataTestDisabled[1], &dataTestDisabled[2], &dataTestDisabled[3], &dataTestDisabled[4], &dataTestDisabled[5]);
-  
+
+  delay(1000);
+  _accelgyro.getMotion6(&dataTestDisabled[0],&dataTestDisabled[1], &dataTestDisabled[2], &dataTestDisabled[3], &dataTestDisabled[4], &dataTestDisabled[5]);
+
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, true);
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, true);
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, true);
 
   delay(1000);
-  _accelgyro.getMotion6(&dataTestEnabled[0], &dataTestEnabled[1], &dataTestEnabled[2], &dataTestEnabled[3], &dataTestEnabled[4], &dataTestEnabled[5]);
+  //_Position.GetAccelGyro(_accelgyro, dataTestEnabled);
+  uint8_t rawData[4];
+  //_Position.GetAccelGyro(_accelgyro, dataTestEnabled);
+  rawData[0] = _accelgyro.getAccelXSelfTestVal(); // X-axis self-test results
+  rawData[1] = _accelgyro.getAccelYSelfTestVal(); // Y-axis self-test results
+  rawData[2] = _accelgyro.getAccelZSelfTestVal(); // Z-axis self-test results
+  rawData[3] = _accelgyro.getAccelMixedSelfTestVal();
+
+  //Serial.print("rawData:\t"); Serial.print(rawData[0]); Serial.print("\t"); Serial.print(rawData[1]); Serial.print("\t"); Serial.print(rawData[2]); Serial.print("\t"); Serial.println(rawData[3]);
+
+
+  // Extract the gyration test results first
+  dataTestEnabled[3] = rawData[0]  & 0x1F ; // XG_TEST result is a five-bit unsigned integer
+  dataTestEnabled[4] = rawData[1]  & 0x1F ; // YG_TEST result is a five-bit unsigned integer
+  dataTestEnabled[5] = rawData[2]  & 0x1F ; // ZG_TEST result is a five-bit unsigned integer
+ 
+ // Serial.print("dataTestEnabled:\t"); Serial.print(dataTestEnabled[3]); Serial.print("\t"); Serial.print(dataTestEnabled[4]); Serial.print("\t"); Serial.println(dataTestEnabled[5]);
+  
   for (int axis = 3; axis < 6; axis ++) { // Gyro data
     if ( axis == 4) // if axis is Y, computation is different (negative sign)
       FT[axis] = ComputeGyroFactoryTrimValue( dataTestEnabled[axis], true );
     else
       FT[axis] = ComputeGyroFactoryTrimValue( dataTestEnabled[axis], false );
     STR[axis] = dataTestEnabled[axis] - dataTestDisabled[axis];
-    trimChange[axis] = (( STR[axis] - FT[axis]) / FT[axis]) * 100;
+    trimChange[axis] = 100 + (( STR[axis] - FT[axis]) / FT[axis]) * 100;
     if ( abs(trimChange[axis]) > 14 ) // 14% See PS-MPU-6000A-00 rev 3.3 - �6.2 Accelerometer specifications
       testSucceed = false;
   }
+  //Serial.print("FT:\t"); Serial.print(FT[3]); Serial.print("\t"); Serial.print(FT[4]); Serial.print("\t"); Serial.println(FT[5]);
+  //Serial.print("STR:\t"); Serial.print(STR[3]); Serial.print("\t"); Serial.print(STR[4]); Serial.print("\t"); Serial.println(STR[5]);
   Serial.print("Gyro trim test results:\t"); Serial.print(trimChange[3]); Serial.print("\t"); Serial.print(trimChange[4]); Serial.print("\t"); Serial.println(trimChange[5]);
 
   // Restore normal operating
@@ -56,38 +76,57 @@ bool CheckGyro(MPU6050 _accelgyro, GetPosition _Position) {
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, false);
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, false);
   _accelgyro.setFullScaleGyroRange(storeGyroSensitivity);
-  delay(1000);
+
+  return testSucceed;
 }
 
 bool CheckAccelero(MPU6050 _accelgyro, GetPosition _Position) {
-  int16_t dataTestEnabled[6] = {0, 0, 0, 0, 0, 0};
+  float dataTestEnabled[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   int16_t dataTestDisabled[6] = {0, 0, 0, 0, 0, 0};
   float STR[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   float FT[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   float trimChange[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   bool testSucceed = true;
   int storeAccSensitivity = -1;
-  
+
   storeAccSensitivity = _accelgyro.getFullScaleAccelRange();
   _accelgyro.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
 
   delay(1000);
-  _accelgyro.getMotion6(&dataTestDisabled[0], &dataTestDisabled[1], &dataTestDisabled[2], &dataTestDisabled[3], &dataTestDisabled[4], &dataTestDisabled[5]);
-
+  _accelgyro.getMotion6(&dataTestDisabled[0],&dataTestDisabled[1], &dataTestDisabled[2], &dataTestDisabled[3], &dataTestDisabled[4], &dataTestDisabled[5]);
+  dataTestDisabled[2] = dataTestDisabled[2] - _Position.AcceleroSensitivity; // Remove gravity
   _accelgyro.setAccelXSelfTest(true);
   _accelgyro.setAccelYSelfTest(true);
   _accelgyro.setAccelZSelfTest(true);
 
   delay(1000);
-   _accelgyro.getMotion6(&dataTestEnabled[0], &dataTestEnabled[1], &dataTestEnabled[2], &dataTestEnabled[3], &dataTestEnabled[4], &dataTestEnabled[5]);
+  uint8_t rawData[4];
+  rawData[0] = _accelgyro.getAccelXSelfTestVal(); // X-axis self-test results
+  rawData[1] = _accelgyro.getAccelYSelfTestVal(); // Y-axis self-test results
+  rawData[2] = _accelgyro.getAccelZSelfTestVal(); // Z-axis self-test results
+  rawData[3] = _accelgyro.getAccelMixedSelfTestVal();
 
+ // Serial.print("rawData:\t"); Serial.print(rawData[0]); Serial.print("\t"); Serial.print(rawData[1]); Serial.print("\t"); Serial.print(rawData[2]); Serial.print("\t"); Serial.println(rawData[3]);
+
+  // Extract the acceleration test results first
+  dataTestEnabled[0] = (rawData[0] >> 3) | (rawData[3] & 0x30) >> 4 ; // XA_TEST result is a five-bit unsigned integer
+  dataTestEnabled[1] = (rawData[1] >> 3) | (rawData[3] & 0x0C) >> 4 ; // YA_TEST result is a five-bit unsigned integer
+  dataTestEnabled[2] = (rawData[2] >> 3) | (rawData[3] & 0x03) >> 4 ; // ZA_TEST result is a five-bit unsigned integer
+
+  //Serial.print("dataTestEnabled:\t"); Serial.print(dataTestEnabled[0]); Serial.print("\t"); Serial.print(dataTestEnabled[1]); Serial.print("\t"); Serial.println(dataTestEnabled[2]);
+  //Serial.print("dataTestDisabled:\t"); Serial.print(dataTestDisabled[0]); Serial.print("\t"); Serial.print(dataTestDisabled[1]); Serial.print("\t"); Serial.println(dataTestDisabled[2]);
   for (int axis = 0; axis < 3; axis ++) {
     FT[axis] = ComputeAccFactoryTrimValue( dataTestEnabled[axis] );
     STR[axis] = dataTestEnabled[axis] - dataTestDisabled[axis];
-    trimChange[axis] = (( STR[axis] - FT[axis]) / FT[axis]) * 100;
+
+    trimChange[axis] = 100 + (( STR[axis] - FT[axis]) / FT[axis]) * 100;
     if ( abs(trimChange[axis]) > 14 ) // 14% See PS-MPU-6000A-00 rev 3.3 - �6.2 Accelerometer specifications
       testSucceed = false;
   }
+
+//  Serial.print("FT:\t"); Serial.print(FT[0]); Serial.print("\t"); Serial.print(FT[1]); Serial.print("\t"); Serial.println(FT[2]);
+//  Serial.print("STR:\t"); Serial.print(STR[0]); Serial.print("\t"); Serial.print(STR[1]); Serial.print("\t"); Serial.println(STR[2]);
+
   Serial.print("Acc trim test results:\t"); Serial.print(trimChange[0]); Serial.print("\t"); Serial.print(trimChange[1]); Serial.print("\t"); Serial.println(trimChange[2]);
 
   // Restore normal operating
@@ -96,18 +135,20 @@ bool CheckAccelero(MPU6050 _accelgyro, GetPosition _Position) {
   _accelgyro.setAccelZSelfTest(false);
   _accelgyro.setFullScaleAccelRange(storeAccSensitivity);
   delay(1000);
+
+  return testSucceed;
 }
 
 bool CheckIMU(MPU6050 _accelgyro, GetPosition _Position) {
   bool testSucceed = true;
-  
+
   // Check accelerometers
   if ( !CheckAccelero( _accelgyro, _Position) )
     testSucceed = false;
-
+  
   // Check Gyroscopes
   if ( !CheckGyro(_accelgyro, _Position) )
-    testSucceed = false;
-
+     testSucceed = false;
+  
   return testSucceed;
 }

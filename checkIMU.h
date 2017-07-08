@@ -1,4 +1,9 @@
-
+#define SELF_TEST_X      0x0D
+#define SELF_TEST_Y      0x0E    
+#define SELF_TEST_Z      0x0F
+#define GYRO_CONFIG      0x1B
+#define ACCEL_CONFIG     0x1C
+#define PWR_MGMT_1       0x6B // Device defaults to the SLEEP mode
 
 #define MPU6050_GCONFIG_XG_ST_BIT 7
 #define MPU6050_GCONFIG_YG_ST_BIT 6

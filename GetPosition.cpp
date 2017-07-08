@@ -53,9 +53,9 @@ void GetPosition::ComputeOffsets(MPU6050 _accelgyro)
       if ( accGyroRaw[coord] < minVal[coord])
         minVal[coord] = accGyroRaw[coord];
       offsetSum[coord] = offsetSum[coord] + accGyroRaw[coord];
-      Serial.print(accGyroRaw[coord]); Serial.print("\t");
+      //Serial.print(accGyroRaw[coord]); Serial.print("\t");
     }
-    Serial.print("\n");
+    //Serial.print("\n");
     wdt_reset();
     delay(200);
   }
