@@ -1,7 +1,7 @@
 #include "CodeDroneDIY.h"
 
 void setup() {
- 
+
   // Buzzer
   pinMode(12, OUTPUT);
 
@@ -49,9 +49,9 @@ void setup() {
 
   PrintSettings(stateMachine);
 
- // Set watchdog reset
+  // Set watchdog reset
   wdt_enable(WDTO_250MS);
-  
+
   Serial.println(F("Setup Finished"));
 }
 
@@ -120,10 +120,10 @@ void loop() {
         stateMachine.throttleWasHigh = true;
         rollPosCmd = rollPosPID.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loop_time );
         rollMotorPwr = rollSpeedPID.ComputeCorrection( rollPosCmd, speedCurr[0], loop_time );
-      
+
         pitchPosCmd = pitchPosPID.ComputeCorrection( Rx.GetElevatorAngle(), posCurr[1], loop_time );
         pitchMotorPwr = pitchSpeedPID.ComputeCorrection( pitchPosCmd, speedCurr[1], loop_time );
-        
+
         yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 20 s without power.
@@ -192,6 +192,10 @@ void loop() {
     case starting:
       IdleAllESC();
       stateMachine.state = Rx.GetFlyingMode();
+      delay(200);
+      if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
+        stateMachine.state = starting;
+
       if ( (stateMachine.state != disarmed) && ( stateMachine.state == angle ) ) {
         g_Kp = map(analogRead(2), 0, 1023, 100, 500);
         Serial.println(g_Kp);
@@ -203,12 +207,14 @@ void loop() {
         yawSpeedPID.SetGains(yawSpeedPIDParams);
 
         stateMachine.statePrev = stateMachine.state;
+        Serial.println("ANGLE MODE");
       } else if ( (stateMachine.state != disarmed) && ( stateMachine.state == accro ) ) {
         rollSpeedPID.SetGains(accroSpeedPIDParams);
         pitchSpeedPID.SetGains(accroSpeedPIDParams);
         yawSpeedPID.SetGains(yawSpeedPIDParams);
 
         stateMachine.statePrev = stateMachine.state;
+        Serial.println("ACCRO MODE");
       } else
         stateMachine.state = starting;
       if ( Rx.GetSwitchH() )
