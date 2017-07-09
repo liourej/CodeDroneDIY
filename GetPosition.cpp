@@ -112,8 +112,8 @@ bool GetPosition::IsVectorNormalized( float _acc[], float _epsilon ) {
 }
 
 float GetPosition::PercentVectorNormalized( float _acc[]) {
- float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
- return abs(1-norm);
+  float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
+  return abs(1 - norm);
 }
 
 // Get rotation speed using only gyro
@@ -128,6 +128,10 @@ void GetPosition::GetCurrSpeed(MPU6050 _accelgyro, float _speed[])
   _speed[0] = gyroRaw[0] / GyroSensitivity;
   _speed[1] = gyroRaw[1] / GyroSensitivity;
   _speed[2] = gyroRaw[2] / GyroSensitivity;
+}
+
+float GetPosition::GetFilterTimeConstant(float _loopTimeSec) {
+  return ( (HighPassFilterCoeff * _loopTimeSec) / (1 - HighPassFilterCoeff));
 }
 
 // Get position combining acc + gyro
@@ -148,9 +152,9 @@ void GetPosition::GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], f
   // If accereleration norm is > 1g, device is moving, do not use acceleration data
   float percentNormalized = PercentVectorNormalized(accRaw);
   if ( percentNormalized < 0.2 ) { // Quadri is not moving, accelero is measuring gravitation
-    HighPassFilterCoeff = 0.98 + percentNormalized; // Filter coeff proportionnal to quadri potential movement
+    //HighPassFilterCoeff = 0.98 + percentNormalized; // Filter coeff proportionnal to quadri potential movement
     Normalize(accRaw);
-  } else{
+  } else {
     HighPassFilterCoeff = 1.0;
   }
 

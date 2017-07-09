@@ -103,7 +103,7 @@ void loop() {
   static int loopNb = 0;
   static float meanLoopTime =  0;
   int throttle = 0;
-  float loop_time = time.GetloopTime();
+  float loopTimeSec = time.GetloopTime();
   int rollPosCmd, pitchPosCmd, yawPosCmd = 0;
   int rollMotorPwr, pitchMotorPwr, yawMotorPwr = 0;
 
@@ -115,16 +115,16 @@ void loop() {
     /*********** ANGLE STATE ***********/
     case angle:
       throttle = Rx.GetThrottle();
-      Position.GetCurrPos(accelgyro, posCurr, speedCurr, loop_time);
+      Position.GetCurrPos(accelgyro, posCurr, speedCurr, loopTimeSec);
       if ( throttle > 1100 ) {
         stateMachine.throttleWasHigh = true;
-        rollPosCmd = rollPosPID.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loop_time );
-        rollMotorPwr = rollSpeedPID.ComputeCorrection( rollPosCmd, speedCurr[0], loop_time );
+        rollPosCmd = rollPosPID.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loopTimeSec );
+        rollMotorPwr = rollSpeedPID.ComputeCorrection( rollPosCmd, speedCurr[0], loopTimeSec );
 
-        pitchPosCmd = pitchPosPID.ComputeCorrection( Rx.GetElevatorAngle(), posCurr[1], loop_time );
-        pitchMotorPwr = pitchSpeedPID.ComputeCorrection( pitchPosCmd, speedCurr[1], loop_time );
+        pitchPosCmd = pitchPosPID.ComputeCorrection( Rx.GetElevatorAngle(), posCurr[1], loopTimeSec );
+        pitchMotorPwr = pitchSpeedPID.ComputeCorrection( pitchPosCmd, speedCurr[1], loopTimeSec );
 
-        yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
+        yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 20 s without power.
         ResetPIDCommand(rollMotorPwr, pitchMotorPwr, yawMotorPwr);
@@ -137,9 +137,9 @@ void loop() {
       Position.GetCurrSpeed(accelgyro, speedCurr);
       if ( throttle > 1100 ) {
         stateMachine.throttleWasHigh = true;
-        rollMotorPwr = rollSpeedPID.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loop_time );
-        pitchMotorPwr = pitchSpeedPID.ComputeCorrection( Rx.GetElevatorSpeed(), speedCurr[1], loop_time );
-        yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loop_time );
+        rollMotorPwr = rollSpeedPID.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loopTimeSec );
+        pitchMotorPwr = pitchSpeedPID.ComputeCorrection( Rx.GetElevatorSpeed(), speedCurr[1], loopTimeSec );
+        yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
 
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 5 s without power.
@@ -213,7 +213,7 @@ void loop() {
       if ( (stateMachine.state != disarmed) && ( stateMachine.state == angle ) ) {
         anglePosPIDParams[1] = map(analogRead(2), 0, 1023, 100, 500); // Adjust Kp from potentiometer
         anglePosPIDParams[3] = map(analogRead(3), 0, 1023, 0, 100); // Adjust Ki from potentiometer
-        
+
         rollPosPID.SetGains(anglePosPIDParams);
         pitchPosPID.SetGains(anglePosPIDParams);
         rollSpeedPID.SetGains(angleSpeedPIDParams);
@@ -238,15 +238,18 @@ void loop() {
       break;
   }
 
-  if ( loopNb > 1000)
-  {
-    meanLoopTime = meanLoopTime / loopNb;
-    // Serial.println(meanLoopTime * 1000, 2);
-    meanLoopTime = 0;
-    loopNb = 0;
-  } else {
-    meanLoopTime += loop_time;
-    loopNb++;
+  // Compute mean loop time and complementary filter time constant
+  if ( ((stateMachine.state == angle) || (stateMachine.state == accro)) && ( throttle > 1100 )) {
+    if ( loopNb > 1000) {
+      meanLoopTime = meanLoopTime / loopNb;
+      // Serial.println(meanLoopTime * 1000, 2);
+      Serial.println(Position.GetFilterTimeConstant(meanLoopTime));
+      meanLoopTime = 0;
+      loopNb = 0;
+    } else {
+      meanLoopTime += loopTimeSec;
+      loopNb++;
+    }
   }
 
   wdt_reset();
