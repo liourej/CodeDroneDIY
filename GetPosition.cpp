@@ -102,13 +102,18 @@ inline void GetPosition::Normalize( float _acc[] )
   _acc[2] = _acc[2] / norm;
 }
 
-bool IsVectorNormalized( float _acc[], float _epsilon ) {
+bool GetPosition::IsVectorNormalized( float _acc[], float _epsilon ) {
   float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
 
   if ( abs(1 - norm) < _epsilon )
     return true;
 
   return false;
+}
+
+float GetPosition::PercentVectorNormalized( float _acc[]) {
+ float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
+ return abs(1-norm);
 }
 
 // Get rotation speed using only gyro
@@ -141,8 +146,9 @@ void GetPosition::GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], f
   _speed[2] = gyroRaw[2];
 
   // If accereleration norm is > 1g, device is moving, do not use acceleration data
-  if ( IsVectorNormalized(accRaw, 0.2) ) {
-    HighPassFilterCoeff = 0.98;
+  float percentNormalized = PercentVectorNormalized(accRaw);
+  if ( percentNormalized < 0.2 ) { // Quadri is not moving, accelero is measuring gravitation
+    HighPassFilterCoeff = 0.98 + percentNormalized; // Filter coeff proportionnal to quadri potential movement
     Normalize(accRaw);
   } else{
     HighPassFilterCoeff = 1.0;

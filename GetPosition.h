@@ -20,7 +20,8 @@ class GetPosition
     void GetCorrectedAccelGyro(MPU6050 _accelgyro, float _accMeasures[], float _gyroMeasures[]);
     void GetCorrectedGyro(MPU6050 _gyro, float _data[]);
     void Normalize( float _acc[] );
-
+    bool IsVectorNormalized( float _acc[], float _epsilon );
+    float PercentVectorNormalized( float _acc[]);
   public:
     bool AreOffsetComputed(void) {
       return offsetComputed;
