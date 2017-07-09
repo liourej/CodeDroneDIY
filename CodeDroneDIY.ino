@@ -176,6 +176,10 @@ void loop() {
       if (stateMachine.state != disarmed) {
         stateMachine.statePrev = stateMachine.state;
         stateMachine.throttleWasHigh = true;
+        if ( stateMachine.state == angle)
+          Serial.println("ANGLE MODE");
+        else if ( stateMachine.state == accro)
+          Serial.println("ACCRO MODE");
       }
 
       if ( Rx.GetSwitchH() )
