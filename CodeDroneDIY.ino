@@ -211,15 +211,14 @@ void loop() {
         stateMachine.state = starting;
 
       if ( (stateMachine.state != disarmed) && ( stateMachine.state == angle ) ) {
-        g_Kp = map(analogRead(2), 0, 1023, 100, 500);
-        Serial.print("g_Kp:\t"); Serial.println(g_Kp);
-        anglePosPIDParams[1] = g_Kp;
+        anglePosPIDParams[1] = map(analogRead(2), 0, 1023, 100, 500); // Adjust Kp from potentiometer
+        anglePosPIDParams[3] = map(analogRead(3), 0, 1023, 0, 100); // Adjust Ki from potentiometer
+        
         rollPosPID.SetGains(anglePosPIDParams);
         pitchPosPID.SetGains(anglePosPIDParams);
         rollSpeedPID.SetGains(angleSpeedPIDParams);
         pitchSpeedPID.SetGains(angleSpeedPIDParams);
         yawSpeedPID.SetGains(yawSpeedPIDParams);
-
         stateMachine.statePrev = stateMachine.state;
         Serial.println("ANGLE MODE");
       } else if ( (stateMachine.state != disarmed) && ( stateMachine.state == accro ) ) {
