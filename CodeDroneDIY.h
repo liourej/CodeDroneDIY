@@ -77,6 +77,8 @@ void PrintSettings(StateMachine _stateMachine) {
     rollSpeedPID.PrintGains();
     pitchSpeedPID.PrintGains();
     yawSpeedPID.PrintGains();
+    Serial.println(F("/********* Complementary filter *********/"));
+    Serial.print("Coefficient:\t");Serial.print(Position.HighPassFilterCoeff); Serial.print("\tTime constant:\t");Serial.println(Position.GetFilterTimeConstant(0.00249));
   } else if ( _stateMachine.state == accro) {
     Serial.println(F("FLYING_MODE_ACCRO"));
     Serial.println(F("/********* PID settings *********/"));

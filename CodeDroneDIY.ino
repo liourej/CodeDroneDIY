@@ -47,8 +47,6 @@ void setup() {
 
   time.Init();
 
-  PrintSettings(stateMachine);
-
   // Set watchdog reset
   wdt_enable(WDTO_250MS);
 
@@ -109,7 +107,7 @@ void loop() {
 
   // State Machine
   // initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
-
+      
   switch ( stateMachine.state )
   {
     /*********** ANGLE STATE ***********/
@@ -221,6 +219,8 @@ void loop() {
         yawSpeedPID.SetGains(yawSpeedPIDParams);
         stateMachine.statePrev = stateMachine.state;
         Serial.println("ANGLE MODE");
+        PrintSettings(stateMachine);
+
       } else if ( (stateMachine.state != disarmed) && ( stateMachine.state == accro ) ) {
         rollSpeedPID.SetGains(accroSpeedPIDParams);
         pitchSpeedPID.SetGains(accroSpeedPIDParams);
@@ -228,6 +228,7 @@ void loop() {
 
         stateMachine.statePrev = stateMachine.state;
         Serial.println("ACCRO MODE");
+        PrintSettings(stateMachine);
       } else
         stateMachine.state = starting;
       if ( Rx.GetSwitchH() )
@@ -243,7 +244,7 @@ void loop() {
     if ( loopNb > 1000) {
       meanLoopTime = meanLoopTime / loopNb;
       // Serial.println(meanLoopTime * 1000, 2);
-      Serial.println(Position.GetFilterTimeConstant(meanLoopTime));
+      //Serial.println(Position.GetFilterTimeConstant(meanLoopTime));
       meanLoopTime = 0;
       loopNb = 0;
     } else {

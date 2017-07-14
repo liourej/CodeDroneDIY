@@ -149,18 +149,22 @@ void GetPosition::GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], f
   _speed[1] = gyroRaw[1];
   _speed[2] = gyroRaw[2];
 
-  // If accereleration norm is > 1g, device is moving, do not use acceleration data
-  float percentNormalized = PercentVectorNormalized(accRaw);
-  if ( percentNormalized < 0.2 ) { // Quadri is not moving, accelero is measuring gravitation
-    //HighPassFilterCoeff = 0.98 + percentNormalized; // Filter coeff proportionnal to quadri potential movement
-    Normalize(accRaw);
-  } else {
-    HighPassFilterCoeff = 1.0;
-  }
+  Normalize(accRaw);
+
+  /*static int counter = 0;
+  static float pitchGyro = 0.0;
+  float pitchAcc = 0.0;
+  pitchGyro = pitchGyro + (gyroRaw[1]) * _loop_time;
+  pitchAcc = ((-atan(accRaw[0] / accRaw[2])) * 57.2957795130823);*/
 
   // Use complementary filter to merge gyro and accelerometer data
   _pos[0] = HighPassFilterCoeff * (_pos[0] + (gyroRaw[0]) * _loop_time) + (1 - HighPassFilterCoeff) * ((atan(accRaw[1] / accRaw[2])) * 57.2957795130823); // High pass filter on gyro, and low pass filter on accelerometer
   _pos[1] = HighPassFilterCoeff * (_pos[1] + (gyroRaw[1]) * _loop_time) + (1 - HighPassFilterCoeff) * ((-atan(accRaw[0] / accRaw[2])) * 57.2957795130823); // High pass filter on gyro, and low pass filter on accelerometer
 
-  // Serial.print( _pos[0] ); Serial.print( "\t" );Serial.print( (atan(accRaw[1] / accRaw[2])) * 57.2957795130823 ); Serial.print( "\t" );Serial.print( _pos[1] ); Serial.print( "\t" );Serial.println( (-atan(accRaw[0] / accRaw[2])) * 57.2957795130823 );
+ /* if ( counter > 250 ) {
+    //Serial.print( accRaw[0] ); Serial.print( "\t" ); Serial.print( accRaw[1] ); Serial.print( "\t" ); Serial.println( accRaw[2] );
+    Serial.print( pitchGyro ); Serial.print( "\t" ); Serial.print( pitchAcc ); Serial.print( "\t" ); Serial.println( _pos[1] );
+    counter = 0;
+  } else
+    counter ++;*/
 }
