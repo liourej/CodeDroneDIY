@@ -19,6 +19,6 @@ float yawSpeedPIDParams[4] = { 0.010, 150.0, 0.0, 0.0};// G, Kp, Kd, Ki
 float mixing = 0.5; //0.75
 
 // Command setup
-#define MAX_ANGLE  30 // °
+#define MAX_ANGLE  45 // °
 #define MAX_ROT_SPEED  135 // °/s
 #define MAX_YAW_SPEED  100// °/s

@@ -86,11 +86,14 @@ void XConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotor
 
 void ResetPIDCommand( int _rollMotorPwr, int _pitchMotorPwr, int _yawMotorPwr ) {
   _pitchMotorPwr = _rollMotorPwr = _yawMotorPwr = 0; // No correction if throttle put to min
-  rollPosPID.Reset();
-  pitchPosPID.Reset();
-  rollSpeedPID.Reset();
-  pitchSpeedPID.Reset();
-  yawSpeedPID.Reset();
+  rollPosPID_Angle.Reset();
+  pitchPosPID_Angle.Reset();
+  rollSpeedPID_Angle.Reset();
+  pitchSpeedPID_Angle.Reset();
+  yawSpeedPID_Angle.Reset();
+  rollSpeedPID_Accro.Reset();
+  pitchSpeedPID_Accro.Reset();
+  yawSpeedPID_Accro.Reset();
 }
 
 void loop() {
@@ -107,7 +110,7 @@ void loop() {
 
   // State Machine
   // initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
-      
+
   switch ( stateMachine.state )
   {
     /*********** ANGLE STATE ***********/
@@ -116,13 +119,13 @@ void loop() {
       Position.GetCurrPos(accelgyro, posCurr, speedCurr, loopTimeSec);
       if ( throttle > 1100 ) {
         stateMachine.throttleWasHigh = true;
-        rollPosCmd = rollPosPID.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loopTimeSec );
-        rollMotorPwr = rollSpeedPID.ComputeCorrection( rollPosCmd, speedCurr[0], loopTimeSec );
+        rollPosCmd = rollPosPID_Angle.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loopTimeSec );
+        rollMotorPwr = rollSpeedPID_Angle.ComputeCorrection( rollPosCmd, speedCurr[0], loopTimeSec );
 
-        pitchPosCmd = pitchPosPID.ComputeCorrection( Rx.GetElevatorAngle(), posCurr[1], loopTimeSec );
-        pitchMotorPwr = pitchSpeedPID.ComputeCorrection( pitchPosCmd, speedCurr[1], loopTimeSec );
+        pitchPosCmd = pitchPosPID_Angle.ComputeCorrection( Rx.GetElevatorAngle(), posCurr[1], loopTimeSec );
+        pitchMotorPwr = pitchSpeedPID_Angle.ComputeCorrection( pitchPosCmd, speedCurr[1], loopTimeSec );
 
-        yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
+        yawMotorPwr = yawSpeedPID_Angle.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 20 s without power.
         ResetPIDCommand(rollMotorPwr, pitchMotorPwr, yawMotorPwr);
@@ -135,9 +138,9 @@ void loop() {
       Position.GetCurrSpeed(accelgyro, speedCurr);
       if ( throttle > 1100 ) {
         stateMachine.throttleWasHigh = true;
-        rollMotorPwr = rollSpeedPID.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loopTimeSec );
-        pitchMotorPwr = pitchSpeedPID.ComputeCorrection( Rx.GetElevatorSpeed(), speedCurr[1], loopTimeSec );
-        yawMotorPwr = yawSpeedPID.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
+        rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loopTimeSec );
+        pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection( Rx.GetElevatorSpeed(), speedCurr[1], loopTimeSec );
+        yawMotorPwr = yawSpeedPID_Accro.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
 
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 5 s without power.
@@ -186,7 +189,7 @@ void loop() {
     /*********** INITIALIZATION STATE ***********/
     case initialization:
       IdleAllESC();
-      if (!Position.AreOffsetComputed())
+      while (!Position.AreOffsetComputed())
         Position.ComputeOffsets(accelgyro);
 
       stateMachine.state = Rx.GetFlyingMode();
@@ -208,27 +211,27 @@ void loop() {
       if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
         stateMachine.state = starting;
 
-      if ( (stateMachine.state != disarmed) && ( stateMachine.state == angle ) ) {
-        anglePosPIDParams[1] = map(analogRead(2), 0, 1023, 100, 500); // Adjust Kp from potentiometer
+      if (stateMachine.state != disarmed) {
+        //Angle mode PID config
+        // anglePosPIDParams[1] = map(analogRead(2), 0, 1023, 100, 500); // Adjust Kp from potentiometer
         anglePosPIDParams[3] = map(analogRead(3), 0, 1023, 0, 100); // Adjust Ki from potentiometer
+        rollPosPID_Angle.SetGains(anglePosPIDParams);
+        pitchPosPID_Angle.SetGains(anglePosPIDParams);
+        rollSpeedPID_Angle.SetGains(angleSpeedPIDParams);
+        pitchSpeedPID_Angle.SetGains(angleSpeedPIDParams);
+        yawSpeedPID_Angle.SetGains(yawSpeedPIDParams);
+        
+        //Accro mode PID config
+        rollSpeedPID_Accro.SetGains(accroSpeedPIDParams);
+        pitchSpeedPID_Accro.SetGains(accroSpeedPIDParams);
+        yawSpeedPID_Accro.SetGains(yawSpeedPIDParams);
 
-        rollPosPID.SetGains(anglePosPIDParams);
-        pitchPosPID.SetGains(anglePosPIDParams);
-        rollSpeedPID.SetGains(angleSpeedPIDParams);
-        pitchSpeedPID.SetGains(angleSpeedPIDParams);
-        yawSpeedPID.SetGains(yawSpeedPIDParams);
-        stateMachine.statePrev = stateMachine.state;
-        PrintSettings(stateMachine);
-
-      } else if ( (stateMachine.state != disarmed) && ( stateMachine.state == accro ) ) {
-        rollSpeedPID.SetGains(accroSpeedPIDParams);
-        pitchSpeedPID.SetGains(accroSpeedPIDParams);
-        yawSpeedPID.SetGains(yawSpeedPIDParams);
-
-        stateMachine.statePrev = stateMachine.state;
-        PrintSettings(stateMachine);
-      } else
-        stateMachine.state = starting;
+        if ( (stateMachine.state == angle) || (stateMachine.state == accro)  ) {
+          stateMachine.statePrev = stateMachine.state;
+          PrintSettings(stateMachine);
+        } else
+          stateMachine.state = starting;
+      }
       if ( Rx.GetSwitchH() )
         ActivateBuzzer(0.005, 500);
       break;

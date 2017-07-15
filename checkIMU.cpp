@@ -31,14 +31,14 @@ bool CheckGyro(MPU6050 _accelgyro, GetPosition _Position) {
   storeGyroSensitivity = _accelgyro.getFullScaleGyroRange();
   _accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
 
-  delay(1000);
+  delay(500);
   _accelgyro.getMotion6(&dataTestDisabled[0],&dataTestDisabled[1], &dataTestDisabled[2], &dataTestDisabled[3], &dataTestDisabled[4], &dataTestDisabled[5]);
 
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, true);
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, true);
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, true);
 
-  delay(1000);
+  delay(500);
   //_Position.GetAccelGyro(_accelgyro, dataTestEnabled);
   uint8_t rawData[4];
   //_Position.GetAccelGyro(_accelgyro, dataTestEnabled);
@@ -92,14 +92,14 @@ bool CheckAccelero(MPU6050 _accelgyro, GetPosition _Position) {
   storeAccSensitivity = _accelgyro.getFullScaleAccelRange();
   _accelgyro.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
 
-  delay(1000);
+  delay(500);
   _accelgyro.getMotion6(&dataTestDisabled[0],&dataTestDisabled[1], &dataTestDisabled[2], &dataTestDisabled[3], &dataTestDisabled[4], &dataTestDisabled[5]);
   dataTestDisabled[2] = dataTestDisabled[2] - _Position.AcceleroSensitivity; // Remove gravity
   _accelgyro.setAccelXSelfTest(true);
   _accelgyro.setAccelYSelfTest(true);
   _accelgyro.setAccelZSelfTest(true);
 
-  delay(1000);
+  delay(500);
   uint8_t rawData[4];
   rawData[0] = _accelgyro.getAccelXSelfTestVal(); // X-axis self-test results
   rawData[1] = _accelgyro.getAccelYSelfTestVal(); // Y-axis self-test results
@@ -134,7 +134,7 @@ bool CheckAccelero(MPU6050 _accelgyro, GetPosition _Position) {
   _accelgyro.setAccelYSelfTest(false);
   _accelgyro.setAccelZSelfTest(false);
   _accelgyro.setFullScaleAccelRange(storeAccSensitivity);
-  delay(1000);
+  delay(500);
 
   return testSucceed;
 }

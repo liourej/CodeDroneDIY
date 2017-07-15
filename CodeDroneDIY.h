@@ -16,8 +16,9 @@ Time time;
 
 Reception Rx;
 
-PID rollPosPID, pitchPosPID, yawPosPID;
-PID rollSpeedPID, pitchSpeedPID, yawSpeedPID;
+PID rollPosPID_Angle, pitchPosPID_Angle, yawPosPID_Angle;
+PID rollSpeedPID_Angle, pitchSpeedPID_Angle, yawSpeedPID_Angle;
+PID rollSpeedPID_Accro, pitchSpeedPID_Accro, yawSpeedPID_Accro;
 GetPosition Position;
 MPU6050 accelgyro;
 StateMachine stateMachine;
@@ -68,27 +69,27 @@ void InitTimer1() {
 void PrintSettings(StateMachine _stateMachine) {
   Serial.println(F("/********* settings *********/"));
   if ( MAX_POWER == 1860)
-    Serial.println(F("FLYING MODE POWER!!!\t"));
+    Serial.println(F("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!FLYING MODE POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\t"));
   else if ( MAX_POWER <= 1300)
     Serial.println(F("DEBUG MODE POWER!!!\t"));
   Serial.print(F("MAX_POWER:\t")); Serial.println(MAX_POWER);
   if ( _stateMachine.state == angle) {
     Serial.println(F("FLYING_MODE_ANGLE"));
     Serial.println(F("/********* PID settings *********/"));
-    rollPosPID.PrintGains();
-    pitchPosPID.PrintGains();
+    rollPosPID_Angle.PrintGains();
+    pitchPosPID_Angle.PrintGains();
 
-    rollSpeedPID.PrintGains();
-    pitchSpeedPID.PrintGains();
-    yawSpeedPID.PrintGains();
+    rollSpeedPID_Angle.PrintGains();
+    pitchSpeedPID_Angle.PrintGains();
+    yawSpeedPID_Angle.PrintGains();
     Serial.println(F("/********* Complementary filter *********/"));
     Serial.print("Coefficient:\t"); Serial.print(Position.HighPassFilterCoeff); Serial.print("\tTime constant:\t"); Serial.println(Position.GetFilterTimeConstant(0.00249));
   } else if ( _stateMachine.state == accro) {
     Serial.println(F("FLYING_MODE_ACCRO"));
     Serial.println(F("/********* PID settings *********/"));
-    rollSpeedPID.PrintGains();
-    pitchSpeedPID.PrintGains();
-    yawSpeedPID.PrintGains();
+    rollSpeedPID_Accro.PrintGains();
+    pitchSpeedPID_Accro.PrintGains();
+    yawSpeedPID_Accro.PrintGains();
   } else if ( _stateMachine.state == disarmed) {
     Serial.println(F("DISARMED"));
   } else if ( _stateMachine.state == safety) {
