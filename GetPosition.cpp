@@ -151,7 +151,7 @@ void GetPosition::GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], f
 
   Normalize(accRaw);
 
-  /*static int counter = 0;
+ /* static int counter = 0;
   static float pitchGyro = 0.0;
   float pitchAcc = 0.0;
   pitchGyro = pitchGyro + (gyroRaw[1]) * _loop_time;

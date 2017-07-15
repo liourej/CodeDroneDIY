@@ -218,7 +218,6 @@ void loop() {
         pitchSpeedPID.SetGains(angleSpeedPIDParams);
         yawSpeedPID.SetGains(yawSpeedPIDParams);
         stateMachine.statePrev = stateMachine.state;
-        Serial.println("ANGLE MODE");
         PrintSettings(stateMachine);
 
       } else if ( (stateMachine.state != disarmed) && ( stateMachine.state == accro ) ) {
@@ -227,7 +226,6 @@ void loop() {
         yawSpeedPID.SetGains(yawSpeedPIDParams);
 
         stateMachine.statePrev = stateMachine.state;
-        Serial.println("ACCRO MODE");
         PrintSettings(stateMachine);
       } else
         stateMachine.state = starting;

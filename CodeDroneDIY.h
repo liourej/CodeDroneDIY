@@ -67,6 +67,10 @@ void InitTimer1() {
 
 void PrintSettings(StateMachine _stateMachine) {
   Serial.println(F("/********* settings *********/"));
+  if ( MAX_POWER == 1860)
+    Serial.println(F("FLYING MODE POWER!!!\t"));
+  else if ( MAX_POWER <= 1300)
+    Serial.println(F("DEBUG MODE POWER!!!\t"));
   Serial.print(F("MAX_POWER:\t")); Serial.println(MAX_POWER);
   if ( _stateMachine.state == angle) {
     Serial.println(F("FLYING_MODE_ANGLE"));
@@ -78,7 +82,7 @@ void PrintSettings(StateMachine _stateMachine) {
     pitchSpeedPID.PrintGains();
     yawSpeedPID.PrintGains();
     Serial.println(F("/********* Complementary filter *********/"));
-    Serial.print("Coefficient:\t");Serial.print(Position.HighPassFilterCoeff); Serial.print("\tTime constant:\t");Serial.println(Position.GetFilterTimeConstant(0.00249));
+    Serial.print("Coefficient:\t"); Serial.print(Position.HighPassFilterCoeff); Serial.print("\tTime constant:\t"); Serial.println(Position.GetFilterTimeConstant(0.00249));
   } else if ( _stateMachine.state == accro) {
     Serial.println(F("FLYING_MODE_ACCRO"));
     Serial.println(F("/********* PID settings *********/"));

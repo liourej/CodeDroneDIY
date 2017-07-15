@@ -6,7 +6,7 @@
 #define GAIN 0.010
 
 // Angle mode
-float anglePosPIDParams[4] = { 0.010, 260, 0.5, 0.3};// G, Kp, Kd, Ki
+float anglePosPIDParams[4] = { 0.010, 268, 0.5, 0.0};// G, Kp, Kd, Ki
 float angleSpeedPIDParams[4] = { 0.010, 192, 0.0, 0.0};
 
 // Accro mode

@@ -5,7 +5,6 @@ void PID::SetGains(float _params[4]) {
   Kp = _params[1];
   Kd = _params[2];
   Ki = _params[3];
-  PrintGains();
 };
 
 void PID::Reset() {
