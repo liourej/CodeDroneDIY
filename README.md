@@ -232,7 +232,9 @@ Poids : 25 g
 ## 6. Bibliographie
 
 Arduino
+
 file:///C:/Program%20Files/Arduino/reference/www.arduino.cc/en/Reference/Libraries.html
+
 file:///C:/Program%20Files/Arduino/reference/www.arduino.cc/en/Reference/HomePage.html
 
 PWM
@@ -260,6 +262,7 @@ https://ericjformanteaching.wordpress.com/2013/10/08/smoothing-sensor-input/
 Fusion de données
 
 http://www.mouser.fr/applications/sensor_solutions_mems/
+
 http://www.pieter-jan.com/node/11
 
 Programme python
