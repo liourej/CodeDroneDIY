@@ -1,11 +1,13 @@
 # Contrôleur de vol de quadrirotor DIY
 
+![Drone](/ReadmePictures/Drone.jpg "Drone")
+
 ## 1. Calcul de l’attitude
 
 ### 1.1 IMU
 
-Une « Inertial Measurement Unit » est constituée d’un gyroscope 3 axes et d’un accéléromètre 3 axes. Le gyroscope détecte la vitesse angulaire, l’accéléromètre mesure l’accélération sur chaque axe.
-Le gyroscope dérive dans le temps, et l’accéléromètre est sensible aux vibrations (bruité), et aux accélérations du quadrirotor. L’orientation ne peut pas être calculée à partir des données du gyroscope seul ou de l’accéléromètre seul. La solution est de fusionner les données des 2 capteurs avec un filtre complémentaire.|
+|Une « Inertial Measurement Unit » est constituée d’un gyroscope 3 axeset d’un accéléromètre 3 axes. Le gyroscope détecte la vitesse angulaire, l’accéléromètre mesure l’accélération sur chaque axe.Le gyroscope dérive dans le temps, et l’accéléromètre est sensible aux vibrations (bruité), et aux accélérations du quadrirotor. L’orientation ne peut pas être calculée à partir des données du gyroscope seul ou de l’accéléromètre seul. La solution est de fusionner les données des 2 capteurs avec un filtre complémentaire. | ![IMU](/ReadmePictures/IMU.jpg "IMU") |
+|------|------------------|
 
 #### 1.1.1 Gyroscopes
 
@@ -33,6 +35,8 @@ Il consiste:
 à appliquer un filtre passe bas sur les données de l’accéléromètre car ses données sont exploitables sur la durée, il faut éliminer les variation brusques.
 à appliquer un filtre passe haut sur les données du gyroscope car ses données sont fiables sur le court terme mais prennent de l’erreur dans le temps à cause de sa dérive
 
+![FiltreComplementaire](/ReadmePictures/FiltreComplementaire.jpg "FiltreComplementaire")
+
 La constante de temps du filtre est un compromis entre l’élimination les accélérations dues aux mouvements du quadricoptère et la compensation de la dérive des gyroscopes :
 Trop basse, les parasites des accéléromètres ne sont pas filtrés
 Trop haute, la mesure dérive à cause des gyroscopes
@@ -40,8 +44,11 @@ Trop haute, la mesure dérive à cause des gyroscopes
 J’ai choisi une constante de temps de 5 sec, soit un coeff de 0.9995 pour un tour de boucle de 2.49ms, pour éliminer les accélérations du quadrirotor qui s’ajoutent à l’accélération de la terre.
 
 ## 2. Stabilisation mode accro (gyroscopes seuls)
+![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
 
 ## 3. Stabilisation, mode “ANGLE” (gyroscopes et accéléromètres)
+
+![AsservissementAngle](/ReadmePictures/AsservissementAngle.jpg "AsservissementAngle")
 
 ## 4. Stabilisation en hauteur
 
@@ -50,17 +57,19 @@ J’ai choisi une constante de temps de 5 sec, soit un coeff de 0.9995 pour un t
 ## 5. Code « CodeDroneDIY »
 
 ### 5.2 Connections
-PB0 ESC0
-PB1 ESC1
-PB2 ESC2
-PB3 ESC3
-PD2 receiver
-PC2 potentiometer
-PC4 SDA MPU6050
-PC5 SCL MPU6050
+| Borche Arduino      | Composant      |
+| -------------- | -------------- |
+| PB0 | ESC0 |
+| PB1 | ESC1 |
+| PB2 | ESC2 |
+| PB3 | ESC3 |
+| PD2 | receiver |
+| PC2 | potentiometer |
+| PC4 | SDA MPU6050 |
+| PC5 | SCL MPU6050 |
 
 ## 5.3 Machine à états
-
+![MachineEtats](/ReadmePictures/MachineEtats.jpg "MachineEtats")
 ## 5.4 Réception CPPM
 
 # 6. Configuration matérielle
@@ -70,14 +79,17 @@ Grand châssis pour privilégier la stabilité : 450mm
 
 ## 6.1 Vue d’ensemble
 
-|ESC|Afro 20A-Simonk firmware 500Hz, 1060 à 1860 us de largeur d'impulsion|
-|Moteurs|Multistar 2216-800Kv|
-|Hélices|10x4.5 SF Props 2pc CW 2 pc CCW Rotation (Orange)|
-|Batterie|Zippy Flightmax 3000mAh 4S|
-|Récepteur|OrangeRx R617XL CPPM DSM2/DSMX 6 ch|
-|Contrôleur|Arduino UNO rev3|
-|IMU|MPU6050|
-|Chassis|Diatone Q450 Quad 450 V3|
+| Composant      | Référence      |
+| -------------- | -------------- |
+| **ESC** | Afro 20A-Simonk firmware 500Hz, 1060 à 1860 us de largeur d'impulsion |
+| **Moteurs** | Multistar 2216-800Kv |
+| **Hélices** | 10x4.5 SF Props 2pc CW 2 pc CCW Rotation (Orange) |
+| **Batterie** | Zippy Flightmax 3000mAh 4S |
+| **Récepteur** | OrangeRx R617XL CPPM DSM2/DSMX 6 ch |
+| **Contrôleur** | Arduino UNO rev3 |
+| **IMU** | MPU6050 |
+| **Chassis** | Diatone Q450 Quad 450 V3 ![Chassis](/ReadmePictures/Chassis.jpg "Chassis")|
+
 
 ## 6.3 Failsafe
 
@@ -88,23 +100,41 @@ Pour programmer le « failsafe », mettre les commandes de la télécommande d
 
 ## 7.1 Les modes de vol
 
+| Mode      | Gyro      | Accé      | Baro      | Bouss      | GPS      | Description      |
+| -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
+| **ACRO** | X |||||Un mode généralement par défaut et son vol plus « acrobatique » (le quadrirotor ne peut faire de la mise à niveau automatique)|
+| **ANGLE** | X |X||||Mode stable ; va essayer de maintenir le niveau du modèle par rapport au sol (mais pas à une position fixe).|
+| **HORIZON** | X |||||Combine l’effet stable avec des commandes et des acrobaties RC lentes et avec des commandes RC rapides.|
+| **BARO (Maintien de l’altitude)** | X | X | X |||Le baromètre est utilisé afin de conserver une certaine hauteur (fixée) lorsqu’aucune autre commande n’est reçue.|
+| **MAG (Tenue du cap)** | X | X | | X | | Mode verrouillage de cap (direction à la boussole), pour essayer de maintenir son orientation en lacet. |
+| **HEADFREE (CareFree/ orientation indépendante du déplacement)** | X | X | | X | | Maintient l’orientation (lacet) du quadrirotor et se déplace toujours dans la même direction 2D pour le même mouvement du manche en ROULIS/TANGAGE.|
+| **GPS/ Retour à la base** | | X | | X | X | Utilise automatiquement une boussole et un GPS pour rentrer à la base, au point de départ GPS. |
+| **GPS/ Points de passage** | | X | | X | X | Suit automatiquement les points de cheminement GPS pré-configurés de manière autonome. |
+| **GPS/ Maintien de position** | | X | | X | X | Maintient la position actuelle en utilisant le GPS et le baromètre (si disponible). |
+
 ## 7.2 Réglages PID
 
-Le P
+**Le P**
+
 C’est le P qui va résoudre les problèmes de vibrations. Le I quant à lui, joue sur l’inertie de la machine et sur sa réactivité.
 Montez le P jusqu’à obtenir une machine qui vibre / oscille. Baissez le I également, ça aide.
 Descendez le P peu à peu jusqu’à ce que les vibrations disparaissent totalement, même à fond de gaz !
-Le I
+
+**Le I**
+
 Il agît sur la dérive du multi est est lié au P. En acro, voltige ou FPV, il sera plus bas que pour une machine dédiée à la vidéo. Dans la vidéo en Français, vous apprendrez comment le régler à l’aide d’un truc connu : placer un poids sur un bras
 Montez le I jusqu’à obtenir des oscillations faibles en montée et ou en descente. Vous devriez en avoir aussi à fond de gaz.
 Si vous avez des oscillations en descente : montez le I
 Si vous avez des oscillations en montée : baissez le I
 Trouvez une valeur qui vous débarrasse des deux
 Si des vibrations réapparaissent, c’est normal. Retouchez le P. Baissez le légèrement, c’est selon.
-Le D
+
+**Le D**
+
 Ce paramètre est le plus  » personnel  » des trois. Il influence la réactivité de la machine.
 Faites de grands mouvements de gauche à droite ou d’avant en arrière pour observer les réactions de la machine. Appréciez et réglez selon vos préférences.
 Des vibrations peuvent revenir : corrigez le P.
+
 Le Yaw
 Si votre machine continue à dériver après un ordre ou si elle dérive seule sur l’axe du lacet, changez la valeur. Elle est très souvent sur 8.5 et est correcte ainsi.
 tpa breakpoint
