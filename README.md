@@ -233,9 +233,9 @@ Poids : 25 g
 
 Arduino
 
-file:///C:/Program%20Files/Arduino/reference/www.arduino.cc/en/Reference/Libraries.html
+https://www.arduino.cc/en/Reference/Libraries.html
 
-file:///C:/Program%20Files/Arduino/reference/www.arduino.cc/en/Reference/HomePage.html
+https://www.arduino.cc/en/Reference/HomePage
 
 PWM
 
