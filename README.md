@@ -231,46 +231,46 @@ Poids : 25 g
 
 ## 6. Bibliographie
 
-Arduino
+*Arduino
 
 https://www.arduino.cc/en/Reference/Libraries.html
 
 https://www.arduino.cc/en/Reference/HomePage
 
-PWM
+*PWM
 
 https://librepilot.atlassian.net/wiki/display/LPDOC/PWM,+PWMSync,+Oneshot+Output
 
 http://forum.arduino.cc/index.php?topic=46487.0
 
-PPM
+*PPM
 
 http://frskytaranis.forumactif.org/t4426-tuto-pwm-cppm-ccpm-ppm-s-bus-s-port-kesako
 
-PID
+*PID
 
 http://www.fpv-passion.fr/docteur-pid/
 
-Quadrirotor
+*Quadrirotor
 
 https://www.mondrone.net/fabriquer-quadricoptere-la-propulsion/
 
-Traitement de données
+*Traitement de données
 
 https://ericjformanteaching.wordpress.com/2013/10/08/smoothing-sensor-input/
 
-Fusion de données
+*Fusion de données
 
 http://www.mouser.fr/applications/sensor_solutions_mems/
 
 http://www.pieter-jan.com/node/11
 
-Programme python
+*Programme python
 
 Andy BAKER
 
 http://pythonfiddle.com/andy-baker-quadcopter/
 
-Vibrations
+*Vibrations
 
 http://ardupilot.org/plane/docs/common-vibration-damping.html
