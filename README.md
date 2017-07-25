@@ -1,75 +1,75 @@
 # Contrôleur de vol de quadrirotor DIY
+
 ![Drone](/ReadmePictures/Drone.jpg "Drone")
 
 ---------------------------Table des matières----------------------------
 
-1. Calcul de l’attitude
+**1.Calcul de l’attitude**
 
-1.1 IMU
+1.1.IMU
 
-1.1.1 Gyroscopes
+1.1.1.Gyroscopes
 
-1.1.2 Accéléromètres
+1.1.2.Accéléromètres
 
-1.2 Fusion de données: le filtre complémentaire
+1.2.Fusion de données: le filtre complémentaire
 
-2. Stabilisation mode accro (gyroscopes seuls)
+**2.Stabilisation**
 
-3. Stabilisation, mode “ANGLE” (gyroscopes et accéléromètres)
+2.1.Mode accro (gyroscopes seuls)
 
-4. Stabilisation en hauteur
+2.2.Mode “ANGLE” (gyroscopes et accéléromètres)
 
-4.1 Baromètre
+2.3.Stabilisation en hauteur
 
-5. Code « CodeDroneDIY »
+**3.Code « CodeDroneDIY »**
 
-5.2 Connections
+3.2.Connections
 
-5.3 Machine à états
+3.3.Machine à états
 
-5.4 Réception CPPM
+3.4.Réception CPPM
 
-6. Configuration matérielle
+**4.Configuration matérielle**
 
-6.1 Vue d’ensemble
+4.1.Vue d’ensemble
 
-6.3 Failsafe
+4.3.Failsafe
 
-7. Annexes
+**5.Annexes**
 
-7.1 Les modes de vol
+5.1.Les modes de vol
 
-7.2 Réglages PID
+5.2.Réglages PID
 
-7.3 Arduino UNO rev3
+5.3.Arduino UNO rev3
 
-7.4 Génération PWM à 400Hz
+5.4.Génération PWM à 400Hz
 
-8. Bibliographie
-----------------------------------------------------------------------
+**6.Bibliographie**
+
 
 ## 1. Calcul de l’attitude <a id="Test"></a>
 
 ### 1.1 IMU
 
-|Une « Inertial Measurement Unit » est constituée d’un gyroscope 3 axeset d’un accéléromètre 3 axes. Le gyroscope détecte la vitesse angulaire, l’accéléromètre mesure l’accélération sur chaque axe.Le gyroscope dérive dans le temps, et l’accéléromètre est sensible aux vibrations (bruité), et aux accélérations du quadrirotor. L’orientation ne peut pas être calculée à partir des données du gyroscope seul ou de l’accéléromètre seul. La solution est de fusionner les données des 2 capteurs avec un filtre complémentaire. | ![IMU](/ReadmePictures/IMU.jpg "IMU") |
-|------|------------------|
+Une « Inertial Measurement Unit » est constituée d’un gyroscope 3 axes et d’un accéléromètre 3 axes. Le gyroscope détecte la vitesse angulaire, l’accéléromètre mesure l’accélération sur chaque axe.
+Le gyroscope dérive dans le temps, et l’accéléromètre est sensible aux vibrations (bruité), et aux accélérations du quadrirotor.
+L’orientation ne peut pas être calculée à partir des données du gyroscope seul ou de l’accéléromètre seul. La solution est de fusionner les données des 2 capteurs avec un filtre complémentaire.
+
+![IMU](/ReadmePictures/IMU.jpg "IMU")
 
 #### 1.1.1 Gyroscopes
 
-La position est calculée par intégration des gyroscopes.
+L'angle avec l'horizontale est calculé par intégration des gyroscopes.
+
+    _pos[0] = _pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time;
 
 #### 1.1.2 Accéléromètres
 
-La position est calculée à partir de la mesure de l’accélération de la terre.
+L'angle avec l'horizontale est calculé à partir de la mesure de l’accélération de la terre: lorsque le quadrirotor est immobile, l’accélération mesurée est la gravité.
 
-**Roulis calculé avec l’accélération de la terre**
-
-Lorsque le quadrirotor est immobile, l’accélération mesurée est la gravité.
-
-**Tangage calculé avec l’accélération de la terre**
-
-Lorsque le quadrirotor est immobile, l’accélération mesurée est la gravité.
+    _pos[0] = atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI);
 
 ## 1.2 Fusion de données: le filtre complémentaire
 
@@ -87,23 +87,43 @@ La constante de temps du filtre est un compromis entre l’élimination les acc�
 Trop basse, les parasites des accéléromètres ne sont pas filtrés
 Trop haute, la mesure dérive à cause des gyroscopes
 
-J’ai choisi une constante de temps de 5 sec, soit un coeff de 0.9995 pour un tour de boucle de 2.49ms, pour éliminer les accélérations du quadrirotor qui s’ajoutent à l’accélération de la terre.
+J’ai choisi une constante de temps de 5 sec, soit un coeff de 0.9995 pour un tour de boucle de 2.49ms, pour éliminer les vibrations et les accélérations du quadrirotor qui s’ajoutent à l’accélération de la terre.
 
-## 2. Stabilisation mode accro (gyroscopes seuls)
->>>>>>> bae8a6b6e94ec29cb9101e33ef3c0e8e499445af
+timeCste = coeff*dt/(1-coeff)
+coeef = timeCste/(dt + timeCste)
+
+    _pos[0] = HighPassFilterCoeff*(_pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time) + LowPassFilterCoeff*((atan(accGyroRaw[1]/accGyroRaw[2]))*57.2957795130823);
+
+## 2. Stabilisation
+### 2.1 mode accro (gyroscopes seuls)
+
 ![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
 
-## 3. Stabilisation, mode “ANGLE” (gyroscopes et accéléromètres)
+### 2.2 Mode “ANGLE” (gyroscopes et accéléromètres)
 
 ![AsservissementAngle](/ReadmePictures/AsservissementAngle.jpg "AsservissementAngle")
 
-## 4. Stabilisation en hauteur
+## 2.3 Stabilisation en hauteur
 
-### 4.1 Baromètre
+Baromètre
 
-## 5. Code « CodeDroneDIY »
+## 3. Code « CodeDroneDIY »
+### 3.1 Design
+| Fichier      | Description      |
+| -------------- | -------------- |
+| CodeDroneDIY.ino | Contient la fonction d'initialisation et la boucle principale |
+| GetPosition.cpp | Intègre et fustionne les données brutes des gyro/accéléro et retourne les angls avec l'horizontale en degrés |
+| MPU6050.cpp | Librairie pour acquérir les données brutes du MPU6050 |
+| PID.cpp | Correcteur proportionnel, intégral, dérivée |
+| Reception.h | Acquisition par interruption 0 des signaux du récepteur au format CPPM |
+| ESC.h | Gère les caractérisques d'un ESC donné: pin attribuée, largeur d'impulsion à appliquer |
+| SetPWM.h | Applique les PWM aux ESC en utiliant le timer0 |
+| Settings.h | Paramètres des PID et de puissance maximale |
+| StateMachine.h | Machine à états |
+| Time.h | Mesure du temps de boucle et du temps écoulé depuis un instant t |
+| checkIMU.cpp | Vérifie le fonctionnement de l'IMU avant une utilisation |
 
-### 5.2 Connections
+### 3.2 Connections
 | Borche Arduino      | Composant      |
 | -------------- | -------------- |
 | PB0 | ESC0 |
@@ -115,16 +135,15 @@ J’ai choisi une constante de temps de 5 sec, soit un coeff de 0.9995 pour un t
 | PC4 | SDA MPU6050 |
 | PC5 | SCL MPU6050 |
 
-### 5.3 Machine à états
+### 3.3 Machine à états
 ![MachineEtats](/ReadmePictures/MachineEtats.jpg "MachineEtats")
-### 5.4 Réception CPPM
+### 3.4 Réception CPPM
 
-## 6. Configuration matérielle
+La largeur en milliseconde de chaque impulsion du train d'impulsion est mesurée à l'aide du timer0, puis stockée dans la case correspondante à la voie dans un tableau.
 
-250 mm : trop nerveux : pour voler vite et bas, entre les obstacles. Faible autonomie.
-Grand châssis pour privilégier la stabilité : 450mm
+## 4. Configuration matérielle
 
-### 6.1 Vue d’ensemble
+### 4.1 Vue d’ensemble
 
 | Composant      | Référence      |
 | -------------- | -------------- |
@@ -135,17 +154,18 @@ Grand châssis pour privilégier la stabilité : 450mm
 | **Récepteur** | OrangeRx R617XL CPPM DSM2/DSMX 6 ch |
 | **Contrôleur** | Arduino UNO rev3 |
 | **IMU** | MPU6050 |
-| **Chassis** | Diatone Q450 Quad 450 V3 ![Chassis](/ReadmePictures/Chassis.jpg "Chassis")|
+| **Chassis** | Diatone Q450 Quad 450 V3. Un grand châssis de 450mm a été choisi pour privilégier la stabilité et l'autonomie. ![Chassis](/ReadmePictures/Chassis.jpg "Chassis")|
 
 
-### 6.3 Failsafe
+### 4.2 Failsafe
 
-Pour la sécurité, définir le « failsafe » pour couper les gaz.
-Pour programmer le « failsafe », mettre les commandes de la télécommande dans la configuration souhaitée lors de la perte de réception radio, et « binder » la télécommande. La configuration utilisée pendant le « bind » défini le « failsafe. »
+Pour la sécurité, définir le « failsafe » pour couper les gaz en cas de perte de la liaison radio.
 
-## 7. Annexes
+Pour programmer le « failsafe », mettre les commandes de la télécommande dans la configuration souhaitée lors de la perte de la réception radio, et « binder » la télécommande. La configuration utilisée pendant le « bind » défini le « failsafe. »
 
-### 7.1 Les modes de vol
+## 5. Annexes
+
+### 5.1 Les modes de vol
 
 | Mode      | Gyro      | Accé      | Baro      | Bouss      | GPS      | Description      |
 | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
@@ -159,7 +179,7 @@ Pour programmer le « failsafe », mettre les commandes de la télécommande d
 | **GPS/ Points de passage** | | X | | X | X | Suit automatiquement les points de cheminement GPS pré-configurés de manière autonome. |
 | **GPS/ Maintien de position** | | X | | X | X | Maintient la position actuelle en utilisant le GPS et le baromètre (si disponible). |
 
-## 7.2 Réglages PID
+## 5.2 Réglages PID
 
 **Le P**
 
@@ -187,7 +207,7 @@ Si votre machine continue à dériver après un ordre ou si elle dérive seule s
 tpa breakpoint
 Ce paramètre joue sur le ratio des PID. En effet, la tension et le niveau de gaz sont des variables qui agissent sur le comportement. Le TPA va faire varier vos PID selon ces facteurs.Si vous n’en mettez pas, il se peut que vous ayez des vibrations lorsque vous êtes à fond de gaz avec une lipo chargée à bloc. Pour être précis, les TPA ( Throtlle PID Attenuation ) jouent sur le P. ( Merci XKin Ai pour la précision )
 
-### 7.3 Arduino UNO rev3
+### 5.3 Arduino UNO rev3
 
 Microcontrôleur ATmega328
 Architecture 8 bits RISC
@@ -196,7 +216,7 @@ Architecture 8 bits RISC
 Dimensions : 68.6 mm x 53.4 mm
 Poids : 25 g
 
-### 7.4 Génération PWM à 400Hz
+### 5.4 Génération PWM à 400Hz
 
 1. Classer les ESC par ordre croissant de largeur d’impulsion.
 2. Utiliser le « Timer1 ».
@@ -209,7 +229,7 @@ Poids : 25 g
 >* The situation with the most difficult timing is when two servos are separated by 2-8 uS, less than an interrupt period.
 >* After every 2.5 ms servo period we wait 7*2.5 ms for the next servo control period. We can use these periods to address  other groups of servos if we use demuxes to distribute the servo pulses to the groups.
 
-## 8. Bibliographie
+## 6. Bibliographie
 
 Arduino
 file:///C:/Program%20Files/Arduino/reference/www.arduino.cc/en/Reference/Libraries.html
