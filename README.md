@@ -46,7 +46,11 @@ Trop haute, la mesure dérive à cause des gyroscopes
 
 J’ai choisi une constante de temps de 5 sec, soit un coeff de 0.9995 pour un tour de boucle de 2.49ms, pour éliminer les accélérations du quadrirotor qui s’ajoutent à l’accélération de la terre.
 
+<<<<<<< HEAD
 ## 2. Stabilisation mode accro (gyroscopes seuls) <a id="Test"></a>
+=======
+## 2. Stabilisation mode accro (gyroscopes seuls)
+>>>>>>> bae8a6b6e94ec29cb9101e33ef3c0e8e499445af
 ![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
 
 ## 3. Stabilisation, mode “ANGLE” (gyroscopes et accéléromètres)
