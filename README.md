@@ -1,9 +1,52 @@
 # Contrôleur de vol de quadrirotor DIY
-
 ![Drone](/ReadmePictures/Drone.jpg "Drone")
 
-dd
-[lien afficher](#nomAncre)
+---------------------------Table des matières----------------------------
+
+1. Calcul de l’attitude
+
+1.1 IMU
+
+1.1.1 Gyroscopes
+
+1.1.2 Accéléromètres
+
+1.2 Fusion de données: le filtre complémentaire
+
+2. Stabilisation mode accro (gyroscopes seuls)
+
+3. Stabilisation, mode “ANGLE” (gyroscopes et accéléromètres)
+
+4. Stabilisation en hauteur
+
+4.1 Baromètre
+
+5. Code « CodeDroneDIY »
+
+5.2 Connections
+
+5.3 Machine à états
+
+5.4 Réception CPPM
+
+6. Configuration matérielle
+
+6.1 Vue d’ensemble
+
+6.3 Failsafe
+
+7. Annexes
+
+7.1 Les modes de vol
+
+7.2 Réglages PID
+
+7.3 Arduino UNO rev3
+
+7.4 Génération PWM à 400Hz
+
+8. Bibliographie
+----------------------------------------------------------------------
 
 ## 1. Calcul de l’attitude <a id="Test"></a>
 
@@ -46,9 +89,6 @@ Trop haute, la mesure dérive à cause des gyroscopes
 
 J’ai choisi une constante de temps de 5 sec, soit un coeff de 0.9995 pour un tour de boucle de 2.49ms, pour éliminer les accélérations du quadrirotor qui s’ajoutent à l’accélération de la terre.
 
-<<<<<<< HEAD
-## 2. Stabilisation mode accro (gyroscopes seuls) <a id="Test"></a>
-=======
 ## 2. Stabilisation mode accro (gyroscopes seuls)
 >>>>>>> bae8a6b6e94ec29cb9101e33ef3c0e8e499445af
 ![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
@@ -75,16 +115,16 @@ J’ai choisi une constante de temps de 5 sec, soit un coeff de 0.9995 pour un t
 | PC4 | SDA MPU6050 |
 | PC5 | SCL MPU6050 |
 
-## 5.3 Machine à états
+### 5.3 Machine à états
 ![MachineEtats](/ReadmePictures/MachineEtats.jpg "MachineEtats")
-## 5.4 Réception CPPM
+### 5.4 Réception CPPM
 
-# 6. Configuration matérielle
+## 6. Configuration matérielle
 
 250 mm : trop nerveux : pour voler vite et bas, entre les obstacles. Faible autonomie.
 Grand châssis pour privilégier la stabilité : 450mm
 
-## 6.1 Vue d’ensemble
+### 6.1 Vue d’ensemble
 
 | Composant      | Référence      |
 | -------------- | -------------- |
@@ -98,14 +138,14 @@ Grand châssis pour privilégier la stabilité : 450mm
 | **Chassis** | Diatone Q450 Quad 450 V3 ![Chassis](/ReadmePictures/Chassis.jpg "Chassis")|
 
 
-## 6.3 Failsafe
+### 6.3 Failsafe
 
 Pour la sécurité, définir le « failsafe » pour couper les gaz.
 Pour programmer le « failsafe », mettre les commandes de la télécommande dans la configuration souhaitée lors de la perte de réception radio, et « binder » la télécommande. La configuration utilisée pendant le « bind » défini le « failsafe. »
 
-# 7. Annexes
+## 7. Annexes
 
-## 7.1 Les modes de vol
+### 7.1 Les modes de vol
 
 | Mode      | Gyro      | Accé      | Baro      | Bouss      | GPS      | Description      |
 | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
@@ -147,7 +187,7 @@ Si votre machine continue à dériver après un ordre ou si elle dérive seule s
 tpa breakpoint
 Ce paramètre joue sur le ratio des PID. En effet, la tension et le niveau de gaz sont des variables qui agissent sur le comportement. Le TPA va faire varier vos PID selon ces facteurs.Si vous n’en mettez pas, il se peut que vous ayez des vibrations lorsque vous êtes à fond de gaz avec une lipo chargée à bloc. Pour être précis, les TPA ( Throtlle PID Attenuation ) jouent sur le P. ( Merci XKin Ai pour la précision )
 
-## 7.3 Arduino UNO rev3
+### 7.3 Arduino UNO rev3
 
 Microcontrôleur ATmega328
 Architecture 8 bits RISC
@@ -156,7 +196,7 @@ Architecture 8 bits RISC
 Dimensions : 68.6 mm x 53.4 mm
 Poids : 25 g
 
-## 7.4 Génération PWM à 400Hz
+### 7.4 Génération PWM à 400Hz
 
 1. Classer les ESC par ordre croissant de largeur d’impulsion.
 2. Utiliser le « Timer1 ».
