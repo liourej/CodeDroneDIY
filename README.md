@@ -1,5 +1,5 @@
 
-# Contrôleur de vol de quadrirotor DIY
+# <p align="center">Contrôleur de vol de quadrirotor DIY</p>
 
 <p align="center">
     <img src="/ReadmePictures/Drone.jpg">
