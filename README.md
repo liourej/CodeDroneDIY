@@ -61,7 +61,9 @@ Une « Inertial Measurement Unit » est un MEMS constitué d’un gyroscope 3 
 | Capteur      | Fonction |Avantages      | Inconvénients |
 | -------------- | -------------- | -------------- | -------------- |
 | Gyroscope | Mesure la vitesse angulaire en degrés par seconde autour de chaque axe. | Rapide | Dérive dans le temps |
-| Accéléromètre | Mesure l’accélération rectiligne en "g" sur chaque axe. | Lent | Bruité et Utilisable quand le drone n'accélère pas |
+| Accéléromètre | Mesure l’accélération rectiligne en "g" sur chaque axe. | Lent | Bruité et utilisable quand le drone n'accélère pas |
+ 
+Le MPU6050 utilisé communique avec le microcontrôleur par protocole I2C.
  
 Ces 2 capteurs sont complémentaires pour calculer l'orientation : les fusionner avec un filtre permet de compenser mutuellement leurs défauts.
 
@@ -75,7 +77,7 @@ L'angle avec l'horizontale est calculé par intégration des données brutes des
 
 #### 1.1.2 Accéléromètres
 
-L'angle avec l'horizontale est calculé à partir de la mesure de l’accélération de la terre: lorsque le quadrirotor est immobile, l’accélération mesurée est la gravité.
+L'angle avec l'horizontale est calculé à partir de la mesure de l’accélération de la terre: lorsque le quadrirotor est immobile ou à vitesse constante, l’accélération mesurée est la gravité.
 Cette mesure est faussée quand le drone accélère.
 
     _pos[0] = atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI);
@@ -106,18 +108,24 @@ coeef = timeCste/(dt + timeCste)
 
 ## 2. Stabilisation
 ### 2.1 mode accro (gyroscopes seuls)
-C'est un asservissement en vitesse.
+C'est un asservissement en vitesse. Le pilote agit sur la vitesse de rotation du drone autour de ses axes.
 
 ![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
 
 ### 2.2 Mode “ANGLE” (gyroscopes et accéléromètres)
 
-C'est un asservissement en position: il consiste en une boucle d'asservissement en vitesse imbriquée dans une boucle d'asservissement en position.
+C'est un asservissement en position. Le pilote agit sur la position angulaire du drone pour chacun de ses axes.
+
+Il consiste en une boucle d'asservissement en vitesse imbriquée dans une boucle d'asservissement en position.
+
 ![AsservissementAngle](/ReadmePictures/AsservissementAngle.jpg "AsservissementAngle")
 
 ## 2.3 Stabilisation en hauteur
 
-Baromètre
+La mesure de la pression par le baromètre permet de déterminer la hauteur à une dizaine de centimètres près.
+Ce capteur est sensible à la lumière et aux variations de préssion: il faut l'isoler du souffle des hélices et des mouvements d'air entrainés par les mouvements du drone.
+
+Le MS5611 choisi pour sa précision communique avec le microcontrôleur par protocole I2C.
 
 ## 3. Code « CodeDroneDIY »
 ### 3.1 Design
@@ -144,14 +152,16 @@ Baromètre
 | PB3 | ESC3 |
 | PD2 | receiver |
 | PC2 | potentiometer |
-| PC4 | SDA MPU6050 |
-| PC5 | SCL MPU6050 |
+| PC4 | SDA MPU6050 & MS5611 |
+| PC5 | SCL MPU6050 & MS5611 |
 
 ### 3.3 Machine à états
 ![MachineEtats](/ReadmePictures/MachineEtats.jpg "MachineEtats")
 ### 3.4 Réception CPPM
 
-La largeur en milliseconde de chaque impulsion du train d'impulsion est mesurée à l'aide du timer0, puis stockée dans la case correspondante à la voie dans un tableau.
+La réception CPPM (Pulse Position Modulation) permet de recevoir toutes les voies sur une seule entrée: chaque front montant correspond à la fin de l'impulsion de la voie précédente et au début de l'impulsion de la voie suivante. Le temps écoulé entre deux front montant correspond à la largeur d'impulsion d'une voie donnée.
+
+Dans le code, la largeur en milliseconde de chaque impulsion du train d'impulsion est mesurée à l'aide du timer0, puis stockée dans la case correspondant à la voie dans un tableau.
 
 ## 4. Configuration matérielle
 
