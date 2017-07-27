@@ -56,21 +56,24 @@
 
 ### 1.1 IMU
 
-Une « Inertial Measurement Unit » est constituée d’un gyroscope 3 axes et d’un accéléromètre 3 axes. Le gyroscope détecte la vitesse angulaire, l’accéléromètre mesure l’accélération sur chaque axe.
-Le gyroscope dérive dans le temps, et l’accéléromètre est sensible aux vibrations (bruité), et aux accélérations du quadrirotor.
-L’orientation ne peut pas être calculée à partir des données du gyroscope seul ou de l’accéléromètre seul. La solution est de fusionner les données des 2 capteurs avec un filtre complémentaire.
+Une « Inertial Measurement Unit » est constituée d’un gyroscope 3 axes et d’un accéléromètre 3 axes:
+ - Le gyroscope mesure la vitesse angulaire en degrés par seconde autour de chaque axe. Il dérive dans le temps.
+ - l’accéléromètre mesure l’accélération rectiligne en "g" sur chaque axe. Il est sensible aux vibrations (bruité)
+ 
+Ces 2 capteurs sont complémentaires pour calculer l'orientation : les fusionner avec un filtre complémentaire permet de compenser leurs défauts.
 
 ![IMU](/ReadmePictures/IMU.jpg "IMU")
 
 #### 1.1.1 Gyroscopes
 
-L'angle avec l'horizontale est calculé par intégration des gyroscopes.
+L'angle avec l'horizontale est calculé par intégration des données brutes des gyroscopes.
 
     _pos[0] = _pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time;
 
 #### 1.1.2 Accéléromètres
 
 L'angle avec l'horizontale est calculé à partir de la mesure de l’accélération de la terre: lorsque le quadrirotor est immobile, l’accélération mesurée est la gravité.
+Cette mesure est faussée quand le drone accélère.
 
     _pos[0] = atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI);
 
@@ -78,19 +81,20 @@ L'angle avec l'horizontale est calculé à partir de la mesure de l’accéléra
 
 Le gyroscope dérive.
 L’accéléromètre n’est pas assez rapide, il est bruité et il n’est utilisable qu’au repos lorsqu’il ne subit que l’accélération de la terre.
-On applique un filtre passe-bas à l’accéléromètre et un filtre passe-haut au gyroscope.
-Le filtre complémentaire permet de fusionner les données des gyroscopes et des accéléromètres.
-Il consiste:
-à appliquer un filtre passe bas sur les données de l’accéléromètre car ses données sont exploitables sur la durée, il faut éliminer les variation brusques.
-à appliquer un filtre passe haut sur les données du gyroscope car ses données sont fiables sur le court terme mais prennent de l’erreur dans le temps à cause de sa dérive
+
+Le filtre complémentaire permet de fusionner les données des gyroscopes et des accéléromètres pour supprimer leurs défauts respectifs:
+- Un filtre passe-bas sur l’accéléromètre permet de filtrer le bruit et les accélérations parasites: ces données sont exploitables sur la durée, il faut éliminer les variation brusques.
+- Un filtre passe-haut est appliqué sur le gyroscope car ses données sont fiables sur le court terme mais prennent de l’erreur dans le temps à cause de sa dérive.
 
 ![FiltreComplementaire](/ReadmePictures/FiltreComplementaire.jpg "FiltreComplementaire")
 
-La constante de temps du filtre est un compromis entre l’élimination les accélérations dues aux mouvements du quadricoptère et la compensation de la dérive des gyroscopes :
+La constante de temps du filtre est un compromis entre l’élimination des accélérations dues aux mouvements du quadricoptère et la compensation de la dérive des gyroscopes :
 Trop basse, les parasites des accéléromètres ne sont pas filtrés
-Trop haute, la mesure dérive à cause des gyroscopes
+Trop haute, la mesure dérive à cause des gyroscopes insufisemment compensés
 
 J’ai choisi une constante de temps de 5 sec, soit un coeff de 0.9995 pour un tour de boucle de 2.49ms, pour éliminer les vibrations et les accélérations du quadrirotor qui s’ajoutent à l’accélération de la terre.
+
+Attention, la constante de temps est corrélée au temps de boucle du système:
 
 timeCste = coeff*dt/(1-coeff)
 coeef = timeCste/(dt + timeCste)
@@ -99,11 +103,13 @@ coeef = timeCste/(dt + timeCste)
 
 ## 2. Stabilisation
 ### 2.1 mode accro (gyroscopes seuls)
+C'est un asservissement en vitesse.
 
 ![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
 
 ### 2.2 Mode “ANGLE” (gyroscopes et accéléromètres)
 
+C'est un asservissement en position: il consiste en une boucle d'asservissement en vitesse imbriquée dans une boucle d'asservissement en position.
 ![AsservissementAngle](/ReadmePictures/AsservissementAngle.jpg "AsservissementAngle")
 
 ## 2.3 Stabilisation en hauteur
