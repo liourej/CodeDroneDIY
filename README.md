@@ -62,9 +62,9 @@ Une « Inertial Measurement Unit » est un MEMS constitué d’un gyroscope 3 
 | -------------- | -------------- | -------------- | -------------- |
 | Gyroscope | Mesure la vitesse angulaire en degrés par seconde autour de chaque axe. | Rapide | Dérive dans le temps |
 | Accéléromètre | Mesure l’accélération rectiligne en "g" sur chaque axe. | Lent | Bruité et utilisable quand le drone n'accélère pas |
- 
+
 Le MPU6050 utilisé communique avec le microcontrôleur par protocole I2C.
- 
+
 Ces 2 capteurs sont complémentaires pour calculer l'orientation : les fusionner avec un filtre permet de compenser mutuellement leurs défauts.
 
 ![IMU](/ReadmePictures/IMU.jpg "IMU")
@@ -156,10 +156,18 @@ Le MS5611 choisi pour sa précision communique avec le microcontrôleur par prot
 | PC5 | SCL MPU6050 & MS5611 |
 
 ### 3.3 Machine à états
+
+Le système possède quatres états:
+
 ![MachineEtats](/ReadmePictures/MachineEtats.jpg "MachineEtats")
+
+Pour armer le système, il faut d'abord le désarmer puis choisir un mode de vol. Au bout de 5 secondes sans puissance moteur, le système passe automatiquement en sécurité: le manche des gaz est alors neutralisé.
+
 ### 3.4 Réception CPPM
 
 La réception CPPM (Pulse Position Modulation) permet de recevoir toutes les voies sur une seule entrée: chaque front montant correspond à la fin de l'impulsion de la voie précédente et au début de l'impulsion de la voie suivante. Le temps écoulé entre deux front montant correspond à la largeur d'impulsion d'une voie donnée.
+
+![CPPM](/ReadmePictures/CPPM.jpg "CPPM")
 
 Dans le code, la largeur en milliseconde de chaque impulsion du train d'impulsion est mesurée à l'aide du timer0, puis stockée dans la case correspondant à la voie dans un tableau.
 
@@ -181,7 +189,7 @@ Dans le code, la largeur en milliseconde de chaque impulsion du train d'impulsio
 
 ### 4.2 Failsafe
 
-Pour la sécurité, définir le « failsafe » pour couper les gaz en cas de perte de la liaison radio.
+Pour la sécurité, le « failsafe » est programmé pour couper les gaz en cas de perte de la liaison radio.
 
 Pour programmer le « failsafe », mettre les commandes de la télécommande dans la configuration souhaitée lors de la perte de la réception radio, et « binder » la télécommande. La configuration utilisée pendant le « bind » défini le « failsafe. »
 
