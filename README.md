@@ -2,7 +2,7 @@
 # Contrôleur de vol de quadrirotor DIY
 
 <p align="center">
-    <img src="/ReadmePictures/Drone.jpg>
+    <img src="/ReadmePictures/Drone.jpg">
 </p>
 
 ---------------------------Table des matières----------------------------
