@@ -56,15 +56,12 @@
 
 ### 1.1 IMU
 
-Une « Inertial Measurement Unit » est constituée d’un gyroscope 3 axes et d’un accéléromètre 3 axes.
+Une « Inertial Measurement Unit » est un MEMS constitué d’un gyroscope 3 axes et d’un accéléromètre 3 axes.
 
- - Le gyroscope mesure la vitesse angulaire en degrés par seconde autour de chaque axe.
- - l’accéléromètre mesure l’accélération rectiligne en "g" sur chaque axe.
-
-| Capteur      | Avantages      | Inconvénients      |
-| -------------- | -------------- | -------------- |
-| Gyroscope | Rapide | Dérive dans le temps |
-| Accéléromètre | Lent | Bruité et Utilisable quand le drone n'accélère pas |
+| Capteur      | Fonction |Avantages      | Inconvénients |
+| -------------- | -------------- | -------------- | -------------- |
+| Gyroscope | Mesure la vitesse angulaire en degrés par seconde autour de chaque axe. | Rapide | Dérive dans le temps |
+| Accéléromètre | Mesure l’accélération rectiligne en "g" sur chaque axe. | Lent | Bruité et Utilisable quand le drone n'accélère pas |
  
 Ces 2 capteurs sont complémentaires pour calculer l'orientation : les fusionner avec un filtre permet de compenser mutuellement leurs défauts.
 
