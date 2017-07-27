@@ -1,8 +1,10 @@
-<p align="center">
+
 # Contrôleur de vol de quadrirotor DIY
 
-![Drone](/ReadmePictures/Drone.jpg "Drone")
+<p align="center">
+    <img src="/ReadmePictures/Drone.jpg>
 </p>
+
 ---------------------------Table des matières----------------------------
 
 **1.Calcul de l’attitude**
