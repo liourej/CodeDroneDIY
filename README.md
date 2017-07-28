@@ -167,12 +167,7 @@ Pour armer le système, il faut d'abord le désarmer puis choisir un mode de vol
 
 La réception CPPM (Pulse Position Modulation) permet de recevoir toutes les voies sur une seule entrée: chaque front montant correspond à la fin de l'impulsion de la voie précédente et au début de l'impulsion de la voie suivante. Le temps écoulé entre deux front montant correspond à la largeur d'impulsion d'une voie donnée.
 
-
-![CPPM](/ReadmePictures/CPPM.jpg "CPPM")
-
-
-![CPPM](/ReadmePictures/CPPM.jpg "CPPM")
-
+![CPPM](/ReadmePictures/CPPM.JPG "CPPM")
 
 Dans le code, la largeur en milliseconde de chaque impulsion du train d'impulsion est mesurée à l'aide du timer0, puis stockée dans la case correspondant à la voie dans un tableau.
 
