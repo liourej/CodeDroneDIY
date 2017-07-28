@@ -25,38 +25,42 @@
 
 2.3.Stabilisation en hauteur
 
-**3.Code « CodeDroneDIY »**
+**3.Machine à états**
 
-3.2.Connections
+**4.Réception CPPM**
 
-3.3.Machine à états
+**5. Organisation du code « CodeDroneDIY »**
 
-3.4.Réception CPPM
+**6.Configuration matérielle**
 
-**4.Configuration matérielle**
+6.1.Liste des composants
 
-4.1.Vue d’ensemble
+6.2.Connections
 
-4.3.Failsafe
+6.3.Failsafe
 
-**5.Annexes**
+**7.Annexes**
 
-5.1.Les modes de vol
+7.1.Les modes de vol
 
-5.2.Réglages PID
+7.2.Réglages PID
 
-5.3.Arduino UNO rev3
+7.3.Arduino UNO rev3
 
-5.4.Génération PWM à 400Hz
+7.4.Génération PWM à 400Hz
 
-**6.Bibliographie**
+**8.Bibliographie**
 
+-------------------------------------------------------------------
 
 ## 1. Calcul de l’attitude <a id="Test"></a>
 
+Le calcul de l'attitude est nécessaire pour le mode angle qui remet automatiquement le drone à plat lorsque les commandes sont mises au neutre.
+
 ### 1.1 IMU
 
-Une « Inertial Measurement Unit » est un MEMS constitué d’un gyroscope 3 axes et d’un accéléromètre 3 axes.
+L'« Inertial Measurement Unit » permet de mesurer les données permettant de calculer l'attitude du drone.
+C'est un MEMS, "Microelectromechanical system", constitué d’un gyroscope 3 axes et d’un accéléromètre 3 axes.
 
 | Capteur      | Fonction |Avantages      | Inconvénients |
 | -------------- | -------------- | -------------- | -------------- |
@@ -65,7 +69,7 @@ Une « Inertial Measurement Unit » est un MEMS constitué d’un gyroscope 3 
 
 Le MPU6050 utilisé communique avec le microcontrôleur par protocole I2C.
 
-Ces 2 capteurs sont complémentaires pour calculer l'orientation : les fusionner avec un filtre permet de compenser mutuellement leurs défauts.
+Ces 2 capteurs sont complémentaires pour calculer l'attitude : les fusionner avec un filtre permet de compenser mutuellement leurs défauts.
 
 ![IMU](/ReadmePictures/IMU.jpg "IMU")
 
@@ -109,6 +113,7 @@ coeef = timeCste/(dt + timeCste)
 ## 2. Stabilisation
 ### 2.1 mode accro (gyroscopes seuls)
 C'est un asservissement en vitesse. Le pilote agit sur la vitesse de rotation du drone autour de ses axes.
+Les données des gyroscopes suffisent: le filtre complémentaire n'est pas utilisé.
 
 ![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
 
@@ -117,6 +122,7 @@ C'est un asservissement en vitesse. Le pilote agit sur la vitesse de rotation du
 C'est un asservissement en position. Le pilote agit sur la position angulaire du drone pour chacun de ses axes.
 
 Il consiste en une boucle d'asservissement en vitesse imbriquée dans une boucle d'asservissement en position.
+Le retour de l'attitude est calculée par fusion des données avec le filtre complémentaire.
 
 ![AsservissementAngle](/ReadmePictures/AsservissementAngle.jpg "AsservissementAngle")
 
@@ -127,12 +133,29 @@ Ce capteur est sensible à la lumière et aux variations de préssion: il faut l
 
 Le MS5611 choisi pour sa précision communique avec le microcontrôleur par protocole I2C.
 
-## 3. Code « CodeDroneDIY »
-### 3.1 Design
+## 3. Machine à états
+
+Pour sécuriser le système, des états "Sécurité", "Désarmé" sont créés en plus des états "Angle" et "Accro". Le but est d'éviter une mise en route involontaire des moteurs.
+Le système possède quatres états:
+
+![MachineEtats](/ReadmePictures/MachineEtats.jpg "MachineEtats")
+
+Pour armer le système, il faut d'abord le désarmer puis choisir un mode de vol. Au bout de 5 secondes sans puissance moteur, le système passe automatiquement en sécurité: le manche des gaz est alors neutralisé. Pour le réarmer, il faut repasser en mode désarmé, puis rechoisir le mode de vol "Angle" ou "Accro".
+
+## 4. Réception CPPM
+
+La réception CPPM (Pulse Position Modulation) permet de recevoir toutes les voies sur une seule entrée: chaque front montant correspond à la fin de l'impulsion de la voie précédente et au début de l'impulsion de la voie suivante. Le temps écoulé entre deux front montant correspond à la largeur d'impulsion d'une voie donnée.
+
+![CPPM](/ReadmePictures/CPPM.JPG "CPPM")
+
+Dans le code, la largeur en milliseconde de chaque impulsion du train d'impulsion est mesurée à l'aide du timer0, puis stockée dans la case correspondant à la voie dans un tableau.
+
+## 5. Organisation du code « CodeDroneDIY »
+
 | Fichier      | Description      |
 | -------------- | -------------- |
 | CodeDroneDIY.ino | Contient la fonction d'initialisation et la boucle principale |
-| GetPosition.cpp | Intègre et fustionne les données brutes des gyro/accéléro et retourne les angls avec l'horizontale en degrés |
+| GetPosition.cpp | Intègre et fustionne les données brutes des gyro/accéléro et retourne les angles avec l'horizontale en degrés |
 | MPU6050.cpp | Librairie pour acquérir les données brutes du MPU6050 |
 | PID.cpp | Correcteur proportionnel, intégral, dérivée |
 | Reception.h | Acquisition par interruption 0 des signaux du récepteur au format CPPM |
@@ -143,7 +166,24 @@ Le MS5611 choisi pour sa précision communique avec le microcontrôleur par prot
 | Time.h | Mesure du temps de boucle et du temps écoulé depuis un instant t |
 | checkIMU.cpp | Vérifie le fonctionnement de l'IMU avant une utilisation |
 
-### 3.2 Connections
+## 6. Configuration matérielle
+
+### 6.1 Liste des composants
+
+| Composant      | Référence      |
+| -------------- | -------------- |
+| **ESC** | Afro 20A-Simonk firmware 500Hz, BEC 0.5A 1060 à 1860 us de largeur d'impulsion |
+| **Moteurs** | Multistar 2216-800Kv 14 Poles - 222W Current max: 20A Shaft: 3mm 2-4S|
+| **Hélices** | 10x4.5 SF Props 2pc CW 2 pc CCW Rotation (Orange) |
+| **Batterie** | Zippy Flightmax 3000mAh 4S |
+| **Récepteur** | OrangeRx R617XL CPPM DSM2/DSMX 6 ch |
+| **Contrôleur** | Arduino UNO rev3 |
+| **IMU** | MPU6050 |
+| **Baromètre** | MS5611 |
+| **Buzzer** | Matek lost model beeper - Built-in MCU |
+| **Chassis** | Diatone Q450 Quad 450 V3. Un grand châssis de 450mm a été choisi pour privilégier la stabilité et l'autonomie. ![Chassis](/ReadmePictures/Chassis.jpg "Chassis")|
+
+### 6.2 Connections
 | Borche Arduino      | Composant      |
 | -------------- | -------------- |
 | PB0 | ESC0 |
@@ -155,47 +195,18 @@ Le MS5611 choisi pour sa précision communique avec le microcontrôleur par prot
 | PC4 | SDA MPU6050 & MS5611 |
 | PC5 | SCL MPU6050 & MS5611 |
 
-### 3.3 Machine à états
-
-Le système possède quatres états:
-
-![MachineEtats](/ReadmePictures/MachineEtats.jpg "MachineEtats")
-
-Pour armer le système, il faut d'abord le désarmer puis choisir un mode de vol. Au bout de 5 secondes sans puissance moteur, le système passe automatiquement en sécurité: le manche des gaz est alors neutralisé.
-
-### 3.4 Réception CPPM
-
-La réception CPPM (Pulse Position Modulation) permet de recevoir toutes les voies sur une seule entrée: chaque front montant correspond à la fin de l'impulsion de la voie précédente et au début de l'impulsion de la voie suivante. Le temps écoulé entre deux front montant correspond à la largeur d'impulsion d'une voie donnée.
-
-![CPPM](/ReadmePictures/CPPM.JPG "CPPM")
-
-Dans le code, la largeur en milliseconde de chaque impulsion du train d'impulsion est mesurée à l'aide du timer0, puis stockée dans la case correspondant à la voie dans un tableau.
-
-## 4. Configuration matérielle
-
-### 4.1 Vue d’ensemble
-
-| Composant      | Référence      |
-| -------------- | -------------- |
-| **ESC** | Afro 20A-Simonk firmware 500Hz, BEC 0.5A 1060 à 1860 us de largeur d'impulsion |
-| **Moteurs** | Multistar 2216-800Kv 14 Poles - 222W Current max: 20A Shaft: 3mm 2-4S|
-| **Hélices** | 10x4.5 SF Props 2pc CW 2 pc CCW Rotation (Orange) |
-| **Batterie** | Zippy Flightmax 3000mAh 4S |
-| **Récepteur** | OrangeRx R617XL CPPM DSM2/DSMX 6 ch |
-| **Contrôleur** | Arduino UNO rev3 |
-| **IMU** | MPU6050 |
-| **Chassis** | Diatone Q450 Quad 450 V3. Un grand châssis de 450mm a été choisi pour privilégier la stabilité et l'autonomie. ![Chassis](/ReadmePictures/Chassis.jpg "Chassis")|
+![flightConfiguration](/ReadmePictures/flightConfiguration.jpg "flightConfiguration")
 
 
-### 4.2 Failsafe
+### 6.3 Failsafe
 
 Pour la sécurité, le « failsafe » est programmé pour couper les gaz en cas de perte de la liaison radio.
 
 Pour programmer le « failsafe », mettre les commandes de la télécommande dans la configuration souhaitée lors de la perte de la réception radio, et « binder » la télécommande. La configuration utilisée pendant le « bind » défini le « failsafe. »
 
-## 5. Annexes
+## 7. Annexes
 
-### 5.1 Les modes de vol
+### 7.1 Les modes de vol
 
 | Mode      | Gyro      | Accé      | Baro      | Bouss      | GPS      | Description      |
 | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
@@ -209,7 +220,7 @@ Pour programmer le « failsafe », mettre les commandes de la télécommande d
 | **GPS/ Points de passage** | | X | | X | X | Suit automatiquement les points de cheminement GPS pré-configurés de manière autonome. |
 | **GPS/ Maintien de position** | | X | | X | X | Maintient la position actuelle en utilisant le GPS et le baromètre (si disponible). |
 
-## 5.2 Réglages PID
+### 7.2 Réglages PID
 
 **Le P**
 
@@ -237,7 +248,7 @@ Si votre machine continue à dériver après un ordre ou si elle dérive seule s
 tpa breakpoint
 Ce paramètre joue sur le ratio des PID. En effet, la tension et le niveau de gaz sont des variables qui agissent sur le comportement. Le TPA va faire varier vos PID selon ces facteurs.Si vous n’en mettez pas, il se peut que vous ayez des vibrations lorsque vous êtes à fond de gaz avec une lipo chargée à bloc. Pour être précis, les TPA ( Throtlle PID Attenuation ) jouent sur le P. ( Merci XKin Ai pour la précision )
 
-### 5.3 Arduino UNO rev3
+### 7.3 Arduino UNO rev3
 
 Microcontrôleur ATmega328
 Architecture 8 bits RISC
@@ -246,7 +257,7 @@ Architecture 8 bits RISC
 Dimensions : 68.6 mm x 53.4 mm
 Poids : 25 g
 
-### 5.4 Génération PWM à 400Hz
+### 7.4 Génération PWM à 400Hz
 
 1. Classer les ESC par ordre croissant de largeur d’impulsion.
 2. Utiliser le « Timer1 ».
@@ -259,7 +270,7 @@ Poids : 25 g
 >* The situation with the most difficult timing is when two servos are separated by 2-8 uS, less than an interrupt period.
 >* After every 2.5 ms servo period we wait 7*2.5 ms for the next servo control period. We can use these periods to address  other groups of servos if we use demuxes to distribute the servo pulses to the groups.
 
-## 6. Bibliographie
+## 8. Bibliographie
 
 * Arduino
 
@@ -281,7 +292,7 @@ http://frskytaranis.forumactif.org/t4426-tuto-pwm-cppm-ccpm-ppm-s-bus-s-port-kes
 
 http://www.fpv-passion.fr/docteur-pid/
 
-*Quadrirotor
+* Quadrirotor
 
 https://www.mondrone.net/fabriquer-quadricoptere-la-propulsion/
 
