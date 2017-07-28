@@ -171,6 +171,9 @@ La réception CPPM (Pulse Position Modulation) permet de recevoir toutes les voi
 ![CPPM](/ReadmePictures/CPPM.jpg "CPPM")
 
 
+![CPPM](/ReadmePictures/CPPM.jpg "CPPM")
+
+
 Dans le code, la largeur en milliseconde de chaque impulsion du train d'impulsion est mesurée à l'aide du timer0, puis stockée dans la case correspondant à la voie dans un tableau.
 
 ## 4. Configuration matérielle
