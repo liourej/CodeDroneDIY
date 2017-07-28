@@ -54,9 +54,12 @@
 
 ## 1. Calcul de l’attitude <a id="Test"></a>
 
+Le calcul de l'attitude est nécessaire pour le mode angle qui remet automatiquement le drone à plat lorsque les commandes sont mises au neutre.
+
 ### 1.1 IMU
 
-Une « Inertial Measurement Unit » est un MEMS constitué d’un gyroscope 3 axes et d’un accéléromètre 3 axes.
+L'« Inertial Measurement Unit » permet de mesurer les données permettant de calculer l'attitude du drone.
+C'est un MEMS, "Microelectromechanical system", constitué d’un gyroscope 3 axes et d’un accéléromètre 3 axes.
 
 | Capteur      | Fonction |Avantages      | Inconvénients |
 | -------------- | -------------- | -------------- | -------------- |
@@ -65,7 +68,7 @@ Une « Inertial Measurement Unit » est un MEMS constitué d’un gyroscope 3 
 
 Le MPU6050 utilisé communique avec le microcontrôleur par protocole I2C.
 
-Ces 2 capteurs sont complémentaires pour calculer l'orientation : les fusionner avec un filtre permet de compenser mutuellement leurs défauts.
+Ces 2 capteurs sont complémentaires pour calculer l'attitude : les fusionner avec un filtre permet de compenser mutuellement leurs défauts.
 
 ![IMU](/ReadmePictures/IMU.jpg "IMU")
 
@@ -109,6 +112,7 @@ coeef = timeCste/(dt + timeCste)
 ## 2. Stabilisation
 ### 2.1 mode accro (gyroscopes seuls)
 C'est un asservissement en vitesse. Le pilote agit sur la vitesse de rotation du drone autour de ses axes.
+Les données des gyroscopes suffisent: le filtre complémentaire n'est pas utilisé.
 
 ![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
 
@@ -117,6 +121,7 @@ C'est un asservissement en vitesse. Le pilote agit sur la vitesse de rotation du
 C'est un asservissement en position. Le pilote agit sur la position angulaire du drone pour chacun de ses axes.
 
 Il consiste en une boucle d'asservissement en vitesse imbriquée dans une boucle d'asservissement en position.
+Le retour de l'attitude est calculée par fusion des données avec le filtre complémentaire.
 
 ![AsservissementAngle](/ReadmePictures/AsservissementAngle.jpg "AsservissementAngle")
 
