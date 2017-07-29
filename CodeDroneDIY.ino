@@ -4,6 +4,7 @@ void setup() {
 
   // Buzzer
   pinMode(12, OUTPUT);
+  pinMode(13, OUTPUT);
 
   // ESC
   ESC0.attach(8);
@@ -202,6 +203,7 @@ void loop() {
       break;
     /*********** STARTING STATE ***********/
     case starting:
+      Serial.println("stateMachine.state starting");
       IdleAllESC();
       stateMachine.state = Rx.GetFlyingMode();
       delay(200);
@@ -211,7 +213,8 @@ void loop() {
       if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
         stateMachine.state = starting;
 
-      if (stateMachine.state != disarmed) {
+      if ( (stateMachine.state == angle) || (stateMachine.state == accro) ) {
+         Serial.println("stateMachine.state != disarmed MODE");
         //Angle mode PID config
         // anglePosPIDParams[1] = map(analogRead(2), 0, 1023, 100, 500); // Adjust Kp from potentiometer
         anglePosPIDParams[3] = map(analogRead(3), 0, 1023, 0, 100); // Adjust Ki from potentiometer
@@ -226,12 +229,12 @@ void loop() {
         pitchSpeedPID_Accro.SetGains(accroSpeedPIDParams);
         yawSpeedPID_Accro.SetGains(yawSpeedPIDParams);
 
-        if ( (stateMachine.state == angle) || (stateMachine.state == accro)  ) {
-          stateMachine.statePrev = stateMachine.state;
-          PrintSettings(stateMachine);
-        } else
-          stateMachine.state = starting;
-      }
+        stateMachine.statePrev = stateMachine.state;
+        PrintSettings(stateMachine);
+        
+      }else
+        stateMachine.state = starting;
+        
       if ( Rx.GetSwitchH() )
         ActivateBuzzer(0.005, 500);
       break;

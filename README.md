@@ -39,17 +39,19 @@
 
 6.3.Failsafe
 
-**7.Annexes**
+**7.FPV**
 
-7.1.Les modes de vol
+**8.Annexes**
 
-7.2.Réglages PID
+8.1.Les modes de vol
 
-7.3.Arduino UNO rev3
+8.2.Réglages PID
 
-7.4.Génération PWM à 400Hz
+8.3.Arduino UNO rev3
 
-**8.Bibliographie**
+8.4.Génération PWM à 400Hz
+
+**9.Bibliographie**
 
 -------------------------------------------------------------------
 
@@ -204,9 +206,20 @@ Pour la sécurité, le « failsafe » est programmé pour couper les gaz en ca
 
 Pour programmer le « failsafe », mettre les commandes de la télécommande dans la configuration souhaitée lors de la perte de la réception radio, et « binder » la télécommande. La configuration utilisée pendant le « bind » défini le « failsafe. »
 
-## 7. Annexes
+## 7. FPV - First Person View
+| Composant      | Référence      |
+| -------------- | -------------- |
+| **Lunettes** | Quanum DIY FPV Goggle V2 Pro |
+| **Batterie lunettes** | 1000 mAh 3S |
+| **Récepteur** | Eachine RC832 Boscam FPV 5.8G 48CH Wireless AV Receiver  |
+| **Antenne récepteur** | DYS FPV 5.8G Antenna 4dBi Mushroom Antenna RHCP TX RX |
+| **Caméra** | Foxeer XAT600M HS1177 600TVL CCD 2.8MM IR Mini FPV Camera IR Blocked 5-22v |
+| **Antenne caméra** | Realacc 5.8G 5dBi 50W RHCP Omnidirectional 3 Leaf Clover FPV Antenna Red |
+| **Emetteur** | Upgrade Aomway Mini 5.8Ghz 200mW 32CH AV Wireless Transmitter Module |
 
-### 7.1 Les modes de vol
+## 8. Annexes
+
+### 8.1 Les modes de vol
 
 | Mode      | Gyro      | Accé      | Baro      | Bouss      | GPS      | Description      |
 | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
@@ -220,7 +233,7 @@ Pour programmer le « failsafe », mettre les commandes de la télécommande d
 | **GPS/ Points de passage** | | X | | X | X | Suit automatiquement les points de cheminement GPS pré-configurés de manière autonome. |
 | **GPS/ Maintien de position** | | X | | X | X | Maintient la position actuelle en utilisant le GPS et le baromètre (si disponible). |
 
-### 7.2 Réglages PID
+### 8.2 Réglages PID
 
 **Le P**
 
@@ -248,7 +261,7 @@ Si votre machine continue à dériver après un ordre ou si elle dérive seule s
 tpa breakpoint
 Ce paramètre joue sur le ratio des PID. En effet, la tension et le niveau de gaz sont des variables qui agissent sur le comportement. Le TPA va faire varier vos PID selon ces facteurs.Si vous n’en mettez pas, il se peut que vous ayez des vibrations lorsque vous êtes à fond de gaz avec une lipo chargée à bloc. Pour être précis, les TPA ( Throtlle PID Attenuation ) jouent sur le P. ( Merci XKin Ai pour la précision )
 
-### 7.3 Arduino UNO rev3
+### 8.3 Arduino UNO rev3
 
 Microcontrôleur ATmega328
 Architecture 8 bits RISC
@@ -257,7 +270,7 @@ Architecture 8 bits RISC
 Dimensions : 68.6 mm x 53.4 mm
 Poids : 25 g
 
-### 7.4 Génération PWM à 400Hz
+### 8.4 Génération PWM à 400Hz
 
 1. Classer les ESC par ordre croissant de largeur d’impulsion.
 2. Utiliser le « Timer1 ».
@@ -270,7 +283,7 @@ Poids : 25 g
 >* The situation with the most difficult timing is when two servos are separated by 2-8 uS, less than an interrupt period.
 >* After every 2.5 ms servo period we wait 7*2.5 ms for the next servo control period. We can use these periods to address  other groups of servos if we use demuxes to distribute the servo pulses to the groups.
 
-## 8. Bibliographie
+## 9. Bibliographie
 
 * Arduino
 
