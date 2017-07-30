@@ -51,6 +51,12 @@ void setup() {
   // Set watchdog reset
   wdt_enable(WDTO_250MS);
 
+  if ( MAX_POWER == 1860)
+    Serial.println(F("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!FLYING MODE POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\t"));
+  else if ( MAX_POWER <= 1300)
+    Serial.println(F("DEBUG MODE POWER!!!\t"));
+  Serial.print(F("MAX_POWER:\t")); Serial.println(MAX_POWER);
+
   Serial.println(F("Setup Finished"));
 }
 
@@ -214,16 +220,16 @@ void loop() {
         stateMachine.state = starting;
 
       if ( (stateMachine.state == angle) || (stateMachine.state == accro) ) {
-         Serial.println("stateMachine.state != disarmed MODE");
+        Serial.println("stateMachine.state != disarmed MODE");
         //Angle mode PID config
         // anglePosPIDParams[1] = map(analogRead(2), 0, 1023, 100, 500); // Adjust Kp from potentiometer
-        anglePosPIDParams[3] = map(analogRead(3), 0, 1023, 0, 100); // Adjust Ki from potentiometer
+        //anglePosPIDParams[3] = map(analogRead(3), 0, 1023, 0, 100); // Adjust Ki from potentiometer
         rollPosPID_Angle.SetGains(anglePosPIDParams);
         pitchPosPID_Angle.SetGains(anglePosPIDParams);
         rollSpeedPID_Angle.SetGains(angleSpeedPIDParams);
         pitchSpeedPID_Angle.SetGains(angleSpeedPIDParams);
         yawSpeedPID_Angle.SetGains(yawSpeedPIDParams);
-        
+
         //Accro mode PID config
         rollSpeedPID_Accro.SetGains(accroSpeedPIDParams);
         pitchSpeedPID_Accro.SetGains(accroSpeedPIDParams);
@@ -231,10 +237,10 @@ void loop() {
 
         stateMachine.statePrev = stateMachine.state;
         PrintSettings(stateMachine);
-        
-      }else
+
+      } else
         stateMachine.state = starting;
-        
+
       if ( Rx.GetSwitchH() )
         ActivateBuzzer(0.005, 500);
       break;

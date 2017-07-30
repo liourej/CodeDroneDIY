@@ -73,11 +73,6 @@ void InitTimer1() {
 
 void PrintSettings(StateMachine _stateMachine) {
   Serial.println(F("/********* settings *********/"));
-  if ( MAX_POWER == 1860)
-    Serial.println(F("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!FLYING MODE POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\t"));
-  else if ( MAX_POWER <= 1300)
-    Serial.println(F("DEBUG MODE POWER!!!\t"));
-  Serial.print(F("MAX_POWER:\t")); Serial.println(MAX_POWER);
   if ( _stateMachine.state == angle) {
     Serial.println(F("FLYING_MODE_ANGLE"));
     Serial.println(F("/********* PID settings *********/"));
