@@ -114,7 +114,7 @@ void loop() {
   float loopTimeSec = time.GetloopTime();
   int rollPosCmd, pitchPosCmd, yawPosCmd = 0;
   int rollMotorPwr, pitchMotorPwr, yawMotorPwr = 0;
-
+  static int tempState = disarmed;
   // State Machine
   // initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
 
@@ -138,11 +138,19 @@ void loop() {
         ResetPIDCommand(rollMotorPwr, pitchMotorPwr, yawMotorPwr);
       }
       XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
+
+      // Allow to change flying mode during flight
+      tempState = Rx.GetFlyingMode();
+      if ( tempState == accro ) {
+        stateMachine.state = accro;
+        Serial.println("Flying mode changed from angle to accro");
+      }
       break;
     /*********** ACCRO STATE ***********/
     case accro:
       throttle = Rx.GetThrottle();
-      Position.GetCurrSpeed(accelgyro, speedCurr);
+      Position.GetCurrPos(accelgyro, posCurr, speedCurr, loopTimeSec);
+      //Position.GetCurrSpeed(accelgyro, speedCurr);
       if ( throttle > 1100 ) {
         stateMachine.throttleWasHigh = true;
         rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loopTimeSec );
@@ -154,6 +162,13 @@ void loop() {
         ResetPIDCommand(rollMotorPwr, pitchMotorPwr, yawMotorPwr);
       }
       XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
+
+      // Allow to change flying mode during flight
+      tempState = Rx.GetFlyingMode();
+      if ( tempState == angle ) {
+        stateMachine.state = angle;
+        Serial.println("Flying mode changed from accro to angle");
+      }
       break;
     /*********** SAFETY STATE ***********/
     case safety:

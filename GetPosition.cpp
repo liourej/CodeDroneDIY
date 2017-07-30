@@ -25,9 +25,9 @@ inline void GetPosition::GetCorrectedGyro(MPU6050 _gyro, float _data[])
   _gyro.getRotation(&gx, &gy, &gz);   // 2ms !!
 
   // Correct raw data with offset
-  _data[0] = (gx - offset[3] );
-  _data[1] = (gy - offset[4] );
-  _data[2] = (gz - offset[5] );
+  _data[0] = (float)(gx - offset[3] )/ GyroSensitivity;
+  _data[1] = (float)(gy - offset[4] )/ GyroSensitivity;
+  _data[2] = (float)(gz - offset[5] )/ GyroSensitivity;
 }
 
 // Compute accelerometer and gyroscope offsets
@@ -125,9 +125,9 @@ void GetPosition::GetCurrSpeed(MPU6050 _accelgyro, float _speed[])
   // Get corrected data from gyro and accelero
   GetCorrectedGyro(_accelgyro, gyroRaw);
 
-  _speed[0] = gyroRaw[0] / GyroSensitivity;
-  _speed[1] = gyroRaw[1] / GyroSensitivity;
-  _speed[2] = gyroRaw[2] / GyroSensitivity;
+  _speed[0] = gyroRaw[0];
+  _speed[1] = gyroRaw[1];
+  _speed[2] = gyroRaw[2];
 }
 
 float GetPosition::GetFilterTimeConstant(float _loopTimeSec) {
