@@ -133,18 +133,20 @@ void loop() {
         pitchMotorPwr = pitchSpeedPID_Angle.ComputeCorrection( pitchPosCmd, speedCurr[1], loopTimeSec );
 
         yawMotorPwr = yawSpeedPID_Angle.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
+
+        // Allow to change flying mode during flight
+        tempState = Rx.GetFlyingMode();
+        if ( tempState == accro ) {
+          stateMachine.state = accro;
+          Serial.println("Flying mode changed from angle to accro");
+        }
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 20 s without power.
         ResetPIDCommand(rollMotorPwr, pitchMotorPwr, yawMotorPwr);
       }
       XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
 
-      // Allow to change flying mode during flight
-      tempState = Rx.GetFlyingMode();
-      if ( tempState == accro ) {
-        stateMachine.state = accro;
-        Serial.println("Flying mode changed from angle to accro");
-      }
+
       break;
     /*********** ACCRO STATE ***********/
     case accro:
@@ -157,18 +159,19 @@ void loop() {
         pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection( Rx.GetElevatorSpeed(), speedCurr[1], loopTimeSec );
         yawMotorPwr = yawSpeedPID_Accro.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
 
+        // Allow to change flying mode during flight
+        tempState = Rx.GetFlyingMode();
+        if ( tempState == angle ) {
+          stateMachine.state = angle;
+          Serial.println("Flying mode changed from accro to angle");
+        }
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 5 s without power.
         ResetPIDCommand(rollMotorPwr, pitchMotorPwr, yawMotorPwr);
       }
       XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
 
-      // Allow to change flying mode during flight
-      tempState = Rx.GetFlyingMode();
-      if ( tempState == angle ) {
-        stateMachine.state = angle;
-        Serial.println("Flying mode changed from accro to angle");
-      }
+
       break;
     /*********** SAFETY STATE ***********/
     case safety:
