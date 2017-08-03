@@ -6,104 +6,112 @@
 </p>
 
 ---------------------------Table des matières----------------------------
+**1. Objectif du projet**
 
-**1.Calcul de l’attitude**
+**2.Calcul de l’attitude**
 
-1.1.IMU
+2.1.IMU
 
-1.1.1.Gyroscopes
+2.1.1.Gyroscopes
 
-1.1.2.Accéléromètres
+2.1.2.Accéléromètres
 
-1.2.Fusion de données: le filtre complémentaire
+2.2.Fusion de données: le filtre complémentaire
 
-**2.Stabilisation**
+**3.Stabilisation**
 
-2.1.Mode accro (gyroscopes seuls)
+3.1.Mode accro (gyroscopes seuls)
 
-2.2.Mode “ANGLE” (gyroscopes et accéléromètres)
+3.2.Mode “ANGLE” (gyroscopes et accéléromètres)
 
-2.3.Stabilisation en hauteur
+3.3.Stabilisation en hauteur
 
-**3.Machine à états**
+**4.Machine à états**
 
-**4.Réception CPPM**
+**5.Réception CPPM**
 
-**5. Organisation du code « CodeDroneDIY »**
+**6. Organisation du code « CodeDroneDIY »**
 
-**6.Configuration matérielle**
+**7.Configuration matérielle**
 
-6.1.Liste des composants
+7.1.Liste des composants
 
-6.2.Connections
+7.2.Connections
 
-6.3.Failsafe
+7.3.Failsafe
 
-**7.FPV**
+**8.FPV**
 
-**8.Annexes**
+**9.Annexes**
 
-8.1.Les modes de vol
+9.1.Les modes de vol
 
-8.2.Réglages PID
+9.2.Réglages PID
 
-8.3.Arduino UNO rev3
+9.3.Arduino UNO rev3
 
-8.4.Génération PWM à 400Hz
+9.4.Génération PWM à 400Hz
 
-**9.Bibliographie**
+**10.Bibliographie**
 
 -------------------------------------------------------------------
+## 1. Objectif du projet
 
-## 1. Calcul de l’attitude <a id="Test"></a>
+L'objectif de ce projet est de concevoir un contrôleur de vol de quadricoptère maison le plus simple possible.
+L'intérêt est double:
+* comprendre le fonctionnement de la stabilisation d'un drone
+* avoir un système évolutif totalement personnalisable: il est possible de rajouter les capteurs que l'on veut
 
-Le calcul de l'attitude est nécessaire pour le mode angle qui remet automatiquement le drone à plat lorsque les commandes sont mises au neutre.
+## 2. Calcul de l’attitude <a id="Test"></a>
 
-### 1.1 IMU
+L'attitude correspond aux angles du drone par rapport à l'horizontale.
+Connaître l'attitude permet de stabiliser le drone, et de le remettre automatiquement à plat lorsque les manches sont ramenés au neutre.
+L'attitude est calculée par fusion des données fournies par une IMU.
 
-L'« Inertial Measurement Unit » permet de mesurer les données permettant de calculer l'attitude du drone.
-C'est un MEMS, "Microelectromechanical system", constitué d’un gyroscope 3 axes et d’un accéléromètre 3 axes.
+### 2.1 IMU
+
+L'« Inertial Measurement Unit » est un MEMS, "Microelectromechanical system", constitué d’un gyroscope 3 axes et d’un accéléromètre 3 axes.
 
 | Capteur      | Fonction |Avantages      | Inconvénients |
 | -------------- | -------------- | -------------- | -------------- |
 | Gyroscope | Mesure la vitesse angulaire en degrés par seconde autour de chaque axe. | Rapide | Dérive dans le temps |
 | Accéléromètre | Mesure l’accélération rectiligne en "g" sur chaque axe. | Lent | Bruité et utilisable quand le drone n'accélère pas |
 
-Le MPU6050 utilisé communique avec le microcontrôleur par protocole I2C.
-
 Ces 2 capteurs sont complémentaires pour calculer l'attitude : les fusionner avec un filtre permet de compenser mutuellement leurs défauts.
 
 ![IMU](/ReadmePictures/IMU.jpg "IMU")
 
-#### 1.1.1 Gyroscopes
+Le projet utilise un MPU6050 qui communique avec le microcontrôleur par protocole I2C.
+
+#### 2.1.1 Gyroscopes
 
 L'angle avec l'horizontale est calculé par intégration des données brutes des gyroscopes.
 
     _pos[0] = _pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time;
 
-#### 1.1.2 Accéléromètres
+#### 2.1.2 Accéléromètres
 
-L'angle avec l'horizontale est calculé à partir de la mesure de l’accélération de la terre: lorsque le quadrirotor est immobile ou à vitesse constante, l’accélération mesurée est la gravité.
-Cette mesure est faussée quand le drone accélère.
+Lorsque le quadrirotor est immobile ou à vitesse constante, les accéléromètres mesurent la gravité. L'angle avec l'horizontale est calculé par trigonométrie à partir de la mesure de l’accélération de la terre.
+Attention, cette mesure est faussée quand le drone accélère.
 
     _pos[0] = atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI);
 
-## 1.2 Fusion de données: le filtre complémentaire
+## 2.2 Fusion de données: le filtre complémentaire
 
 Le gyroscope dérive.
 L’accéléromètre n’est pas assez rapide, il est bruité et il n’est utilisable qu’au repos lorsqu’il ne subit que l’accélération de la terre.
 
-Le filtre complémentaire permet de fusionner les données des gyroscopes et des accéléromètres pour supprimer leurs défauts respectifs:
-- Un filtre passe-bas sur l’accéléromètre permet de filtrer le bruit et les accélérations parasites: ces données sont exploitables sur la durée, il faut éliminer les variation brusques.
+Le filtre complémentaire fusionne les données des gyroscopes et des accéléromètres pour supprimer leurs défauts respectifs:
+- Un filtre passe-bas sur l’accéléromètre filtre le bruit et les accélérations parasites: ces données sont exploitables sur la durée, il faut éliminer les variation brusques.
 - Un filtre passe-haut est appliqué sur le gyroscope car ses données sont fiables sur le court terme mais prennent de l’erreur dans le temps à cause de sa dérive.
 
 ![FiltreComplementaire](/ReadmePictures/FiltreComplementaire.jpg "FiltreComplementaire")
 
-La constante de temps du filtre est un compromis entre l’élimination des accélérations dues aux mouvements du quadricoptère et la compensation de la dérive des gyroscopes :
-Trop basse, les parasites des accéléromètres ne sont pas filtrés
-Trop haute, la mesure dérive à cause des gyroscopes insufisemment compensés
+La valeur de la constante de temps du filtre est un compromis entre l’élimination des accélérations dues aux mouvements du quadricoptère, et la compensation de la dérive des gyroscopes :
+* trop faible, les parasites des accéléromètres ne sont pas filtrés
+* trop haute, la mesure dérive à cause des gyroscopes insufisemment compensés
 
-J’ai choisi une constante de temps de 5 sec, soit un coeff de 0.9995 pour un tour de boucle de 2.49ms, pour éliminer les vibrations et les accélérations du quadrirotor qui s’ajoutent à l’accélération de la terre.
+La constante de temps du projet est de 5 sec, soit un coeff de 0.9995 pour un tour de boucle de 2.49ms, pour éliminer les vibrations et les accélérations du quadrirotor.
 
 Attention, la constante de temps est corrélée au temps de boucle du système:
 
@@ -112,14 +120,14 @@ coeef = timeCste/(dt + timeCste)
 
     _pos[0] = HighPassFilterCoeff*(_pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time) + LowPassFilterCoeff*((atan(accGyroRaw[1]/accGyroRaw[2]))*57.2957795130823);
 
-## 2. Stabilisation
-### 2.1 mode accro (gyroscopes seuls)
+## 3. Stabilisation
+### 3.1 mode accro (gyroscopes seuls)
 C'est un asservissement en vitesse. Le pilote agit sur la vitesse de rotation du drone autour de ses axes.
-Les données des gyroscopes suffisent: le filtre complémentaire n'est pas utilisé.
+Seules les données des gyroscopes sont utilisées: le filtre complémentaire n'est pas utile.
 
 ![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
 
-### 2.2 Mode “ANGLE” (gyroscopes et accéléromètres)
+### 3.2 Mode “ANGLE” (gyroscopes et accéléromètres)
 
 C'est un asservissement en position. Le pilote agit sur la position angulaire du drone pour chacun de ses axes.
 
@@ -128,31 +136,32 @@ Le retour de l'attitude est calculée par fusion des données avec le filtre com
 
 ![AsservissementAngle](/ReadmePictures/AsservissementAngle.jpg "AsservissementAngle")
 
-## 2.3 Stabilisation en hauteur
+## 3.3 Stabilisation en hauteur
 
 La mesure de la pression par le baromètre permet de déterminer la hauteur à une dizaine de centimètres près.
-Ce capteur est sensible à la lumière et aux variations de préssion: il faut l'isoler du souffle des hélices et des mouvements d'air entrainés par les mouvements du drone.
+Ce capteur est sensible à la lumière et aux variations de pression: il faut l'isoler du souffle des hélices et des déplacements  d'air entrainés par les mouvements du drone.
 
-Le MS5611 choisi pour sa précision communique avec le microcontrôleur par protocole I2C.
+Le projet utilise un MS5611 choisi pour sa précision et qui communique avec le microcontrôleur par protocole I2C.
 
-## 3. Machine à états
+## 4. Machine à états
 
-Pour sécuriser le système, des états "Sécurité", "Désarmé" sont créés en plus des états "Angle" et "Accro". Le but est d'éviter une mise en route involontaire des moteurs.
-Le système possède quatres états:
+Le système possède 6 états:
 
 ![MachineEtats](/ReadmePictures/MachineEtats.jpg "MachineEtats")
 
-Pour armer le système, il faut d'abord le désarmer puis choisir un mode de vol. Au bout de 5 secondes sans puissance moteur, le système passe automatiquement en sécurité: le manche des gaz est alors neutralisé. Pour le réarmer, il faut repasser en mode désarmé, puis rechoisir le mode de vol "Angle" ou "Accro".
+Au bout de 5 secondes de puissance moteur à 0%, le système passe dans l'état "sécurité": la commande des moteurs est inhibée et la puissance ne peut plus être remise.
 
-## 4. Réception CPPM
+Pour réarmer le système, il faut d'abord le désarmer, puis choisir un mode de vol "Angle" ou "Accro".
 
-La réception CPPM (Pulse Position Modulation) permet de recevoir toutes les voies sur une seule entrée: chaque front montant correspond à la fin de l'impulsion de la voie précédente et au début de l'impulsion de la voie suivante. Le temps écoulé entre deux front montant correspond à la largeur d'impulsion d'une voie donnée.
+## 5. Réception CPPM
+
+La réception CPPM (Pulse Position Modulation) permet de recevoir toutes les voies sur une seule entrée: chaque front montant correspond à la fin de l'impulsion de la voie précédente et au début de l'impulsion de la voie suivante. Le temps écoulé entre deux fronts montants correspond à la largeur d'impulsion d'une voie donnée.
 
 ![CPPM](/ReadmePictures/CPPM.JPG "CPPM")
 
-Dans le code, la largeur en milliseconde de chaque impulsion du train d'impulsion est mesurée à l'aide du timer0, puis stockée dans la case correspondant à la voie dans un tableau.
+Dans le projet, la largeur en milliseconde de chaque impulsion du train d'impulsion est mesurée à l'aide du timer0, puis stockée dans la case correspondant à la voie dans un tableau.
 
-## 5. Organisation du code « CodeDroneDIY »
+## 6. Organisation du code « CodeDroneDIY »
 
 | Fichier      | Description      |
 | -------------- | -------------- |
@@ -168,9 +177,9 @@ Dans le code, la largeur en milliseconde de chaque impulsion du train d'impulsio
 | Time.h | Mesure du temps de boucle et du temps écoulé depuis un instant t |
 | checkIMU.cpp | Vérifie le fonctionnement de l'IMU avant une utilisation |
 
-## 6. Configuration matérielle
+## 7. Configuration matérielle
 
-### 6.1 Liste des composants
+### 7.1 Liste des composants
 
 | Composant      | Référence      |
 | -------------- | -------------- |
@@ -185,7 +194,7 @@ Dans le code, la largeur en milliseconde de chaque impulsion du train d'impulsio
 | **Buzzer** | Matek lost model beeper - Built-in MCU |
 | **Chassis** | Diatone Q450 Quad 450 V3. Un grand châssis de 450mm a été choisi pour privilégier la stabilité et l'autonomie. ![Chassis](/ReadmePictures/Chassis.jpg "Chassis")|
 
-### 6.2 Connections
+### 7.2 Connections
 | Borche Arduino      | Composant      |
 | -------------- | -------------- |
 | PB0 | ESC0 |
@@ -200,13 +209,13 @@ Dans le code, la largeur en milliseconde de chaque impulsion du train d'impulsio
 ![flightConfiguration](/ReadmePictures/flightConfiguration.jpg "flightConfiguration")
 
 
-### 6.3 Failsafe
+### 7.3 Failsafe
 
-Pour la sécurité, le « failsafe » est programmé pour couper les gaz en cas de perte de la liaison radio.
+Pour la sécurité, le « failsafe » doit être programmé pour couper les gaz en cas de perte de la liaison radio.
 
 Pour programmer le « failsafe », mettre les commandes de la télécommande dans la configuration souhaitée lors de la perte de la réception radio, et « binder » la télécommande. La configuration utilisée pendant le « bind » défini le « failsafe. »
 
-## 7. FPV - First Person View
+## 8. FPV - First Person View
 | Composant      | Référence      |
 | -------------- | -------------- |
 | **Lunettes** | Quanum DIY FPV Goggle V2 Pro |
@@ -217,9 +226,9 @@ Pour programmer le « failsafe », mettre les commandes de la télécommande d
 | **Antenne caméra** | Realacc 5.8G 5dBi 50W RHCP Omnidirectional 3 Leaf Clover FPV Antenna Red |
 | **Emetteur** | Upgrade Aomway Mini 5.8Ghz 200mW 32CH AV Wireless Transmitter Module |
 
-## 8. Annexes
+## 9. Annexes
 
-### 8.1 Les modes de vol
+### 9.1 Les modes de vol
 
 | Mode      | Gyro      | Accé      | Baro      | Bouss      | GPS      | Description      |
 | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
@@ -233,7 +242,7 @@ Pour programmer le « failsafe », mettre les commandes de la télécommande d
 | **GPS/ Points de passage** | | X | | X | X | Suit automatiquement les points de cheminement GPS pré-configurés de manière autonome. |
 | **GPS/ Maintien de position** | | X | | X | X | Maintient la position actuelle en utilisant le GPS et le baromètre (si disponible). |
 
-### 8.2 Réglages PID
+### 9.2 Réglages PID
 
 **Le P**
 
@@ -261,7 +270,7 @@ Si votre machine continue à dériver après un ordre ou si elle dérive seule s
 tpa breakpoint
 Ce paramètre joue sur le ratio des PID. En effet, la tension et le niveau de gaz sont des variables qui agissent sur le comportement. Le TPA va faire varier vos PID selon ces facteurs.Si vous n’en mettez pas, il se peut que vous ayez des vibrations lorsque vous êtes à fond de gaz avec une lipo chargée à bloc. Pour être précis, les TPA ( Throtlle PID Attenuation ) jouent sur le P. ( Merci XKin Ai pour la précision )
 
-### 8.3 Arduino UNO rev3
+### 9.3 Arduino UNO rev3
 
 Microcontrôleur ATmega328
 Architecture 8 bits RISC
@@ -270,7 +279,7 @@ Architecture 8 bits RISC
 Dimensions : 68.6 mm x 53.4 mm
 Poids : 25 g
 
-### 8.4 Génération PWM à 400Hz
+### 9.4 Génération PWM à 400Hz
 
 1. Classer les ESC par ordre croissant de largeur d’impulsion.
 2. Utiliser le « Timer1 ».
@@ -283,7 +292,7 @@ Poids : 25 g
 >* The situation with the most difficult timing is when two servos are separated by 2-8 uS, less than an interrupt period.
 >* After every 2.5 ms servo period we wait 7*2.5 ms for the next servo control period. We can use these periods to address  other groups of servos if we use demuxes to distribute the servo pulses to the groups.
 
-## 9. Bibliographie
+## 10. Bibliographie
 
 * Arduino
 
