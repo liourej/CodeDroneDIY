@@ -8,7 +8,7 @@ class StateMachine {
     Time elapsedTime;
   public:
     int state = initialization;
-    int statePrev = initialization;
+    int statePrev = initialization; // TODO: useless?
     bool throttleWasHigh = true;
     int printedState = -1;
 

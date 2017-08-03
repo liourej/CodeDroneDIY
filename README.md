@@ -60,7 +60,7 @@
 
 L'objectif de ce projet est de concevoir un contrôleur de vol de quadricoptère maison le plus simple possible.
 L'intérêt est double:
-* comprendre le fonctionnement de la stabilisation d'un drone
+* comprendre et maitriser le fonctionnement de la stabilisation d'un drone
 * avoir un système évolutif totalement personnalisable: il est possible de rajouter les capteurs que l'on veut
 
 ## 2. Calcul de l’attitude <a id="Test"></a>
