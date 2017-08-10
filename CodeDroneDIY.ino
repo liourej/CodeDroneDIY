@@ -1,5 +1,12 @@
 #include "CodeDroneDIY.h"
 
+// 07/08/2017
+// Test 01
+// Démarrage des moteurs à 10-20%
+// Changements de mode plusieurs fois
+// 40 minutes sur le mode accro
+// Résultats: oscillations au bout de 40 minutes
+
 void setup() {
 
   // Buzzer
@@ -270,8 +277,8 @@ void loop() {
   // Compute mean loop time and complementary filter time constant
   if ( ((stateMachine.state == angle) || (stateMachine.state == accro)) && ( throttle > 1100 )) {
     if ( loopNb > 1000) {
-      meanLoopTime = meanLoopTime / loopNb;
-      // Serial.println(meanLoopTime * 1000, 2);
+      // meanLoopTime = meanLoopTime / loopNb;
+      //Serial.println(meanLoopTime * 1000, 2);
       //Serial.println(Position.GetFilterTimeConstant(meanLoopTime));
       meanLoopTime = 0;
       loopNb = 0;

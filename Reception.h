@@ -70,14 +70,16 @@ class Reception
       PWM_Width = PWM_Stop - PWM_Start;
       PWM_Start = PWM_Stop;
 
-      if ( initialized )
-        cPPM[channel] = PWM_Width;
+      if ( initialized ) {
+        if ( channel < 7)
+          cPPM[channel] = PWM_Width;
+      }
 
       if ( PWM_Width > 4000 ) // If delay more than 4ms
       {
-        channel = 0;
+       channel = 0;
         initialized = true;
-        // Serial.print("\t");Serial.print(cPPM[0]); Serial.print("\t");Serial.print(cPPM[1]); Serial.print("\t");Serial.print(cPPM[2]); Serial.print("\t");Serial.println(cPPM[3]);
+        //Serial.print("\t");Serial.print(cPPM[0]); Serial.print("\t");Serial.print(cPPM[1]); Serial.print("\t");Serial.print(cPPM[2]); Serial.print("\t");Serial.println(cPPM[3];Serial.println(cPPM[4]);
       } else
         channel++;
     }
