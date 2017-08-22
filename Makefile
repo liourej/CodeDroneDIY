@@ -3,8 +3,8 @@
 BOARD_TAG    = uno
 
 ARDUINO_LIBS = I2Cdev Wire MPU6050
-ARDMK_DIR = /home/julien/Téléchargements/Arduino-Makefile-master/
-include /home/julien/Téléchargements/Arduino-Makefile-master/Arduino.mk
+ARDMK_DIR = /home/julien/Programmes/Arduino-Makefile-master/
+include /home/julien/Programmes/Arduino-Makefile-master/Arduino.mk
 
 # --- leonardo (or pro micro w/leo bootloader)
 #BOARD_TAG    = leonardo

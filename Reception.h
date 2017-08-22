@@ -16,7 +16,7 @@ class Reception
     float PWM_Start = 0;
     float PWM_Stop = 0;
     float PWM_Width = 0;
-    int cPPM[7] = {0, 0, 0, 0, 0, 0, 0}; // 6 channels plus separation
+    int cPPM[CHANNELS_NB] = {0, 0, 0, 0, 0, 0, 0}; // 6 channels plus separation
 
   public:
     void PrintCmd(void) {
@@ -71,7 +71,7 @@ class Reception
       PWM_Start = PWM_Stop;
 
       if ( initialized ) {
-        if ( channel < 7)
+        if ( channel < CHANNELS_NB)
           cPPM[channel] = PWM_Width;
       }
 
@@ -80,7 +80,7 @@ class Reception
        channel = 0;
         initialized = true;
         //Serial.print("\t");Serial.print(cPPM[0]); Serial.print("\t");Serial.print(cPPM[1]); Serial.print("\t");Serial.print(cPPM[2]); Serial.print("\t");Serial.println(cPPM[3];Serial.println(cPPM[4]);
-      } else
+      } else if( (channel + 1) < CHANNELS_NB)
         channel++;
     }
 };

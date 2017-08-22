@@ -1,6 +1,10 @@
 // Power setup
 #define MIN_POWER 1060
 #define MAX_POWER 1860 // Set to 1860 later to reach max power
+#define IDLE_THRESHOLD 1100
+
+//Reception setup
+#define CHANNELS_NB 7
 
 // PID setup
 #define GAIN 0.010

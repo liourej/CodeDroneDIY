@@ -131,7 +131,7 @@ void loop() {
     case angle:
       throttle = Rx.GetThrottle();
       Position.GetCurrPos(accelgyro, posCurr, speedCurr, loopTimeSec);
-      if ( throttle > 1100 ) {
+      if ( throttle > IDLE_THRESHOLD ) {
         stateMachine.throttleWasHigh = true;
         rollPosCmd = rollPosPID_Angle.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loopTimeSec );
         rollMotorPwr = rollSpeedPID_Angle.ComputeCorrection( rollPosCmd, speedCurr[0], loopTimeSec );
@@ -160,7 +160,7 @@ void loop() {
       throttle = Rx.GetThrottle();
       Position.GetCurrPos(accelgyro, posCurr, speedCurr, loopTimeSec);
       //Position.GetCurrSpeed(accelgyro, speedCurr);
-      if ( throttle > 1100 ) {
+      if ( throttle > IDLE_THRESHOLD ) {
         stateMachine.throttleWasHigh = true;
         rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loopTimeSec );
         pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection( Rx.GetElevatorSpeed(), speedCurr[1], loopTimeSec );
@@ -275,7 +275,7 @@ void loop() {
   }
 
   // Compute mean loop time and complementary filter time constant
-  if ( ((stateMachine.state == angle) || (stateMachine.state == accro)) && ( throttle > 1100 )) {
+  if ( ((stateMachine.state == angle) || (stateMachine.state == accro)) && ( throttle > IDLE_THRESHOLD )) {
     if ( loopNb > 1000) {
       // meanLoopTime = meanLoopTime / loopNb;
       //Serial.println(meanLoopTime * 1000, 2);
@@ -293,6 +293,3 @@ void loop() {
 
 // Notes:
 // Inter pos 0: 1900; Inter pos 1: 1496; Inter pos 3: 1088
-
-
-
