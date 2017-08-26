@@ -37,7 +37,7 @@ void ActivateBuzzer(float _frequency, int _duration) {
     delay(10);
     //delay(1 / (2 * _frequency) );
     wdt_reset();
-    Serial.println(F("BUZZZZZ"));
+  //  Serial.println(F("BUZZZZZ"));
   }
 }
 

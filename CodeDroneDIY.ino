@@ -10,20 +10,20 @@
 void setup() {
 
   // Buzzer
-  pinMode(12, OUTPUT);
-  pinMode(13, OUTPUT);
+  //pinMode(12, OUTPUT);
+  //pinMode(13, OUTPUT);
 
   // ESC
-  ESC0.attach(8);
-  ESC1.attach(9);
-  ESC2.attach(10);
-  ESC3.attach(11);
+  ESC0.attach(4); // ESC0 on PD4 pin
+  ESC1.attach(5); // ESC1 on PD5 pin
+  ESC2.attach(6); // ESC2 on PD6 pin
+  ESC3.attach(7); // ESC3 on PD7 pin
   IdleAllESC();
 
   InitTimer1();
 
   // Receiver
-  attachInterrupt(0, RxInterrupt, RISING);
+  attachInterrupt(0, RxInterrupt, RISING); // Receiver interrupt on PD2 (INT0)
 
   // Console print: initialize serial communication
   Serial.begin(250000);
