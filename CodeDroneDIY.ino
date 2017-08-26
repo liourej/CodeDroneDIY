@@ -10,14 +10,14 @@
 void setup() {
 
   // Buzzer
-  pinMode(12, OUTPUT);
-  pinMode(13, OUTPUT);
+  //pinMode(12, OUTPUT);
+  //pinMode(13, OUTPUT);
 
   // ESC
-  ESC0.attach(8);
-  ESC1.attach(9);
-  ESC2.attach(10);
-  ESC3.attach(11);
+  ESC0.attach(4);
+  ESC1.attach(5);
+  ESC2.attach(6);
+  ESC3.attach(7);
   IdleAllESC();
 
   InitTimer1();
