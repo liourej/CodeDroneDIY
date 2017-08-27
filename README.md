@@ -3,6 +3,8 @@
 
 <p align="center">
     <img src="/ReadmePictures/Drone.jpg">
+    <img src="/ReadmePictures/v1_v2_boards.jpg">
+    Picture: v1 Arduino Uno board and v2 Arduino Nano board
 </p>
 
 ---------------------------Table des matières----------------------------
