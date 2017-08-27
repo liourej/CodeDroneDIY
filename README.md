@@ -184,7 +184,7 @@ Dans le projet, la largeur en milliseconde de chaque impulsion du train d'impuls
 
 | Composant      | Référence      |
 | -------------- | -------------- |
-| **Contrôleur de vol ** | Arduino Nano |
+| **Contrôleur de vol** | Arduino Nano |
 | **ESC** | Afro 20A-Simonk firmware 500Hz, BEC 0.5A 1060 à 1860 us de largeur d'impulsion |
 | **Moteurs** | Multistar 2216-800Kv 14 Poles - 222W Current max: 20A Shaft: 3mm 2-4S|
 | **Hélices** | 10x4.5 SF Props 2pc CW 2 pc CCW Rotation (Orange) |
