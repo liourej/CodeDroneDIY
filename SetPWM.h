@@ -23,6 +23,7 @@ inline void SetPWM_f5(volatile uint16_t *TCNTn, volatile uint16_t* OCRnA)
     *OCRnA = ESC3.GetTicks();
   } else {
     PORTD ^= B10010000; // Reset pin PD7 and set pin PD4 using XOR
+
     g_currESC = -1;
     *OCRnA = ESC0.GetTicks();
   }
