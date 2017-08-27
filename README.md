@@ -186,26 +186,28 @@ Dans le projet, la largeur en milliseconde de chaque impulsion du train d'impuls
 
 | Composant      | Référence      |
 | -------------- | -------------- |
+| **Contrôleur de vol** | Arduino Nano |
 | **ESC** | Afro 20A-Simonk firmware 500Hz, BEC 0.5A 1060 à 1860 us de largeur d'impulsion |
 | **Moteurs** | Multistar 2216-800Kv 14 Poles - 222W Current max: 20A Shaft: 3mm 2-4S|
 | **Hélices** | 10x4.5 SF Props 2pc CW 2 pc CCW Rotation (Orange) |
 | **Batterie** | Zippy Flightmax 3000mAh 4S |
 | **Récepteur** | OrangeRx R617XL CPPM DSM2/DSMX 6 ch |
 | **Contrôleur** | Arduino UNO rev3 |
-| **IMU** | MPU6050 |
-| **Baromètre** | MS5611 |
+| **IMU** | MPU6050 (GY-86 breakout board)|
+| **Baromètre** | MS5611 (GY-86 breakout board) |
+| **Boussole** | HMC5883L (GY-86 breakout board) |
 | **Buzzer** | Matek lost model beeper - Built-in MCU |
 | **Chassis** | Diatone Q450 Quad 450 V3. Un grand châssis de 450mm a été choisi pour privilégier la stabilité et l'autonomie. ![Chassis](/ReadmePictures/Chassis.jpg "Chassis")|
 
 ### 7.2 Connections
 | Borche Arduino      | Composant      |
 | -------------- | -------------- |
-| PB0 | ESC0 |
-| PB1 | ESC1 |
-| PB2 | ESC2 |
-| PB3 | ESC3 |
 | PD2 | receiver |
-| PC2 | potentiometer |
+| PD4 | ESC0 |
+| PD5 | ESC1 |
+| PD6 | ESC2 |
+| PD7 | ESC3 |
+| PC0 | potentiomètre |
 | PC4 | SDA MPU6050 & MS5611 |
 | PC5 | SCL MPU6050 & MS5611 |
 
