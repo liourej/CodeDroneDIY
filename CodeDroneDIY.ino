@@ -47,11 +47,14 @@ void setup() {
   // Set watchdog reset
   wdt_enable(WDTO_250MS);
 
-  if ( MAX_POWER == 1860)
+  if ( (MAX_POWER == 1860) && (MAX_THROTTLE >= (1860*0.8)) )
     Serial.println(F("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!FLYING MODE POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\t"));
-  else if ( MAX_POWER <= 1300)
+  else if ( (MAX_POWER <= 1300) )
     Serial.println(F("DEBUG MODE POWER!!!\t"));
-  Serial.print(F("MAX_POWER:\t")); Serial.println(MAX_POWER);
+  else
+    Serial.println(F("UNEXPECTED POWER\t"));
+
+  Serial.print(F("MAX_POWER:\t")); Serial.print(MAX_POWER);  Serial.print(F("MAX_THROTTLE_PERCENT:\t")); Serial.println(MAX_THROTTLE_PERCENT);
 
   Serial.println(F("Setup Finished"));
 }
@@ -189,12 +192,6 @@ void loop() {
       wdt_reset();
       if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
         stateMachine.state = disarmed;
-      /* if ( (stateMachine.state != disarmed) &&
-            (stateMachine.state != stateMachine.statePrev) ) {
-         stateMachine.state  = safety;
-         Serial.println(F("Choose same state than previous used"));
-         IdleAllESC();
-        } else*/
       if (stateMachine.state != disarmed) {
         stateMachine.statePrev = stateMachine.state;
         stateMachine.throttleWasHigh = true;

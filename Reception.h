@@ -45,7 +45,7 @@ class Reception
       return (map(cPPM[1], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED));
     };
     inline int GetThrottle() {
-      return map(cPPM[2], 1080, 1900, MIN_POWER, MAX_POWER);
+      return map(cPPM[2], 1080, 1900, MIN_POWER, MAX_THROTTLE);
     };
     inline int GetRudder() {
       return map(cPPM[3], 1080, 1900, -MAX_YAW_SPEED, MAX_YAW_SPEED);
