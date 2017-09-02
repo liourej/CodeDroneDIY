@@ -1,11 +1,27 @@
 #include <avr/wdt.h>
 #include "GetPosition.h"
+#include "checkIMU.h"
 
-inline void GetPosition::GetCorrectedAccelGyro(MPU6050 _accelgyro, float _accMeasures[], float _gyroMeasures[])
+void GetPosition::Init(){
+  accelgyro.initialize();
+  accelgyro.setFullScaleGyroRange( MPU6050_GYRO_FS_1000); //  +-1000°s max  /!\ Be carrefull when changing this parameter: "GyroSensitivity" must be updated accordingly !!!
+  accelgyro.setFullScaleAccelRange( MPU6050_ACCEL_FS_8 );//  +-8g max /!\ Be carrefull when changing this parameter: "AcceleroSensitivity" must be updated accordingly !!!
+  wdt_reset();
+  if ( !accelgyro.testConnection())
+    Serial.println(F("Test failed"));
+
+  Serial.println(F("/********* IMU self-test *********/"));
+  if ( !CheckIMU(accelgyro, AcceleroSensitivity) )
+      Serial.println("IMU SELF TEST FAILED !!!!!");
+  else
+      Serial.println("IMU self test succeed");
+}
+
+inline void GetPosition::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[])
 {
   int16_t ax, ay, az, gx, gy, gz = 0;
 
-  _accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);   // 2ms !!
+  accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);   // 2ms !!
 
   // Correct raw data with offset
   _accMeasures[0] = (float)(ax - offset[0] ) / AcceleroSensitivity;
@@ -18,11 +34,11 @@ inline void GetPosition::GetCorrectedAccelGyro(MPU6050 _accelgyro, float _accMea
   //Normalize(_data); // Normalize 3 first array cases (acceleration)
 }
 
-inline void GetPosition::GetCorrectedGyro(MPU6050 _gyro, float _data[])
+inline void GetPosition::GetCorrectedGyro(float _data[])
 {
   int16_t gx, gy, gz;
 
-  _gyro.getRotation(&gx, &gy, &gz);   // 2ms !!
+  accelgyro.getRotation(&gx, &gy, &gz);   // 2ms !!
 
   // Correct raw data with offset
   _data[0] = (float)(gx - offset[3] )/ GyroSensitivity;
@@ -31,7 +47,7 @@ inline void GetPosition::GetCorrectedGyro(MPU6050 _gyro, float _data[])
 }
 
 // Compute accelerometer and gyroscope offsets
-void GetPosition::ComputeOffsets(MPU6050 _accelgyro)
+void GetPosition::ComputeOffsets()
 {
   int16_t accGyroRaw[6] = {0, 0, 0, 0, 0, 0};
   int32_t offsetSum[6] = {0, 0, 0, 0, 0, 0};
@@ -46,7 +62,7 @@ void GetPosition::ComputeOffsets(MPU6050 _accelgyro)
   // mean on 10 samples during 2 sec
   for (int sample = 0; sample < 10; sample++)
   {
-    _accelgyro.getMotion6(&accGyroRaw[0], &accGyroRaw[1], &accGyroRaw[2], &accGyroRaw[3], &accGyroRaw[4], &accGyroRaw[5]);
+    accelgyro.getMotion6(&accGyroRaw[0], &accGyroRaw[1], &accGyroRaw[2], &accGyroRaw[3], &accGyroRaw[4], &accGyroRaw[5]);
     for ( int coord = 0; coord < 6; coord++) {
       if ( accGyroRaw[coord] > maxVal[coord])
         maxVal[coord] = accGyroRaw[coord];
@@ -117,13 +133,13 @@ float GetPosition::PercentVectorNormalized( float _acc[]) {
 }
 
 // Get rotation speed using only gyro
-void GetPosition::GetCurrSpeed(MPU6050 _accelgyro, float _speed[])
+void GetPosition::GetCurrSpeed(float _speed[])
 {
   // float roll, pitch = 0;
   float gyroRaw[3] = {0, 0, 0};
 
   // Get corrected data from gyro and accelero
-  GetCorrectedGyro(_accelgyro, gyroRaw);
+  GetCorrectedGyro(gyroRaw);
 
   _speed[0] = gyroRaw[0];
   _speed[1] = gyroRaw[1];
@@ -135,14 +151,14 @@ float GetPosition::GetFilterTimeConstant(float _loopTimeSec) {
 }
 
 // Get position combining acc + gyro
-void GetPosition::GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], float _loop_time)
+void GetPosition::GetCurrPos(float _pos[], float _speed[], float _loop_time)
 {
   // float roll, pitch = 0;
   float accRaw[3] = {0, 0, 0};
   float gyroRaw[3] = {0, 0, 0};
 
   // Get corrected data from gyro and accelero
-  GetCorrectedAccelGyro(_accelgyro, accRaw, gyroRaw);
+  GetCorrectedAccelGyro(accRaw, gyroRaw);
 
   // Compute rotation speed using gyroscopes
   _speed[0] = gyroRaw[0];

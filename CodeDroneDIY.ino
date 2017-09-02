@@ -35,20 +35,7 @@ void setup() {
   Wire.setClock(400000L); // Communication with MPU-6050 at 400KHz
 
   // MPU6050: initialize MPU6050 device
-  accelgyro.initialize();
-  accelgyro.setFullScaleGyroRange( MPU6050_GYRO_FS_1000); //  +-1000°s max  /!\ Be carrefull when changing this parameter: "GyroSensitivity" must be updated accordingly !!!
-  accelgyro.setFullScaleAccelRange( MPU6050_ACCEL_FS_8 );//  +-8g max /!\ Be carrefull when changing this parameter: "AcceleroSensitivity" must be updated accordingly !!!
-  wdt_reset();
-  if ( !accelgyro.testConnection())
-    Serial.println(F("Test failed"));
-
-  // IMU check
-  Serial.println(F("/********* IMU self-test *********/"));
-  if ( !CheckIMU(accelgyro, Position) )
-    Serial.println("IMU SELF TEST FAILED !!!!!");
-  else
-    Serial.println("IMU self test succeed");
-
+  Position.Init();
 
   while ( !Rx.IsReady() ) {
     IdleAllESC();
@@ -132,7 +119,7 @@ void loop() {
     /*********** ANGLE STATE ***********/
     case angle:
       throttle = Rx.GetThrottle();
-      Position.GetCurrPos(accelgyro, posCurr, speedCurr, loopTimeSec);
+      Position.GetCurrPos(posCurr, speedCurr, loopTimeSec);
       if ( throttle > IDLE_THRESHOLD ) {
         stateMachine.throttleWasHigh = true;
         rollPosCmd = rollPosPID_Angle.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loopTimeSec );
@@ -160,8 +147,8 @@ void loop() {
     /*********** ACCRO STATE ***********/
     case accro:
       throttle = Rx.GetThrottle();
-      Position.GetCurrPos(accelgyro, posCurr, speedCurr, loopTimeSec);
-      //Position.GetCurrSpeed(accelgyro, speedCurr);
+      Position.GetCurrPos( posCurr, speedCurr, loopTimeSec);
+      //Position.GetCurrSpeed( speedCurr);
       if ( throttle > IDLE_THRESHOLD ) {
         stateMachine.throttleWasHigh = true;
         rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loopTimeSec );
@@ -224,7 +211,7 @@ void loop() {
     case initialization:
       IdleAllESC();
       while (!Position.AreOffsetComputed())
-        Position.ComputeOffsets(accelgyro);
+        Position.ComputeOffsets();
 
       stateMachine.state = Rx.GetFlyingMode();
       if ( stateMachine.state != disarmed )

@@ -1,5 +1,4 @@
 #include "MPU6050.h"
-#include "GetPosition.h"
 #include "checkIMU.h"
 
 float ComputeAccFactoryTrimValue(float _accTestVal) {
@@ -19,7 +18,7 @@ float ComputeGyroFactoryTrimValue(float _gyroTestVal, bool _isYcoord) {
     return (25 * 131 * pow(1.046, _gyroTestVal - 1));
 }
 
-bool CheckGyro(MPU6050 _accelgyro, GetPosition _Position) {
+bool CheckGyro(MPU6050 _accelgyro) {
   float dataTestEnabled[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   int16_t dataTestDisabled[6] = {0, 0, 0, 0, 0, 0};
   float STR[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -54,9 +53,9 @@ bool CheckGyro(MPU6050 _accelgyro, GetPosition _Position) {
   dataTestEnabled[3] = rawData[0]  & 0x1F ; // XG_TEST result is a five-bit unsigned integer
   dataTestEnabled[4] = rawData[1]  & 0x1F ; // YG_TEST result is a five-bit unsigned integer
   dataTestEnabled[5] = rawData[2]  & 0x1F ; // ZG_TEST result is a five-bit unsigned integer
- 
+
  // Serial.print("dataTestEnabled:\t"); Serial.print(dataTestEnabled[3]); Serial.print("\t"); Serial.print(dataTestEnabled[4]); Serial.print("\t"); Serial.println(dataTestEnabled[5]);
-  
+
   for (int axis = 3; axis < 6; axis ++) { // Gyro data
     if ( axis == 4) // if axis is Y, computation is different (negative sign)
       FT[axis] = ComputeGyroFactoryTrimValue( dataTestEnabled[axis], true );
@@ -80,7 +79,7 @@ bool CheckGyro(MPU6050 _accelgyro, GetPosition _Position) {
   return testSucceed;
 }
 
-bool CheckAccelero(MPU6050 _accelgyro, GetPosition _Position) {
+bool CheckAccelero(MPU6050 _accelgyro, const float _acceleroSensitivity) {
   float dataTestEnabled[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   int16_t dataTestDisabled[6] = {0, 0, 0, 0, 0, 0};
   float STR[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -94,7 +93,7 @@ bool CheckAccelero(MPU6050 _accelgyro, GetPosition _Position) {
 
   delay(500);
   _accelgyro.getMotion6(&dataTestDisabled[0],&dataTestDisabled[1], &dataTestDisabled[2], &dataTestDisabled[3], &dataTestDisabled[4], &dataTestDisabled[5]);
-  dataTestDisabled[2] = dataTestDisabled[2] - _Position.AcceleroSensitivity; // Remove gravity
+  dataTestDisabled[2] = dataTestDisabled[2] - _acceleroSensitivity; // Remove gravity
   _accelgyro.setAccelXSelfTest(true);
   _accelgyro.setAccelYSelfTest(true);
   _accelgyro.setAccelZSelfTest(true);
@@ -139,16 +138,16 @@ bool CheckAccelero(MPU6050 _accelgyro, GetPosition _Position) {
   return testSucceed;
 }
 
-bool CheckIMU(MPU6050 _accelgyro, GetPosition _Position) {
+bool CheckIMU(MPU6050 _accelgyro, const float _AcceleroSensitivity) {
   bool testSucceed = true;
 
   // Check accelerometers
-  if ( !CheckAccelero( _accelgyro, _Position) )
+  if ( !CheckAccelero( _accelgyro, _AcceleroSensitivity) )
     testSucceed = false;
-  
+
   // Check Gyroscopes
-  if ( !CheckGyro(_accelgyro, _Position) )
+  if ( !CheckGyro(_accelgyro) )
      testSucceed = false;
-  
+
   return testSucceed;
 }

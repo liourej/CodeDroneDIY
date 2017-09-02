@@ -1,5 +1,5 @@
 #define SELF_TEST_X      0x0D
-#define SELF_TEST_Y      0x0E    
+#define SELF_TEST_Y      0x0E
 #define SELF_TEST_Z      0x0F
 #define GYRO_CONFIG      0x1B
 #define ACCEL_CONFIG     0x1C
@@ -17,8 +17,8 @@ float ComputeAccFactoryTrimValue(float _accTestVal);
 
 float ComputeGyroFactoryTrimValue(float _gyroTestVal, bool _isYcoord);
 
-bool CheckGyro(MPU6050 _accelgyro, GetPosition _Position);
+bool CheckGyro(MPU6050 _accelgyro);
 
-bool CheckAccelero(MPU6050 _accelgyro, GetPosition _Position);
+bool CheckAccelero(MPU6050 _accelgyro, const float _AcceleroSensitivity);
 
-bool CheckIMU(MPU6050 _accelgyro, GetPosition _Position);
+bool CheckIMU(MPU6050 _accelgyro, const float _AcceleroSensitivity);

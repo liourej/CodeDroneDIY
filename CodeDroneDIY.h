@@ -8,7 +8,6 @@
 #include "PID.h"
 #include "SetPWM.h"
 #include "StateMachine.h"
-#include "checkIMU.h"
 
 typedef enum { _timer1, _Nbr_16timers } timer16_Sequence_t;
 
@@ -20,7 +19,6 @@ PID rollPosPID_Angle, pitchPosPID_Angle, yawPosPID_Angle;
 PID rollSpeedPID_Angle, pitchSpeedPID_Angle, yawSpeedPID_Angle;
 PID rollSpeedPID_Accro, pitchSpeedPID_Accro, yawSpeedPID_Accro;
 GetPosition Position;
-MPU6050 accelgyro;
 StateMachine stateMachine;
 
 void ActivateBuzzer(float _frequency, int _duration) {
@@ -100,5 +98,5 @@ void PrintSettings(StateMachine _stateMachine) {
   Serial.println(F("/********* Receiver settings *********/"));
   Rx.PrintCmd();
   Serial.println(F("/********* MPU 6050 Configuration *********/"));
-  Serial.print(F("Gyroscope range:\t")); Serial.print(accelgyro.getFullScaleGyroRange()); Serial.print("\tAccelerometer range:\t");  Serial.println(accelgyro.getFullScaleAccelRange());
+//  Serial.print(F("Gyroscope range:\t")); Serial.print(accelgyro.getFullScaleGyroRange()); Serial.print("\tAccelerometer range:\t");  Serial.println(accelgyro.getFullScaleAccelRange());
 }

@@ -6,6 +6,7 @@
 #include "I2Cdev.h"
 #include "MPU6050.h"
 
+
 class GetPosition
 {
   public:
@@ -24,18 +25,19 @@ class GetPosition
     int16_t offset[6] = {0, 0, 0, 0, 0, 0};
 
   private:
-    void GetCorrectedAccelGyro(MPU6050 _accelgyro, float _accMeasures[], float _gyroMeasures[]);
-    void GetCorrectedGyro(MPU6050 _gyro, float _data[]);
+    MPU6050 accelgyro;
+    void GetCorrectedAccelGyro( float _accMeasures[], float _gyroMeasures[]);
+    void GetCorrectedGyro( float _data[]);
     void Normalize( float _acc[] );
     bool IsVectorNormalized( float _acc[], float _epsilon );
     float PercentVectorNormalized( float _acc[]);
   public:
+    void Init();
     float GetFilterTimeConstant(float _loopTime);
     bool AreOffsetComputed(void) {
       return offsetComputed;
     }
-    void ComputeOffsets(MPU6050 _accelgyro);
-    void GetCurrPos(MPU6050 _accelgyro, float _pos[], float _speed[], float _loop_time);
-    void GetCurrSpeed(MPU6050 _accelgyro, float speedCurr[]);
+    void ComputeOffsets();
+    void GetCurrPos(float _pos[], float _speed[], float _loop_time);
+    void GetCurrSpeed(float speedCurr[]);
 };
-
