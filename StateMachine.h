@@ -6,6 +6,9 @@ class StateMachine {
     const int delayThreshold = 5;
 
     Time elapsedTime;
+    Time timeBuzzer;
+
+    bool setBuzzer = false;
   public:
     int state = initialization;
     int statePrev = initialization; // TODO: useless?
@@ -36,10 +39,31 @@ class StateMachine {
           break;
       }
       printedState = state;
-      
+
     }
     void Init() {
       elapsedTime.Init();
+      timeBuzzer.Init();
+      setBuzzer = false;
+    }
+
+    void ActivateBuzzer(int _duration) {
+
+      if( setBuzzer ){
+        Time time;
+        time.Init();
+        while ( (time.GetExecutionTime() * 1000) < _duration) {
+          digitalWrite(12, HIGH);
+          digitalWrite(13, HIGH);
+          delayMicroseconds(1800);
+          digitalWrite(12, LOW);
+          digitalWrite(13, LOW);
+          delay(10);
+          wdt_reset();
+          Serial.println(F("BUZZZZZ"));
+        }
+      }else if( timeBuzzer.GetExecutionTime() > 120 ) // Activate buzzer after 2 minutes
+        setBuzzer = true;
     }
 
     void RefreshState() {

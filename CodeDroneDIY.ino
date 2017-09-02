@@ -43,6 +43,7 @@ void setup() {
   }
 
   time.Init();
+  stateMachine.Init();
 
   // Set watchdog reset
   wdt_enable(WDTO_250MS);
@@ -105,13 +106,13 @@ void ResetPIDCommand( int _rollMotorPwr, int _pitchMotorPwr, int _yawMotorPwr ) 
 void loop() {
   static float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
   static float posCurr[3] = { 0.0, 0.0, 0.0 }; // Teta position (°) (use gyro + accelero)
-  static int g_iloop = 0;
-  static float g_MeanLoop = 0;
+//  static int g_iloop = 0;
+//  static float g_MeanLoop = 0;
   static int loopNb = 0;
   static float meanLoopTime =  0;
   int throttle = 0;
   float loopTimeSec = time.GetloopTime();
-  int rollPosCmd, pitchPosCmd, yawPosCmd = 0;
+  int rollPosCmd, pitchPosCmd = 0;
   int rollMotorPwr, pitchMotorPwr, yawMotorPwr = 0;
   static int tempState = disarmed;
   // State Machine
@@ -180,8 +181,7 @@ void loop() {
         stateMachine.state = safety;
       }
 
-      if ( Rx.GetSwitchH() )
-        ActivateBuzzer(0.005, 500);
+      stateMachine.ActivateBuzzer(500);
       break;
     /*********** DISARMED STATE ***********/
     case disarmed:
@@ -201,8 +201,7 @@ void loop() {
           Serial.println("ACCRO MODE");
       }
 
-      if ( Rx.GetSwitchH() )
-        ActivateBuzzer(0.005, 500);
+      stateMachine.ActivateBuzzer(500);
       break;
     /*********** INITIALIZATION STATE ***********/
     case initialization:
@@ -215,8 +214,6 @@ void loop() {
         stateMachine.state = initialization;
       else if ( Position.AreOffsetComputed())
         stateMachine.state =  starting;
-      if ( Rx.GetSwitchH() )
-        ActivateBuzzer(0.005, 500);
       break;
     /*********** STARTING STATE ***********/
     case starting:
@@ -252,8 +249,7 @@ void loop() {
       } else
         stateMachine.state = starting;
 
-      if ( Rx.GetSwitchH() )
-        ActivateBuzzer(0.005, 500);
+      stateMachine.ActivateBuzzer(500);
       break;
     default:
       Serial.print("UNDEFINED STATE!");

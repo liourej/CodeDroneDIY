@@ -21,24 +21,6 @@ PID rollSpeedPID_Accro, pitchSpeedPID_Accro, yawSpeedPID_Accro;
 GetPosition Position;
 StateMachine stateMachine;
 
-void ActivateBuzzer(float _frequency, int _duration) {
-  Time time;
-  time.Init();
-  while ( (time.GetExecutionTime() * 1000) < _duration) {
-   // digitalWrite(12, HIGH);
-    digitalWrite(13, HIGH);
-    delayMicroseconds(1800);
-   // delay(1.7 );
-    //delay(1 / (2 * _frequency) );
-    //digitalWrite(12, LOW);
-    digitalWrite(13, LOW);
-    delay(10);
-    //delay(1 / (2 * _frequency) );
-    wdt_reset();
-  //  Serial.println(F("BUZZZZZ"));
-  }
-}
-
 void IdleAllESC() {
   ESC0.Idle();
   ESC1.Idle();
