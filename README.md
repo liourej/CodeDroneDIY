@@ -166,6 +166,8 @@ Dans le projet, la largeur en milliseconde de chaque impulsion du train d'impuls
 
 ## 6. Organisation du code « CodeDroneDIY »
 
+![DiagrammeUML](/ReadmePictures/DiagrammeUML.jpg "DiagrammeUML")
+
 | Fichier      | Description      |
 | -------------- | -------------- |
 | CodeDroneDIY.ino | Contient la fonction d'initialisation et la boucle principale |
