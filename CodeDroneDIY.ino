@@ -103,6 +103,13 @@ void ResetPIDCommand( int _rollMotorPwr, int _pitchMotorPwr, int _yawMotorPwr ) 
   yawSpeedPID_Accro.Reset();
 }
 
+void Pause500ms(){
+  for (int loop = 0; loop < 5; loop++){
+    delay(100);
+    wdt_reset();
+  }
+}
+
 void loop() {
   static float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
   static float posCurr[3] = { 0.0, 0.0, 0.0 }; // Teta position (°) (use gyro + accelero)
@@ -146,7 +153,6 @@ void loop() {
       }
       XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
 
-
       break;
     /*********** ACCRO STATE ***********/
     case accro:
@@ -171,7 +177,6 @@ void loop() {
       }
       XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
 
-
       break;
     /*********** SAFETY STATE ***********/
     case safety:
@@ -186,19 +191,17 @@ void loop() {
     /*********** DISARMED STATE ***********/
     case disarmed:
       stateMachine.state = Rx.GetFlyingMode();
-      delay(200);
-      wdt_reset();
-      delay(200);
-      wdt_reset();
+      Pause500ms();
       if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
         stateMachine.state = disarmed;
       if (stateMachine.state != disarmed) {
-        stateMachine.statePrev = stateMachine.state;
         stateMachine.throttleWasHigh = true;
         if ( stateMachine.state == angle)
           Serial.println("ANGLE MODE");
         else if ( stateMachine.state == accro)
           Serial.println("ACCRO MODE");
+        else
+          stateMachine.state = disarmed;
       }
 
       stateMachine.ActivateBuzzer(500);
@@ -214,16 +217,15 @@ void loop() {
         stateMachine.state = initialization;
       else if ( Position.AreOffsetComputed())
         stateMachine.state =  starting;
+      else
+        stateMachine.state =  initialization;
       break;
     /*********** STARTING STATE ***********/
     case starting:
       Serial.println("stateMachine.state starting");
       IdleAllESC();
       stateMachine.state = Rx.GetFlyingMode();
-      delay(200);
-      wdt_reset();
-      delay(200);
-      wdt_reset();
+      Pause500ms();
       if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
         stateMachine.state = starting;
 
@@ -243,9 +245,7 @@ void loop() {
         pitchSpeedPID_Accro.SetGains(accroSpeedPIDParams);
         yawSpeedPID_Accro.SetGains(yawSpeedPIDParams);
 
-        stateMachine.statePrev = stateMachine.state;
         PrintSettings(stateMachine);
-
       } else
         stateMachine.state = starting;
 

@@ -11,7 +11,6 @@ class StateMachine {
     bool setBuzzer = false;
   public:
     int state = initialization;
-    int statePrev = initialization; // TODO: useless?
     bool throttleWasHigh = true;
     int printedState = -1;
 
