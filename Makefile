@@ -1,10 +1,15 @@
 # Arduino Make file. Refer to https://github.com/sudar/Arduino-Makefile
 
-BOARD_TAG    = uno
+# 1. Download and extract Arduino-Makefile-master folder where you want
+# 2. Put this makefile in the CodeDroneDIY folder
+# 3. In this file, update the Arduino.mk path according to the Arduino-Makefile-master folder location
+# 4. In this file, include your libraries
 
+BOARD_TAG    = nano328
 ARDUINO_LIBS = I2Cdev Wire MPU6050
-ARDMK_DIR = /home/julien/Programmes/Arduino-Makefile-master/
 include /home/julien/Programmes/Arduino-Makefile-master/Arduino.mk
+
+#MONITOR_PORT  = /dev/ttyUSB0
 
 # --- leonardo (or pro micro w/leo bootloader)
 #BOARD_TAG    = leonardo

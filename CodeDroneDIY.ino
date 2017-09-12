@@ -28,7 +28,8 @@ void setup() {
   attachInterrupt(0, RxInterrupt, RISING); // Receiver interrupt on PD2 (INT0)
 
   // Console print: initialize serial communication
-  Serial.begin(250000);
+  //Serial.begin(250000);
+  Serial.begin(230400);
 
   // MPU6050: join I2C bus
   Wire.begin();
