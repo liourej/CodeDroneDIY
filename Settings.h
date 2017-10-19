@@ -25,6 +25,10 @@ float yawSpeedPIDParams[4] = { 0.010, 150.0, 0.0, 0.0};// G, Kp, Kd, Ki
 float mixing = 0.5; //0.75
 
 // Command setup
+#define ALTI_DEAD_ZONE 0.4 // (%) altimeter dead zone
+#define ALTI_LOW_ZONE 1080+1900*((1-ALTI_DEAD_ZONE)/2) // Upper this limit, vertical speed is positive
+#define ALTI_HIGH_ZONE 1900-1900*((1-ALTI_DEAD_ZONE)/2) // Under this limit, vertical speed is negative
+#define ALTI_MAX_VERTICAL_SPEED 2 //(2 m.s-1)
 #define MAX_ANGLE  45 // (°) Max roll and pitch angles reachable in angle mode
 #define MAX_ROT_SPEED  135 // (°/s) Max roll and pitch speed in accro mode
 #define MAX_YAW_SPEED  135// (°/s) Max yaw speed in accro and angle modes

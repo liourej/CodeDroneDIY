@@ -47,6 +47,18 @@ class Reception
     inline int GetThrottle() {
       return map(cPPM[2], 1080, 1900, MIN_POWER, MAX_THROTTLE);
     };
+    
+    inline float GetVerticalSpeed() {
+      if (cPPM[2] < ALTI_LOW_ZONE)
+        return map(cPPM[2], 1080, ALTI_LOW_ZONE, -ALTI_MAX_VERTICAL_SPEED, 0);
+
+      if ( cPPM[2] > ALTI_HIGH_ZONE)
+        return map(cPPM[2], ALTI_HIGH_ZONE, 1900, 0, ALTI_MAX_VERTICAL_SPEED);
+
+      // Throttle stick is in dead zone
+      return 0.0;
+
+    };
     inline int GetRudder() {
       return map(cPPM[3], 1080, 1900, -MAX_YAW_SPEED, MAX_YAW_SPEED);
     };
@@ -77,10 +89,10 @@ class Reception
 
       if ( PWM_Width > 4000 ) // If delay more than 4ms
       {
-       channel = 0;
+        channel = 0;
         initialized = true;
         //Serial.print("\t");Serial.print(cPPM[0]); Serial.print("\t");Serial.print(cPPM[1]); Serial.print("\t");Serial.print(cPPM[2]); Serial.print("\t");Serial.println(cPPM[3];Serial.println(cPPM[4]);
-      } else if( (channel + 1) < CHANNELS_NB)
+      } else if ( (channel + 1) < CHANNELS_NB)
         channel++;
     }
 };

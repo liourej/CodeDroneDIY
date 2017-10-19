@@ -19,6 +19,6 @@ class Time {
     }
 
     float GetExecutionTime() {
-      return (millis() - startTime) / 1000; // Loop time in s;
+      return (millis() - startTime); // Loop time in ms;
     }
 };

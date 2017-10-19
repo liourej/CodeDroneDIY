@@ -49,7 +49,7 @@ void setup() {
   // Set watchdog reset
   wdt_enable(WDTO_250MS);
 
-  if ( (MAX_POWER == 1860) && (MAX_THROTTLE >= (1860*0.8)) )
+  if ( (MAX_POWER == 1860) && (MAX_THROTTLE >= (1860 * 0.8)) )
     Serial.println(F("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!FLYING MODE POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\t"));
   else if ( (MAX_POWER <= 1300) )
     Serial.println(F("DEBUG MODE POWER!!!\t"));
@@ -104,21 +104,57 @@ void ResetPIDCommand( int _rollMotorPwr, int _pitchMotorPwr, int _yawMotorPwr ) 
   yawSpeedPID_Accro.Reset();
 }
 
-void Pause500ms(){
-  for (int loop = 0; loop < 5; loop++){
+void Pause500ms() {
+  for (int loop = 0; loop < 5; loop++) {
     delay(100);
     wdt_reset();
   }
 }
 
+float ComputeVerticalSpeed(void) {
+  long realPressure = 0;
+  static bool initialized = false;
+  static float altiPrev = 0.0;
+  float altiCurr = 0.0;
+  static float measures[10];
+  static int indice = 0;
+  float mean = 0.0;
+  float verticalSpeed = 0.0;
+
+  realPressure = ms5611.readPressureFast();
+
+  // Compute altitude mean
+  measures[indice] = ms5611.getAltitude(realPressure);
+  indice++;
+
+  if ( indice > 9) {
+    indice = 0;
+    initialized = true;
+  }
+
+  if ( initialized == false)
+    return 0.0;
+
+  // Compute mean altitude
+  for (int i = 0; i < 10; i++)
+    mean = mean + measures[indice];
+
+  // Compute vertical speed
+  altiCurr = mean / 10;
+  verticalSpeed = altiCurr - altiPrev;
+  altiPrev = altiCurr;
+
+  return verticalSpeed;
+}
+
 void loop() {
   static float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
   static float posCurr[3] = { 0.0, 0.0, 0.0 }; // Teta position (°) (use gyro + accelero)
-//  static int g_iloop = 0;
-//  static float g_MeanLoop = 0;
+  //  static int g_iloop = 0;
+  //  static float g_MeanLoop = 0;
   static int loopNb = 0;
   static float meanLoopTime =  0;
-  int throttle = 0;
+  int throttle, verticalSpeed = 0;
   float loopTimeSec = time.GetloopTime();
   int rollPosCmd, pitchPosCmd = 0;
   int rollMotorPwr, pitchMotorPwr, yawMotorPwr = 0;
@@ -126,6 +162,13 @@ void loop() {
   // State Machine
   // initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
 
+  if( stateMachine.state != accro){
+     if( time.GetExecutionTime() >= 100){
+      verticalSpeed = ComputeVerticalSpeed();
+      time.Init();
+    }
+  }
+  
   switch ( stateMachine.state )
   {
     /*********** ANGLE STATE ***********/
@@ -141,6 +184,8 @@ void loop() {
         pitchMotorPwr = pitchSpeedPID_Angle.ComputeCorrection( pitchPosCmd, speedCurr[1], loopTimeSec );
 
         yawMotorPwr = yawSpeedPID_Angle.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
+
+        throttle = altiSpeedPID_Angle.ComputeCorrection( Rx.GetVerticalSpeed(), verticalSpeed, loopTimeSec );
 
         // Allow to change flying mode during flight
         tempState = Rx.GetFlyingMode();
