@@ -1,40 +1,51 @@
+#define COUNTER_NB 2
+
 class Time {
   private:
-    float startTime[2] = {0.0, 0.0};
-    float prev_time[2] = {0.0, 0.0};
-    float loop_time[2] = {0.0, 0.0}; // sec
-    bool first_loop[2] = {true, true};
+    float startTime[COUNTER_NB] = {0.0, 0.0};
+    float prev_time[COUNTER_NB] = {0.0, 0.0};
+    float loop_time[COUNTER_NB] = {0.0, 0.0}; // sec
+    bool first_loop[COUNTER_NB] = {true, true};
 
   public:
-    void InitAllCounters(){
-      for (int i = 0; i < 2; i++) {
-        startTime[i] = millis();
-        prev_time[i] = millis();
+    void InitAllCounters() {
+      for (int i = 0; i < COUNTER_NB; i++) {
+        startTime[COUNTER_NB] = millis();
+        prev_time[COUNTER_NB] = millis();
       }
     }
 
-    void Init(int _counter){
-      if ( _counter > 2 )
+    void Init(int _counter) {
+      if ( _counter > COUNTER_NB )
         return;
-        
+
       startTime[_counter] = millis();
       prev_time[_counter] = millis();
     }
 
-    inline float GetloopTime(int _counter) { // Compute loop time
-      if ( _counter > 2 )
+    inline float GetloopTimeSeconds(int _counter) {
+      return (GetloopTimeMilliseconds(_counter)/1000);
+    }
+
+    float GetExecutionTimeSeconds(int _counter) {
+      return (GetExecutionTimeMilliseconds(_counter)/1000);
+    }
+
+
+    inline float GetloopTimeMilliseconds(int _counter) {
+      if ( _counter > COUNTER_NB )
         return -1;
-        
-      loop_time[_counter] = (millis() - prev_time[_counter]) / 1000; // Loop time in s
+
+      loop_time[_counter] = (millis() - prev_time[_counter]);
       prev_time[_counter] = millis();
 
       return loop_time[_counter];
     }
 
-    float GetExecutionTime(int _counter) {
-      if ( _counter > 2 )
+    float GetExecutionTimeMilliseconds(int _counter) {
+      if ( _counter > COUNTER_NB )
         return -1;
-        
-      return (millis() - startTime[_counter])/1000; // Loop time in s;
+
+      return (millis() - startTime[_counter]);
     }
 };

@@ -51,7 +51,7 @@ class StateMachine {
       if( setBuzzer ){
         Time time;
         time.Init(0);
-        while ( (time.GetExecutionTime(0) * 1000) < _duration) {
+        while ( (time.GetExecutionTimeMilliseconds(0)) < _duration) {
           digitalWrite(12, HIGH);
           digitalWrite(13, HIGH);
           delayMicroseconds(1800);
@@ -61,7 +61,7 @@ class StateMachine {
           wdt_reset();
           Serial.println(F("BUZZZZZ"));
         }
-      }else if( timeBuzzer.GetExecutionTime(0) > 120 ) // Activate buzzer after 2 minutes
+      }else if( timeBuzzer.GetExecutionTimeSeconds(0) > 120 ) // Activate buzzer after 2 minutes
         setBuzzer = true;
     }
 
@@ -72,7 +72,7 @@ class StateMachine {
         throttleWasHigh = false;
       } else if ( (state != safety) &&
                   (state != disarmed) &&
-                  (elapsedTime.GetExecutionTime(0) > delayThreshold) ) // (s)
+                  (elapsedTime.GetExecutionTimeSeconds(0) > delayThreshold) ) // (s)
       {
         state = safety;
         Serial.print(delayThreshold); Serial.println(F(" sec without power, system DISARMED!"));

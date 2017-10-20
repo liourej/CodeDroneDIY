@@ -104,7 +104,7 @@ void loop() {
   static float meanLoopTime =  0;
   int throttle = 0;
   static float verticalSpeed = 0.0;
-  float loopTimeSec = time.GetloopTime(0);
+  float loopTimeSec = time.GetloopTimeMilliseconds(0);
   int rollPosCmd, pitchPosCmd = 0;
   int rollMotorPwr, pitchMotorPwr, yawMotorPwr = 0;
   static int tempState = disarmed;
@@ -113,12 +113,12 @@ void loop() {
 
   if ( stateMachine.state != accro) {
     // Compute vertical speed
-    if ( (altiTime.GetExecutionTime(0)*1000) >= ALTI_REFRESH_PERIOD) {
+    if ( altiTime.GetExecutionTimeMilliseconds(0) >= ALTI_REFRESH_PERIOD) {
       verticalSpeed = Position.GetVerticalSpeed();
       altiTime.Init(0);
     }
     // refresh temperature for altitude estimation
-    if ( (altiTime.GetExecutionTime(1)*1000) >= ALTI_TEMP_REFRESH_PERIOD) {
+    if ( altiTime.GetExecutionTimeMilliseconds(1) >= ALTI_TEMP_REFRESH_PERIOD) {
       Position.refreshTemperature();
       altiTime.Init(1);
     }
@@ -264,7 +264,7 @@ void loop() {
   if ( ((stateMachine.state == angle) || (stateMachine.state == accro)) && ( throttle > IDLE_THRESHOLD )) {
     if ( loopNb > 1000) {
       meanLoopTime = meanLoopTime / loopNb;
-      Serial.println(meanLoopTime * 1000, 2);
+      Serial.println(meanLoopTime, 2);
       //Serial.println(Position.GetFilterTimeConstant(meanLoopTime));
       meanLoopTime = 0;
       loopNb = 0;
