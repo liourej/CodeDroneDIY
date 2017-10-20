@@ -14,6 +14,7 @@
 // Angle mode
 float anglePosPIDParams[4] = { 0.010, 268, 0.5, 0.0};// G, Kp, Kd, Ki
 float angleSpeedPIDParams[4] = { 0.010, 192, 0.0, 0.0};
+float altiSpeedPIDParams[4] = { 0.010, 10, 0.0, 0.0};
 
 // Accro mode
 //float accroSpeedPIDParams[4] = { 0.010, 192, 0.25, 0.0}; // Tested during flight test: OK
@@ -28,6 +29,8 @@ float mixing = 0.5; //0.75
 #define ALTI_DEAD_ZONE 0.4 // (%) altimeter dead zone
 #define ALTI_LOW_ZONE 1080+1900*((1-ALTI_DEAD_ZONE)/2) // Upper this limit, vertical speed is positive
 #define ALTI_HIGH_ZONE 1900-1900*((1-ALTI_DEAD_ZONE)/2) // Under this limit, vertical speed is negative
+#define ALTI_REFRESH_PERIOD 95 // (ms)
+unsigned int ALTI_TEMP_REFRESH_PERIOD = 60000; // (ms)
 #define ALTI_MAX_VERTICAL_SPEED 2 //(2 m.s-1)
 #define MAX_ANGLE  45 // (°) Max roll and pitch angles reachable in angle mode
 #define MAX_ROT_SPEED  135 // (°/s) Max roll and pitch speed in accro mode

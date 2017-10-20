@@ -3,7 +3,7 @@ extern Reception Rx;
 
 class StateMachine {
   private:
-    const int delayThreshold = 5;
+    const int delayThreshold = 5; // (s)
 
     Time elapsedTime;
     Time timeBuzzer;
@@ -41,8 +41,8 @@ class StateMachine {
 
     }
     void Init() {
-      elapsedTime.Init();
-      timeBuzzer.Init();
+      elapsedTime.Init(0);
+      timeBuzzer.Init(0);
       setBuzzer = false;
     }
 
@@ -50,8 +50,8 @@ class StateMachine {
 
       if( setBuzzer ){
         Time time;
-        time.Init();
-        while ( (time.GetExecutionTime() * 1000) < _duration) {
+        time.Init(0);
+        while ( (time.GetExecutionTime(0) * 1000) < _duration) {
           digitalWrite(12, HIGH);
           digitalWrite(13, HIGH);
           delayMicroseconds(1800);
@@ -61,7 +61,7 @@ class StateMachine {
           wdt_reset();
           Serial.println(F("BUZZZZZ"));
         }
-      }else if( timeBuzzer.GetExecutionTime() > 120 ) // Activate buzzer after 2 minutes
+      }else if( timeBuzzer.GetExecutionTime(0) > 120 ) // Activate buzzer after 2 minutes
         setBuzzer = true;
     }
 
@@ -72,7 +72,7 @@ class StateMachine {
         throttleWasHigh = false;
       } else if ( (state != safety) &&
                   (state != disarmed) &&
-                  (elapsedTime.GetExecutionTime() > delayThreshold) )
+                  (elapsedTime.GetExecutionTime(0) > delayThreshold) ) // (s)
       {
         state = safety;
         Serial.print(delayThreshold); Serial.println(F(" sec without power, system DISARMED!"));

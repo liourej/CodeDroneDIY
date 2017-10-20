@@ -35,7 +35,7 @@ void setup() {
   Wire.begin();
   Wire.setClock(400000L); // Communication with MPU-6050 at 400KHz
 
-  // MPU6050: initialize MPU6050 device
+  // MPU6050, MS5611: initialize MPU6050 and MS5611 devices (IMU and barometer)
   Position.Init();
 
   while ( !Rx.IsReady() ) {
@@ -43,7 +43,8 @@ void setup() {
     delay(10);
   }
 
-  time.Init();
+  time.InitAllCounters();
+  altiTime.InitAllCounters();
   stateMachine.Init();
 
   // Set watchdog reset
@@ -59,24 +60,6 @@ void setup() {
   Serial.print(F("MAX_POWER:\t")); Serial.print(MAX_POWER);  Serial.print(F("MAX_THROTTLE_PERCENT:\t")); Serial.println(MAX_THROTTLE_PERCENT);
 
   Serial.println(F("Setup Finished"));
-}
-
-//    + configuration:
-//         ESC0(CCW)
-//          ^
-//          |
-//  ESC3 <-- --  ESC1
-//          |
-//         ESC2(CCW)
-//
-void PlusConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotorPwr) {
-  // Pitch correction
-  ESC0.write( _throttle - _pitchMotorPwr - _YawMotorPwr);
-  ESC2.write( _throttle + _pitchMotorPwr - _YawMotorPwr);
-
-  // Roll correction
-  ESC1.write( _throttle - _rollMotorPwr + _YawMotorPwr);
-  ESC3.write( _throttle + _rollMotorPwr + _YawMotorPwr);
 }
 
 //    X configuration:
@@ -102,6 +85,7 @@ void ResetPIDCommand( int _rollMotorPwr, int _pitchMotorPwr, int _yawMotorPwr ) 
   rollSpeedPID_Accro.Reset();
   pitchSpeedPID_Accro.Reset();
   yawSpeedPID_Accro.Reset();
+  altiSpeedPID_Angle.Reset();
 }
 
 void Pause500ms() {
@@ -111,64 +95,35 @@ void Pause500ms() {
   }
 }
 
-float ComputeVerticalSpeed(void) {
-  long realPressure = 0;
-  static bool initialized = false;
-  static float altiPrev = 0.0;
-  float altiCurr = 0.0;
-  static float measures[10];
-  static int indice = 0;
-  float mean = 0.0;
-  float verticalSpeed = 0.0;
-
-  realPressure = ms5611.readPressureFast();
-
-  // Compute altitude mean
-  measures[indice] = ms5611.getAltitude(realPressure);
-  indice++;
-
-  if ( indice > 9) {
-    indice = 0;
-    initialized = true;
-  }
-
-  if ( initialized == false)
-    return 0.0;
-
-  // Compute mean altitude
-  for (int i = 0; i < 10; i++)
-    mean = mean + measures[indice];
-
-  // Compute vertical speed
-  altiCurr = mean / 10;
-  verticalSpeed = altiCurr - altiPrev;
-  altiPrev = altiCurr;
-
-  return verticalSpeed;
-}
-
 void loop() {
   static float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
   static float posCurr[3] = { 0.0, 0.0, 0.0 }; // Teta position (°) (use gyro + accelero)
-  //  static int g_iloop = 0;
-  //  static float g_MeanLoop = 0;
+  static int g_iloop = 0;
+  static float g_MeanLoop = 0;
   static int loopNb = 0;
   static float meanLoopTime =  0;
-  int throttle, verticalSpeed = 0;
-  float loopTimeSec = time.GetloopTime();
+  int throttle = 0;
+  static float verticalSpeed = 0.0;
+  float loopTimeSec = time.GetloopTime(0);
   int rollPosCmd, pitchPosCmd = 0;
   int rollMotorPwr, pitchMotorPwr, yawMotorPwr = 0;
   static int tempState = disarmed;
   // State Machine
   // initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
 
-  if( stateMachine.state != accro){
-     if( time.GetExecutionTime() >= 100){
-      verticalSpeed = ComputeVerticalSpeed();
-      time.Init();
+  if ( stateMachine.state != accro) {
+    // Compute vertical speed
+    if ( (altiTime.GetExecutionTime(0)*1000) >= ALTI_REFRESH_PERIOD) {
+      verticalSpeed = Position.GetVerticalSpeed();
+      altiTime.Init(0);
+    }
+    // refresh temperature for altitude estimation
+    if ( (altiTime.GetExecutionTime(1)*1000) >= ALTI_TEMP_REFRESH_PERIOD) {
+      Position.refreshTemperature();
+      altiTime.Init(1);
     }
   }
-  
+
   switch ( stateMachine.state )
   {
     /*********** ANGLE STATE ***********/
@@ -191,7 +146,7 @@ void loop() {
         tempState = Rx.GetFlyingMode();
         if ( tempState == accro ) {
           stateMachine.state = accro;
-          Serial.println("Flying mode changed from angle to accro");
+          Serial.println(F("Flying mode changed from angle to accro"));
         }
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 20 s without power.
@@ -215,7 +170,7 @@ void loop() {
         tempState = Rx.GetFlyingMode();
         if ( tempState == angle ) {
           stateMachine.state = angle;
-          Serial.println("Flying mode changed from accro to angle");
+          Serial.println(F("Flying mode changed from accro to angle"));
         }
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 5 s without power.
@@ -243,9 +198,9 @@ void loop() {
       if (stateMachine.state != disarmed) {
         stateMachine.throttleWasHigh = true;
         if ( stateMachine.state == angle)
-          Serial.println("ANGLE MODE");
+          Serial.println(F("ANGLE MODE"));
         else if ( stateMachine.state == accro)
-          Serial.println("ACCRO MODE");
+          Serial.println(F("ACCRO MODE"));
         else
           stateMachine.state = disarmed;
       }
@@ -268,7 +223,7 @@ void loop() {
       break;
     /*********** STARTING STATE ***********/
     case starting:
-      Serial.println("stateMachine.state starting");
+      Serial.println(F("stateMachine.state starting"));
       IdleAllESC();
       stateMachine.state = Rx.GetFlyingMode();
       Pause500ms();
@@ -276,7 +231,7 @@ void loop() {
         stateMachine.state = starting;
 
       if ( (stateMachine.state == angle) || (stateMachine.state == accro) ) {
-        Serial.println("stateMachine.state != disarmed MODE");
+        Serial.println(F("stateMachine.state != disarmed MODE"));
         //Angle mode PID config
         // anglePosPIDParams[1] = map(analogRead(2), 0, 1023, 100, 500); // Adjust Kp from potentiometer
         //anglePosPIDParams[3] = map(analogRead(3), 0, 1023, 0, 100); // Adjust Ki from potentiometer
@@ -285,6 +240,9 @@ void loop() {
         rollSpeedPID_Angle.SetGains(angleSpeedPIDParams);
         pitchSpeedPID_Angle.SetGains(angleSpeedPIDParams);
         yawSpeedPID_Angle.SetGains(yawSpeedPIDParams);
+
+        altiSpeedPIDParams[1] = map(analogRead(2), 0, 1023, 0, 500); // Adjust Kp from potentiometer
+        altiSpeedPID_Angle.SetGains(altiSpeedPIDParams);
 
         //Accro mode PID config
         rollSpeedPID_Accro.SetGains(accroSpeedPIDParams);
@@ -298,15 +256,15 @@ void loop() {
       stateMachine.ActivateBuzzer(500);
       break;
     default:
-      Serial.print("UNDEFINED STATE!");
+      Serial.print(F("UNDEFINED STATE!"));
       break;
   }
 
   // Compute mean loop time and complementary filter time constant
   if ( ((stateMachine.state == angle) || (stateMachine.state == accro)) && ( throttle > IDLE_THRESHOLD )) {
     if ( loopNb > 1000) {
-      // meanLoopTime = meanLoopTime / loopNb;
-      //Serial.println(meanLoopTime * 1000, 2);
+      meanLoopTime = meanLoopTime / loopNb;
+      Serial.println(meanLoopTime * 1000, 2);
       //Serial.println(Position.GetFilterTimeConstant(meanLoopTime));
       meanLoopTime = 0;
       loopNb = 0;

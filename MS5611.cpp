@@ -130,12 +130,42 @@ uint32_t MS5611::readRawPressure(void)
   return readRegister24(MS5611_CMD_ADC_READ);
 }
 
-int32_t MS5611::readPressureFast()
+void MS5611::refreshTemperature(void){
+  D2 = readRawTemperature(); // Julien: For faster loops, temperature is read only every minutes
+}
+
+int32_t MS5611::readPressureFast(bool compensation)
 {
   uint32_t D1 = readRawPressure();
 
-  int64_t OFF = (int64_t)fc[1] * 65536;
-  int64_t SENS = (int64_t)fc[0] * 32768;
+  //uint32_t D2 = readRawTemperature(); // Julien: For faster loops, temperature is read only every minutes
+  int32_t dT = D2 - (uint32_t)fc[4] * 256;
+
+  int64_t OFF = (int64_t)fc[1] * 65536 + (int64_t)fc[3] * dT / 128;
+  int64_t SENS = (int64_t)fc[0] * 32768 + (int64_t)fc[2] * dT / 256;
+
+  if (compensation)
+  {
+    int32_t TEMP = 2000 + ((int64_t) dT * fc[5]) / 8388608;
+
+    OFF2 = 0;
+    SENS2 = 0;
+
+    if (TEMP < 2000)
+    {
+      OFF2 = 5 * ((TEMP - 2000) * (TEMP - 2000)) / 2;
+      SENS2 = 5 * ((TEMP - 2000) * (TEMP - 2000)) / 4;
+    }
+
+    if (TEMP < -1500)
+    {
+      OFF2 = OFF2 + 7 * ((TEMP + 1500) * (TEMP + 1500));
+      SENS2 = SENS2 + 11 * ((TEMP + 1500) * (TEMP + 1500)) / 2;
+    }
+
+    OFF = OFF - OFF2;
+    SENS = SENS - SENS2;
+  }
 
   uint32_t P = (D1 * SENS / 2097152 - OFF) / 32768;
 

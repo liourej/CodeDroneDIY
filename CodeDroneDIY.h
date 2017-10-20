@@ -8,11 +8,11 @@
 #include "PID.h"
 #include "SetPWM.h"
 #include "StateMachine.h"
-#include "MS5611.h"
 
 typedef enum { _timer1, _Nbr_16timers } timer16_Sequence_t;
 
 Time time;
+Time altiTime;
 
 Reception Rx;
 
@@ -21,7 +21,6 @@ PID rollSpeedPID_Angle, pitchSpeedPID_Angle, yawSpeedPID_Angle, altiSpeedPID_Ang
 PID rollSpeedPID_Accro, pitchSpeedPID_Accro, yawSpeedPID_Accro;
 GetPosition Position;
 StateMachine stateMachine;
-MS5611 ms5611; // Barometer for altitude stabilization
 
 void IdleAllESC() {
   ESC0.Idle();

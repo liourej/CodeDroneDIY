@@ -1,24 +1,40 @@
 class Time {
   private:
-    float startTime = 0;
-    float prev_time = 0;
-    float loop_time = 0; // sec
-    bool first_loop = true;
+    float startTime[2] = {0.0, 0.0};
+    float prev_time[2] = {0.0, 0.0};
+    float loop_time[2] = {0.0, 0.0}; // sec
+    bool first_loop[2] = {true, true};
 
   public:
-    void Init()
-    {
-      startTime = millis();
-      prev_time = millis();
-    }
-    inline float GetloopTime() { // Compute loop time
-      loop_time = (millis() - prev_time) / 1000; // Loop time in s
-      prev_time = millis();
-
-      return loop_time;
+    void InitAllCounters(){
+      for (int i = 0; i < 2; i++) {
+        startTime[i] = millis();
+        prev_time[i] = millis();
+      }
     }
 
-    float GetExecutionTime() {
-      return (millis() - startTime); // Loop time in ms;
+    void Init(int _counter){
+      if ( _counter > 2 )
+        return;
+        
+      startTime[_counter] = millis();
+      prev_time[_counter] = millis();
+    }
+
+    inline float GetloopTime(int _counter) { // Compute loop time
+      if ( _counter > 2 )
+        return -1;
+        
+      loop_time[_counter] = (millis() - prev_time[_counter]) / 1000; // Loop time in s
+      prev_time[_counter] = millis();
+
+      return loop_time[_counter];
+    }
+
+    float GetExecutionTime(int _counter) {
+      if ( _counter > 2 )
+        return -1;
+        
+      return (millis() - startTime[_counter])/1000; // Loop time in s;
     }
 };

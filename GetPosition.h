@@ -5,7 +5,7 @@
 // for both classes must be in the include path of your project
 #include "I2Cdev.h"
 #include "MPU6050.h"
-
+#include "MS5611.h"
 
 class GetPosition
 {
@@ -25,7 +25,8 @@ class GetPosition
     int16_t offset[6] = {0, 0, 0, 0, 0, 0};
 
   private:
-    MPU6050 accelgyro;
+    MPU6050 accelgyro; // IMU
+    MS5611 ms5611; // Barometer for altitude stabilization
     void GetCorrectedAccelGyro( float _accMeasures[], float _gyroMeasures[]);
     void GetCorrectedGyro( float _data[]);
     void Normalize( float _acc[] );
@@ -34,10 +35,10 @@ class GetPosition
   public:
     void Init();
     float GetFilterTimeConstant(float _loopTime);
-    bool AreOffsetComputed(void) {
-      return offsetComputed;
-    }
+    bool AreOffsetComputed(void) { return offsetComputed; }
     void ComputeOffsets();
     void GetCurrPos(float _pos[], float _speed[], float _loop_time);
     void GetCurrSpeed(float speedCurr[]);
+    float GetVerticalSpeed(void);
+    void refreshTemperature(void) {ms5611.refreshTemperature();};
 };

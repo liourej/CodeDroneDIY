@@ -2,7 +2,11 @@
 #include "GetPosition.h"
 #include "checkIMU.h"
 
-void GetPosition::Init(){
+void GetPosition::Init() {
+  // Initialize MS5611 sensor (barometer for altitude)
+  while (!ms5611.begin(MS5611_ULTRA_HIGH_RES))
+    delay(500);
+
   accelgyro.initialize();
   accelgyro.setFullScaleGyroRange( MPU6050_GYRO_FS_1000); //  +-1000°s max  /!\ Be carrefull when changing this parameter: "GyroSensitivity" must be updated accordingly !!!
   accelgyro.setFullScaleAccelRange( MPU6050_ACCEL_FS_8 );//  +-8g max /!\ Be carrefull when changing this parameter: "AcceleroSensitivity" must be updated accordingly !!!
@@ -12,9 +16,11 @@ void GetPosition::Init(){
 
   Serial.println(F("/********* IMU self-test *********/"));
   if ( !CheckIMU(accelgyro, AcceleroSensitivity) )
-      Serial.println("IMU SELF TEST FAILED !!!!!");
+    Serial.println(F("IMU SELF TEST FAILED !!!!!"));
   else
-      Serial.println("IMU self test succeed");
+    Serial.println(F("IMU self test succeed"));
+
+  ms5611.refreshTemperature();
 }
 
 inline void GetPosition::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[])
@@ -41,9 +47,9 @@ inline void GetPosition::GetCorrectedGyro(float _data[])
   accelgyro.getRotation(&gx, &gy, &gz);   // 2ms !!
 
   // Correct raw data with offset
-  _data[0] = (float)(gx - offset[3] )/ GyroSensitivity;
-  _data[1] = (float)(gy - offset[4] )/ GyroSensitivity;
-  _data[2] = (float)(gz - offset[5] )/ GyroSensitivity;
+  _data[0] = (float)(gx - offset[3] ) / GyroSensitivity;
+  _data[1] = (float)(gy - offset[4] ) / GyroSensitivity;
+  _data[2] = (float)(gz - offset[5] ) / GyroSensitivity;
 }
 
 // Compute accelerometer and gyroscope offsets
@@ -167,20 +173,45 @@ void GetPosition::GetCurrPos(float _pos[], float _speed[], float _loop_time)
 
   Normalize(accRaw);
 
- /* static int counter = 0;
-  static float pitchGyro = 0.0;
-  float pitchAcc = 0.0;
-  pitchGyro = pitchGyro + (gyroRaw[1]) * _loop_time;
-  pitchAcc = ((-atan(accRaw[0] / accRaw[2])) * 57.2957795130823);*/
-
   // Use complementary filter to merge gyro and accelerometer data
   _pos[0] = HighPassFilterCoeff * (_pos[0] + (gyroRaw[0]) * _loop_time) + (1 - HighPassFilterCoeff) * ((atan(accRaw[1] / accRaw[2])) * 57.2957795130823); // High pass filter on gyro, and low pass filter on accelerometer
   _pos[1] = HighPassFilterCoeff * (_pos[1] + (gyroRaw[1]) * _loop_time) + (1 - HighPassFilterCoeff) * ((-atan(accRaw[0] / accRaw[2])) * 57.2957795130823); // High pass filter on gyro, and low pass filter on accelerometer
 
- /* if ( counter > 250 ) {
-    //Serial.print( accRaw[0] ); Serial.print( "\t" ); Serial.print( accRaw[1] ); Serial.print( "\t" ); Serial.println( accRaw[2] );
-    Serial.print( pitchGyro ); Serial.print( "\t" ); Serial.print( pitchAcc ); Serial.print( "\t" ); Serial.println( _pos[1] );
-    counter = 0;
-  } else
-    counter ++;*/
+}
+
+float GetPosition::GetVerticalSpeed(void) {
+  long realPressure = 0;
+  static bool initialized = false;
+  static float altiPrev = 0.0;
+  float altiCurr = 0.0;
+  static float measures[10];
+  static int indice = 0;
+  float mean = 0.0;
+  float verticalSpeed = 0.0;
+
+  realPressure = ms5611.readPressureFast();
+
+  // Compute altitude mean
+  measures[indice] = ms5611.getAltitude(realPressure);
+  indice++;
+
+  if ( indice > 9) {
+    indice = 0;
+    initialized = true;
+  }
+
+  if ( initialized == false)
+    return 0.0;
+
+  // Compute mean altitude
+  mean = 0.0;
+  for (int i = 0; i < 10; i++)
+    mean = mean + measures[indice];
+
+  // Compute vertical speed
+  altiCurr = mean / 10;
+  verticalSpeed = altiCurr - altiPrev;
+  altiPrev = altiCurr;
+
+  return verticalSpeed;
 }
