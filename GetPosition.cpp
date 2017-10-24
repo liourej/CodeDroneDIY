@@ -3,10 +3,24 @@
 #include "checkIMU.h"
 
 void GetPosition::Init() {
-  // Initialize MS5611 sensor (barometer for altitude)
-  while (!ms5611.begin(MS5611_ULTRA_HIGH_RES))
-    delay(500);
 
+  // Initialize MS5611 sensor (barometer for altitude). If timeout, there is no barometer, so do not use it
+  int timeout = 0;
+  while ((!ms5611.begin(MS5611_ULTRA_HIGH_RES)) && (timeout <= 4 ) ) {
+    delay(250);
+    timeout++;
+  }
+  if ( timeout <= 4 ) {
+    baro_available = true;
+    delay(500);
+    ms5611.refreshTemperature();
+    Serial.println(F("Barometer present"));
+  } else {
+    baro_available = false;
+    Serial.println(F("NO barometer detected !!!"));
+  }
+
+  // Initialize MPU 6050
   accelgyro.initialize();
   accelgyro.setFullScaleGyroRange( MPU6050_GYRO_FS_1000); //  +-1000°s max  /!\ Be carrefull when changing this parameter: "GyroSensitivity" must be updated accordingly !!!
   accelgyro.setFullScaleAccelRange( MPU6050_ACCEL_FS_8 );//  +-8g max /!\ Be carrefull when changing this parameter: "AcceleroSensitivity" must be updated accordingly !!!
@@ -20,7 +34,6 @@ void GetPosition::Init() {
   else
     Serial.println(F("IMU self test succeed"));
 
-  ms5611.refreshTemperature();
 }
 
 inline void GetPosition::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[])

@@ -11,8 +11,8 @@
 void setup() {
 
   // Buzzer
-  //pinMode(12, OUTPUT);
-  //pinMode(13, OUTPUT);
+  pinMode(12, OUTPUT);
+  pinMode(13, OUTPUT);
 
   // ESC
   ESC0.attach(4); // ESC0 on PD4 pin
@@ -111,23 +111,23 @@ void loop() {
   // State Machine
   // initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
 
-  if ( stateMachine.state != accro) {
-    // Compute vertical speed
-    if ( altiTime.GetExecutionTimeMilliseconds(0) >= ALTI_REFRESH_PERIOD) {
-      verticalSpeed = Position.GetVerticalSpeed();
-      altiTime.Init(0);
-    }
-    // refresh temperature for altitude estimation
-    if ( altiTime.GetExecutionTimeMilliseconds(1) >= ALTI_TEMP_REFRESH_PERIOD) {
-      Position.refreshTemperature();
-      altiTime.Init(1);
-    }
-  }
-
   switch ( stateMachine.state )
   {
     /*********** ANGLE STATE ***********/
     case angle:
+      if ( Position.baro_available == true) {
+        // Compute vertical speed
+        if ( altiTime.GetExecutionTimeMilliseconds(0) >= ALTI_REFRESH_PERIOD) {
+          verticalSpeed = Position.GetVerticalSpeed();
+          altiTime.Init(0);
+        }
+        // refresh temperature for altitude estimation
+        if ( altiTime.GetExecutionTimeMilliseconds(1) >= ALTI_TEMP_REFRESH_PERIOD) {
+          Position.refreshTemperature();
+          altiTime.Init(1);
+        }
+      }
+      
       throttle = Rx.GetThrottle();
       Position.GetCurrPos(posCurr, speedCurr, loopTimeSec);
       if ( throttle > IDLE_THRESHOLD ) {
@@ -139,9 +139,11 @@ void loop() {
         pitchMotorPwr = pitchSpeedPID_Angle.ComputeCorrection( pitchPosCmd, speedCurr[1], loopTimeSec );
 
         yawMotorPwr = yawSpeedPID_Angle.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
-
-        throttle = altiSpeedPID_Angle.ComputeCorrection( Rx.GetVerticalSpeed(), verticalSpeed, loopTimeSec );
-
+        
+        if ( Position.baro_available == true) {
+          throttle = altiSpeedPID_Angle.ComputeCorrection( Rx.GetVerticalSpeed(), verticalSpeed, loopTimeSec );
+        }
+        
         // Allow to change flying mode during flight
         tempState = Rx.GetFlyingMode();
         if ( tempState == accro ) {

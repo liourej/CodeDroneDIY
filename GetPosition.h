@@ -23,6 +23,7 @@ class GetPosition
 
     bool offsetComputed = false;
     int16_t offset[6] = {0, 0, 0, 0, 0, 0};
+    bool baro_available = false;
 
   private:
     MPU6050 accelgyro; // IMU
