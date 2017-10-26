@@ -7,7 +7,7 @@
 #include "MPU6050.h"
 #include "MS5611.h"
 
-class GetPosition
+class Attitude
 {
   public:
     /* /!\ HighPassFilterCoeff is an important coeff for complementary filter /!\

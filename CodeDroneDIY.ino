@@ -15,10 +15,10 @@ void setup() {
   pinMode(13, OUTPUT);
 
   // ESC
-  ESC0.attach(4); // ESC0 on PD4 pin
-  ESC1.attach(5); // ESC1 on PD5 pin
-  ESC2.attach(6); // ESC2 on PD6 pin
-  ESC3.attach(7); // ESC3 on PD7 pin
+  ESC0.attach(2); // ESC0 on PD4 pin (physical pin 2)
+  ESC1.attach(9); // ESC1 on PD5 pin (physical pin 9)
+  ESC2.attach(10); // ESC2 on PD6 pin (physical pin 10)
+  ESC3.attach(11); // ESC3 on PD7 pin (physical pin 11)
 
   IdleAllESC();
 
@@ -36,7 +36,7 @@ void setup() {
   Wire.setClock(400000L); // Communication with MPU-6050 at 400KHz
 
   // MPU6050, MS5611: initialize MPU6050 and MS5611 devices (IMU and barometer)
-  Position.Init();
+  Attitude.Init();
 
   while ( !Rx.IsReady() ) {
     IdleAllESC();
@@ -115,21 +115,21 @@ void loop() {
   {
     /*********** ANGLE STATE ***********/
     case angle:
-      if ( Position.baro_available == true) {
+      if ( Attitude.baro_available == true) {
         // Compute vertical speed
         if ( altiTime.GetExecutionTimeMilliseconds(0) >= ALTI_REFRESH_PERIOD) {
-          verticalSpeed = Position.GetVerticalSpeed();
+          verticalSpeed = Attitude.GetVerticalSpeed();
           altiTime.Init(0);
         }
         // refresh temperature for altitude estimation
         if ( altiTime.GetExecutionTimeMilliseconds(1) >= ALTI_TEMP_REFRESH_PERIOD) {
-          Position.refreshTemperature();
+          Attitude.refreshTemperature();
           altiTime.Init(1);
         }
       }
       
       throttle = Rx.GetThrottle();
-      Position.GetCurrPos(posCurr, speedCurr, loopTimeSec);
+      Attitude.GetCurrPos(posCurr, speedCurr, loopTimeSec);
       if ( throttle > IDLE_THRESHOLD ) {
         stateMachine.throttleWasHigh = true;
         rollPosCmd = rollPosPID_Angle.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loopTimeSec );
@@ -140,7 +140,7 @@ void loop() {
 
         yawMotorPwr = yawSpeedPID_Angle.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
         
-        if ( Position.baro_available == true) {
+        if ( Attitude.baro_available == true) {
           throttle = altiSpeedPID_Angle.ComputeCorrection( Rx.GetVerticalSpeed(), verticalSpeed, loopTimeSec );
         }
         
@@ -160,7 +160,7 @@ void loop() {
     /*********** ACCRO STATE ***********/
     case accro:
       throttle = Rx.GetThrottle();
-      Position.GetCurrPos( posCurr, speedCurr, loopTimeSec);
+      Attitude.GetCurrPos( posCurr, speedCurr, loopTimeSec);
       //Position.GetCurrSpeed( speedCurr);
       if ( throttle > IDLE_THRESHOLD ) {
         stateMachine.throttleWasHigh = true;
@@ -212,13 +212,13 @@ void loop() {
     /*********** INITIALIZATION STATE ***********/
     case initialization:
       IdleAllESC();
-      while (!Position.AreOffsetComputed())
-        Position.ComputeOffsets();
+      while (!Attitude.AreOffsetComputed())
+        Attitude.ComputeOffsets();
 
       stateMachine.state = Rx.GetFlyingMode();
       if ( stateMachine.state != disarmed )
         stateMachine.state = initialization;
-      else if ( Position.AreOffsetComputed())
+      else if ( Attitude.AreOffsetComputed())
         stateMachine.state =  starting;
       else
         stateMachine.state =  initialization;

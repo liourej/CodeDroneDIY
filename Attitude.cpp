@@ -1,8 +1,8 @@
 #include <avr/wdt.h>
-#include "GetPosition.h"
+#include "Attitude.h"
 #include "checkIMU.h"
 
-void GetPosition::Init() {
+void Attitude::Init() {
 
   // Initialize MS5611 sensor (barometer for altitude). If timeout, there is no barometer, so do not use it
   int timeout = 0;
@@ -36,7 +36,7 @@ void GetPosition::Init() {
 
 }
 
-inline void GetPosition::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[])
+inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[])
 {
   int16_t ax, ay, az, gx, gy, gz = 0;
 
@@ -53,7 +53,7 @@ inline void GetPosition::GetCorrectedAccelGyro(float _accMeasures[], float _gyro
   //Normalize(_data); // Normalize 3 first array cases (acceleration)
 }
 
-inline void GetPosition::GetCorrectedGyro(float _data[])
+inline void Attitude::GetCorrectedGyro(float _data[])
 {
   int16_t gx, gy, gz;
 
@@ -66,7 +66,7 @@ inline void GetPosition::GetCorrectedGyro(float _data[])
 }
 
 // Compute accelerometer and gyroscope offsets
-void GetPosition::ComputeOffsets()
+void Attitude::ComputeOffsets()
 {
   int16_t accGyroRaw[6] = {0, 0, 0, 0, 0, 0};
   int32_t offsetSum[6] = {0, 0, 0, 0, 0, 0};
@@ -128,7 +128,7 @@ void GetPosition::ComputeOffsets()
     Serial.println(F("ERROR DURING OFFSETS COMPUTATION !!"));
 };
 
-inline void GetPosition::Normalize( float _acc[] )
+inline void Attitude::Normalize( float _acc[] )
 {
   float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
 
@@ -137,7 +137,7 @@ inline void GetPosition::Normalize( float _acc[] )
   _acc[2] = _acc[2] / norm;
 }
 
-bool GetPosition::IsVectorNormalized( float _acc[], float _epsilon ) {
+bool Attitude::IsVectorNormalized( float _acc[], float _epsilon ) {
   float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
 
   if ( abs(1 - norm) < _epsilon )
@@ -146,13 +146,13 @@ bool GetPosition::IsVectorNormalized( float _acc[], float _epsilon ) {
   return false;
 }
 
-float GetPosition::PercentVectorNormalized( float _acc[]) {
+float Attitude::PercentVectorNormalized( float _acc[]) {
   float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
   return abs(1 - norm);
 }
 
 // Get rotation speed using only gyro
-void GetPosition::GetCurrSpeed(float _speed[])
+void Attitude::GetCurrSpeed(float _speed[])
 {
   // float roll, pitch = 0;
   float gyroRaw[3] = {0, 0, 0};
@@ -165,12 +165,12 @@ void GetPosition::GetCurrSpeed(float _speed[])
   _speed[2] = gyroRaw[2];
 }
 
-float GetPosition::GetFilterTimeConstant(float _loopTimeSec) {
+float Attitude::GetFilterTimeConstant(float _loopTimeSec) {
   return ( (HighPassFilterCoeff * _loopTimeSec) / (1 - HighPassFilterCoeff));
 }
 
 // Get position combining acc + gyro
-void GetPosition::GetCurrPos(float _pos[], float _speed[], float _loop_time)
+void Attitude::GetCurrPos(float _pos[], float _speed[], float _loop_time)
 {
   // float roll, pitch = 0;
   float accRaw[3] = {0, 0, 0};
@@ -192,7 +192,7 @@ void GetPosition::GetCurrPos(float _pos[], float _speed[], float _loop_time)
 
 }
 
-float GetPosition::GetVerticalSpeed(void) {
+float Attitude::GetVerticalSpeed(void) {
   long realPressure = 0;
   static bool initialized = false;
   static float altiPrev = 0.0;

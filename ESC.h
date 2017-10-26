@@ -5,15 +5,13 @@ class ESC
 {
   public:
     int pin = 0;
-    int PORTBPin = 0;
     float PWM = MIN_POWER;
     uint16_t ticks = 0;
 
   public:
     void attach (int _pin ) {
       pin = _pin;
-      PORTBPin = _pin - 8;
-      pinMode( _pin, OUTPUT);
+      pinMode( pin, OUTPUT);
     }; // set servo pin to output};
     
     inline void write (float _PWM) {
