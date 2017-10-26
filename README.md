@@ -43,6 +43,8 @@
 
 7.3.Failsafe
 
+7.4.The benchtest
+
 **8.First Person View (FPV)**
 
 **9.Appendix**
@@ -58,6 +60,15 @@
 **10.Bibliography**
 
 -------------------------------------------------------------------
+## Warning
+![Danger.jpg](/ReadmePictures/Danger.jpg "Danger")
+
+Before starting this project, you must know that using propellers at high speed is very dangerous for your eyes and the persons around.
+When testting, you must wear large protective glasses, and set up a power limits when you are testing inside a room.
+For outside tests, choose a very large area, with nobody around.
+
+![Protection_glasses.jpg](/ReadmePictures/Protection_glasses.jpg "Protection_glasses")
+
 ## 1. Project purpose
 
 The aim of this project is to develop a quadrirotor flight controller from scratch, using an Arduino and sensors.
@@ -164,29 +175,30 @@ To arm again the system, pilot has to disarm it, and then he has to choose a fli
 
 ## 5. CPPM reception
 
-La réception CPPM (Pulse Position Modulation) permet de recevoir toutes les voies sur une seule entrée: chaque front montant correspond à la fin de l'impulsion de la voie précédente et au début de l'impulsion de la voie suivante. Le temps écoulé entre deux fronts montants correspond à la largeur d'impulsion d'une voie donnée.
+CPPM (Pulse Position Modulation) reception  allows to receive all channels using only one entry pin. Each rising edge correpond to the end of the previous channel impulsion, and at the beginning of the next channel impulsion.
+Elapsed time between two rising edge correspond to the pulse width of a given channel.
 
 ![CPPM](/ReadmePictures/CPPM.JPG "CPPM")
 
-Dans le projet, la largeur en milliseconde de chaque impulsion du train d'impulsion est mesurée à l'aide du timer0, puis stockée dans la case correspondant à la voie dans un tableau.
+In this projet, each pulse width is measured using INT0, and then stored in the correponding channel of an array.
 
-## 6. Organisation du code « CodeDroneDIY »
+## 6. Source code organization « CodeDroneDIY »
 
 ![DiagrammeUML](/ReadmePictures/DiagrammeUML.jpg "DiagrammeUML")
 
 | File      | Description      |
 | -------------- | -------------- |
 | CodeDroneDIY.ino | Initialization fucntion and main loop |
-| GetPosition.cpp | Intègre et fustionne les données brutes des gyro/accéléro et retourne les angles avec l'horizontale en degrés |
-| MPU6050.cpp | Librairie pour acquérir les données brutes du MPU6050 |
-| PID.cpp | Correcteur proportionnel, intégral, dérivée |
-| Reception.h | Acquisition par interruption 0 des signaux du récepteur au format CPPM |
-| ESC.h | Gère les caractérisques d'un ESC donné: pin attribuée, largeur d'impulsion à appliquer |
-| SetPWM.h | Applique les PWM aux ESC en utiliant le timer0 |
-| Settings.h | Paramètres des PID et de puissance maximale |
-| StateMachine.h | Machine à états |
-| Time.h | Mesure du temps de boucle et du temps écoulé depuis un instant t |
-| checkIMU.cpp | Vérifie le fonctionnement de l'IMU avant une utilisation |
+| GetPosition.cpp | Gyro and accelero raw data intergration and merging, attitude angles computation |
+| MPU6050.cpp | Library for MPU6050 raw data acquisition |
+| PID.cpp | Proportionnal, integral, derivative loop correction |
+| Reception.h | Receiver CPPM signal acquisition using INT0 |
+| ESC.h | Manage an ESC: pin, PWM to set |
+| SetPWM.h | Set PWM to ESC using timer 0 |
+| Settings.h | All parameters: max power, PID settings... |
+| StateMachine.h | State machine |
+| Time.h | To measure loop time and elapsed time |
+| checkIMU.cpp | IMU checking before using |
 
 ## 7. Hardware configuration
 
@@ -230,6 +242,10 @@ To set the failsafe:
 2. Bind the receiver with the transmitter
 
 Trasnmitter configuration used during the « bind » operation defines the « failsafe. »
+
+### 7.4 The benchtest
+
+![BenchTest01](/ReadmePictures/BenchTest01.jpg "BenchTest01")
 
 ## 8. FPV - First Person View
 | Component      | Reference      |
@@ -288,12 +304,12 @@ Ce paramètre joue sur le ratio des PID. En effet, la tension et le niveau de ga
 
 ### 9.3 Arduino UNO rev3
 
-Microcontrôleur ATmega328
-Architecture 8 bits RISC
+ATmega328 microcontroller
+8 bits RISC architecture
 16Mhz => T = 0.0625us
-1MIPS par MHz
+1MIPS by MHz
 Dimensions : 68.6 mm x 53.4 mm
-Poids : 25 g
+Weight : 25 g
 
 ### 9.4 PWM generation at 400Hz
 
