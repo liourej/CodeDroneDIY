@@ -35,11 +35,7 @@ class ESC
     inline void Idle(){
       ticks = PWM = 0;
     }
-    
-    inline float GetPWM() {
-      return PWM;
-    };
-    
+        
     inline uint16_t GetTicks() {
       return ticks;
     };

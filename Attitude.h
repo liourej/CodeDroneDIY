@@ -29,17 +29,13 @@ class Attitude
     MPU6050 accelgyro; // IMU
     MS5611 ms5611; // Barometer for altitude stabilization
     void GetCorrectedAccelGyro( float _accMeasures[], float _gyroMeasures[]);
-    void GetCorrectedGyro( float _data[]);
     void Normalize( float _acc[] );
-    bool IsVectorNormalized( float _acc[], float _epsilon );
-    float PercentVectorNormalized( float _acc[]);
   public:
     void Init();
     float GetFilterTimeConstant(float _loopTime);
     bool AreOffsetComputed(void) { return offsetComputed; }
     void ComputeOffsets();
     void GetCurrPos(float _pos[], float _speed[], float _loop_time);
-    void GetCurrSpeed(float speedCurr[]);
     float GetVerticalSpeed(void);
     void refreshTemperature(void) {ms5611.refreshTemperature();};
 };

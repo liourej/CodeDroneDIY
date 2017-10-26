@@ -40,7 +40,7 @@ inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMea
 {
   int16_t ax, ay, az, gx, gy, gz = 0;
 
-  accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);   // 2ms !!
+  accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
   // Correct raw data with offset
   _accMeasures[0] = (float)(ax - offset[0] ) / AcceleroSensitivity;
@@ -51,18 +51,6 @@ inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMea
   _gyroMeasures[2] = (float)(gz - offset[5] ) / GyroSensitivity;
 
   //Normalize(_data); // Normalize 3 first array cases (acceleration)
-}
-
-inline void Attitude::GetCorrectedGyro(float _data[])
-{
-  int16_t gx, gy, gz;
-
-  accelgyro.getRotation(&gx, &gy, &gz);   // 2ms !!
-
-  // Correct raw data with offset
-  _data[0] = (float)(gx - offset[3] ) / GyroSensitivity;
-  _data[1] = (float)(gy - offset[4] ) / GyroSensitivity;
-  _data[2] = (float)(gz - offset[5] ) / GyroSensitivity;
 }
 
 // Compute accelerometer and gyroscope offsets
@@ -137,33 +125,6 @@ inline void Attitude::Normalize( float _acc[] )
   _acc[2] = _acc[2] / norm;
 }
 
-bool Attitude::IsVectorNormalized( float _acc[], float _epsilon ) {
-  float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
-
-  if ( abs(1 - norm) < _epsilon )
-    return true;
-
-  return false;
-}
-
-float Attitude::PercentVectorNormalized( float _acc[]) {
-  float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
-  return abs(1 - norm);
-}
-
-// Get rotation speed using only gyro
-void Attitude::GetCurrSpeed(float _speed[])
-{
-  // float roll, pitch = 0;
-  float gyroRaw[3] = {0, 0, 0};
-
-  // Get corrected data from gyro and accelero
-  GetCorrectedGyro(gyroRaw);
-
-  _speed[0] = gyroRaw[0];
-  _speed[1] = gyroRaw[1];
-  _speed[2] = gyroRaw[2];
-}
 
 float Attitude::GetFilterTimeConstant(float _loopTimeSec) {
   return ( (HighPassFilterCoeff * _loopTimeSec) / (1 - HighPassFilterCoeff));

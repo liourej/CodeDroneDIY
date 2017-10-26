@@ -161,7 +161,6 @@ void loop() {
     case accro:
       throttle = Rx.GetThrottle();
       Attitude.GetCurrPos( posCurr, speedCurr, loopTimeSec);
-      //Position.GetCurrSpeed( speedCurr);
       if ( throttle > IDLE_THRESHOLD ) {
         stateMachine.throttleWasHigh = true;
         rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loopTimeSec );
@@ -235,8 +234,6 @@ void loop() {
       if ( (stateMachine.state == angle) || (stateMachine.state == accro) ) {
         Serial.println(F("stateMachine.state != disarmed MODE"));
         //Angle mode PID config
-        // anglePosPIDParams[1] = map(analogRead(2), 0, 1023, 100, 500); // Adjust Kp from potentiometer
-        //anglePosPIDParams[3] = map(analogRead(3), 0, 1023, 0, 100); // Adjust Ki from potentiometer
         rollPosPID_Angle.SetGains(anglePosPIDParams);
         pitchPosPID_Angle.SetGains(anglePosPIDParams);
         rollSpeedPID_Angle.SetGains(angleSpeedPIDParams);
