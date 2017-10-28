@@ -4,20 +4,13 @@
 
 void Attitude::Init() {
 
-  // Initialize MS5611 sensor (barometer for altitude). If timeout, there is no barometer, so do not use it
-  int timeout = 0;
-  while ((!ms5611.begin(MS5611_ULTRA_HIGH_RES)) && (timeout <= 4 ) ) {
-    delay(250);
-    timeout++;
-  }
-  if ( timeout <= 4 ) {
-    baro_available = true;
+  // Initialize MS5611 sensor (barometer for altitude)
+  if( baro_available){
+    while (!ms5611.begin(MS5611_ULTRA_HIGH_RES) ){
+      delay(250);
+    }
     delay(500);
     ms5611.refreshTemperature();
-    Serial.println(F("Barometer present"));
-  } else {
-    baro_available = false;
-    Serial.println(F("NO barometer detected !!!"));
   }
 
   // Initialize MPU 6050

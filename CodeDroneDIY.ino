@@ -115,7 +115,7 @@ void loop() {
   {
     /*********** ANGLE STATE ***********/
     case angle:
-      if ( Attitude.baro_available == true) {
+      if ( Attitude.baro_available ) {
         // Compute vertical speed
         if ( altiTime.GetExecutionTimeMilliseconds(0) >= ALTI_REFRESH_PERIOD) {
           verticalSpeed = Attitude.GetVerticalSpeed();
