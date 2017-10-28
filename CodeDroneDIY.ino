@@ -15,10 +15,10 @@ void setup() {
   pinMode(13, OUTPUT);
 
   // ESC
-  ESC0.attach(2); // ESC0 on PD4 pin (physical pin 2)
-  ESC1.attach(9); // ESC1 on PD5 pin (physical pin 9)
-  ESC2.attach(10); // ESC2 on PD6 pin (physical pin 10)
-  ESC3.attach(11); // ESC3 on PD7 pin (physical pin 11)
+  ESC0.attach(4); // ESC0 on PD4 pin (physical pin 2)
+  ESC1.attach(5); // ESC1 on PD5 pin (physical pin 9)
+  ESC2.attach(6); // ESC2 on PD6 pin (physical pin 10)
+  ESC3.attach(7); // ESC3 on PD7 pin (physical pin 11)
 
   IdleAllESC();
 
@@ -51,13 +51,13 @@ void setup() {
   wdt_enable(WDTO_250MS);
 
   if ( (MAX_POWER == 1860) && (MAX_THROTTLE >= (1860 * 0.8)) )
-    Serial.println(F("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!FLYING MODE POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\t"));
+    Serial.println(F("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!FLYING MODE POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "));
   else if ( (MAX_POWER <= 1300) )
-    Serial.println(F("DEBUG MODE POWER!!!\t"));
+    Serial.println(F("DEBUG MODE POWER!!! "));
   else
-    Serial.println(F("UNEXPECTED POWER\t"));
+    Serial.println(F("UNEXPECTED POWER "));
 
-  Serial.print(F("MAX_POWER:\t")); Serial.print(MAX_POWER);  Serial.print(F("MAX_THROTTLE_PERCENT:\t")); Serial.println(MAX_THROTTLE_PERCENT);
+  Serial.print(F("MAX_POWER: ")); Serial.print(MAX_POWER);  Serial.print(F("MAX_THROTTLE_PERCENT: ")); Serial.println(MAX_THROTTLE_PERCENT);
 
   Serial.println(F("Setup Finished"));
 }
@@ -224,7 +224,6 @@ void loop() {
       break;
     /*********** STARTING STATE ***********/
     case starting:
-      Serial.println(F("stateMachine.state starting"));
       IdleAllESC();
       stateMachine.state = Rx.GetFlyingMode();
       Pause500ms();

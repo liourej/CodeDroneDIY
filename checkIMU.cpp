@@ -68,7 +68,7 @@ bool CheckGyro(MPU6050 _accelgyro) {
   }
   //Serial.print("FT:\t"); Serial.print(FT[3]); Serial.print("\t"); Serial.print(FT[4]); Serial.print("\t"); Serial.println(FT[5]);
   //Serial.print("STR:\t"); Serial.print(STR[3]); Serial.print("\t"); Serial.print(STR[4]); Serial.print("\t"); Serial.println(STR[5]);
-  Serial.print("Gyro trim test results:\t"); Serial.print(trimChange[3]); Serial.print("\t"); Serial.print(trimChange[4]); Serial.print("\t"); Serial.println(trimChange[5]);
+  Serial.print("Gyro trim test results: "); Serial.print(trimChange[3]); Serial.print(" "); Serial.print(trimChange[4]); Serial.print(" "); Serial.println(trimChange[5]);
 
   // Restore normal operating
   I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT, false);
@@ -126,7 +126,7 @@ bool CheckAccelero(MPU6050 _accelgyro, const float _acceleroSensitivity) {
 //  Serial.print("FT:\t"); Serial.print(FT[0]); Serial.print("\t"); Serial.print(FT[1]); Serial.print("\t"); Serial.println(FT[2]);
 //  Serial.print("STR:\t"); Serial.print(STR[0]); Serial.print("\t"); Serial.print(STR[1]); Serial.print("\t"); Serial.println(STR[2]);
 
-  Serial.print("Acc trim test results:\t"); Serial.print(trimChange[0]); Serial.print("\t"); Serial.print(trimChange[1]); Serial.print("\t"); Serial.println(trimChange[2]);
+  Serial.print("Acc trim test results: "); Serial.print(trimChange[0]); Serial.print(" "); Serial.print(trimChange[1]); Serial.print(" "); Serial.println(trimChange[2]);
 
   // Restore normal operating
   _accelgyro.setAccelXSelfTest(false);

@@ -101,9 +101,14 @@ void Attitude::ComputeOffsets()
 
   if (offsetComputed) {
     Serial.print(F("Offsets Computed :"));
-    for (int i = 0; i < 6; i++) {
-      Serial.print(offset[i]); Serial.print("\t");
+    for (int i = 0; i < 3; i++) {
+      Serial.print(offset[i]/AcceleroSensitivity); Serial.print(" ");
     }
+    Serial.print("(m.s-2) ");
+    for (int i = 3; i < 6; i++) {
+      Serial.print(offset[i]/GyroSensitivity); Serial.print(" ");
+    }
+    Serial.print("(deg.s-1) ");
     Serial.print("\n");
   } else
     Serial.println(F("ERROR DURING OFFSETS COMPUTATION !!"));
