@@ -17,8 +17,8 @@ float angleSpeedPIDParams[4] = { 0.010, 192, 0.0, 0.0};
 float altiSpeedPIDParams[4] = { 0.010, 10, 0.0, 0.0};
 
 // Accro mode
-//float accroSpeedPIDParams[4] = { 0.010, 192, 0.25, 0.0}; // Tested during flight test: OK
-float accroSpeedPIDParams[4] = { 0.010, 192, 0.0, 0.0};
+//float accroSpeedPIDParams[4] = { 0.010, 192, 0.0, 0.0}; // 450mm frame, 10x4.5" bi-pale - Tested during flight test: OK
+float accroSpeedPIDParams[4] = {10.0, 0.80, 0.30, 0.005}; // 220 mm frame, 5x4.5" bi-pale
 #define ACCRO_YAW_KP 0 // Not used for now
 
 //Yaw PID

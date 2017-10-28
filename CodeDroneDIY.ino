@@ -8,6 +8,13 @@
 // 40 minutes sur le mode accro
 // Résultats: oscillations au bout de 40 minutes
 
+void Pause500ms() {
+  for (int loop = 0; loop < 5; loop++) {
+    delay(100);
+    wdt_reset();
+  }
+}
+
 void setup() {
 
   // Buzzer
@@ -15,12 +22,13 @@ void setup() {
   pinMode(13, OUTPUT);
 
   // ESC
-  ESC0.attach(4); // ESC0 on PD4 pin (physical pin 2)
+  DDRD = 0b11110000;
+  /*ESC0.attach(4); // ESC0 on PD4 pin (physical pin 2)
   ESC1.attach(5); // ESC1 on PD5 pin (physical pin 9)
   ESC2.attach(6); // ESC2 on PD6 pin (physical pin 10)
   ESC3.attach(7); // ESC3 on PD7 pin (physical pin 11)
-
-  IdleAllESC();
+*/
+  //IdleAllESC();
 
   InitTimer1();
 
@@ -39,8 +47,10 @@ void setup() {
   Attitude.Init();
 
   while ( !Rx.IsReady() ) {
+    Serial.println(F("Rx not ready, try again, please wait. "));
     IdleAllESC();
-    delay(10);
+    wdt_reset();
+    delay(200);
   }
 
   time.InitAllCounters();
@@ -57,7 +67,11 @@ void setup() {
   else
     Serial.println(F("UNEXPECTED POWER "));
 
-  Serial.print(F("MAX_POWER: ")); Serial.print(MAX_POWER);  Serial.print(F("MAX_THROTTLE_PERCENT: ")); Serial.println(MAX_THROTTLE_PERCENT);
+  Serial.print(F("MAX_POWER: ")); Serial.print(MAX_POWER);  Serial.print(F(" MAX_THROTTLE_PERCENT: ")); Serial.println(MAX_THROTTLE_PERCENT);
+
+  // TODO dirty, but needed for BH_HELI_S, in order to avoid it enter in calibration mode (need to keep ESC idle some seconds):
+  for (int pause = 0; pause < 10; pause++)
+    Pause500ms();
 
   Serial.println(F("Setup Finished"));
 }
@@ -88,13 +102,6 @@ void ResetPIDCommand( int *_rollMotorPwr, int *_pitchMotorPwr, int *_yawMotorPwr
   altiSpeedPID_Angle.Reset();
 }
 
-void Pause500ms() {
-  for (int loop = 0; loop < 5; loop++) {
-    delay(100);
-    wdt_reset();
-  }
-}
-
 void loop() {
   static float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
   static float posCurr[3] = { 0.0, 0.0, 0.0 }; // Teta position (°) (use gyro + accelero)
@@ -110,6 +117,16 @@ void loop() {
   static int tempState = disarmed;
   // State Machine
   // initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
+bool calibrationESC = false;
+if( calibrationESC ){
+  throttle = Rx.GetThrottle();
+  ESC0.write( throttle );
+  ESC1.write( throttle );
+  ESC2.write( throttle );
+  ESC3.write( throttle );
+  Serial.println(throttle);
+  delay(50);
+}else{
 
   switch ( stateMachine.state )
   {
@@ -166,7 +183,6 @@ void loop() {
         rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loopTimeSec );
         pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection( Rx.GetElevatorSpeed(), speedCurr[1], loopTimeSec );
         yawMotorPwr = yawSpeedPID_Accro.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
-
         // Allow to change flying mode during flight
         tempState = Rx.GetFlyingMode();
         if ( tempState == angle ) {
@@ -230,6 +246,12 @@ void loop() {
       if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
         stateMachine.state = starting;
 
+      // Get yaw PID Kp from thottle if inter is activated
+      if( Rx.GetSwitchH() == false ){
+          yawSpeedPIDParams[1] = map(Rx.GetThrottle(), MIN_POWER, MAX_THROTTLE, 0, 1000); // Adjust Kp from throttle
+          Serial.println(yawSpeedPIDParams[1]);
+      }
+
       if ( (stateMachine.state == angle) || (stateMachine.state == accro) ) {
         Serial.println(F("stateMachine.state != disarmed MODE"));
         //Angle mode PID config
@@ -237,6 +259,7 @@ void loop() {
         pitchPosPID_Angle.SetGains(anglePosPIDParams);
         rollSpeedPID_Angle.SetGains(angleSpeedPIDParams);
         pitchSpeedPID_Angle.SetGains(angleSpeedPIDParams);
+
         yawSpeedPID_Angle.SetGains(yawSpeedPIDParams);
 
         altiSpeedPIDParams[1] = map(analogRead(2), 0, 1023, 0, 500); // Adjust Kp from potentiometer
@@ -263,6 +286,7 @@ void loop() {
     if ( loopNb > 1000) {
       meanLoopTime = meanLoopTime / loopNb;
       Serial.println(meanLoopTime, 2);
+      Serial.println(yawSpeedPIDParams[1]);
       //Serial.println(Position.GetFilterTimeConstant(meanLoopTime));
       meanLoopTime = 0;
       loopNb = 0;
@@ -271,6 +295,7 @@ void loop() {
       loopNb++;
     }
   }
+}
 
   wdt_reset();
 }
