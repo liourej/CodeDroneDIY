@@ -75,8 +75,8 @@ void XConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotor
   ESC3.write( _throttle + _pitchMotorPwr * mixing + _rollMotorPwr * mixing  + _YawMotorPwr * mixing);
 }
 
-void ResetPIDCommand( int _rollMotorPwr, int _pitchMotorPwr, int _yawMotorPwr ) {
-  _pitchMotorPwr = _rollMotorPwr = _yawMotorPwr = 0; // No correction if throttle put to min
+void ResetPIDCommand( int *_rollMotorPwr, int *_pitchMotorPwr, int *_yawMotorPwr ) {
+  *_pitchMotorPwr = *_rollMotorPwr = *_yawMotorPwr = 0; // No correction if throttle put to min
   rollPosPID_Angle.Reset();
   pitchPosPID_Angle.Reset();
   rollSpeedPID_Angle.Reset();
@@ -127,7 +127,7 @@ void loop() {
           altiTime.Init(1);
         }
       }
-      
+
       throttle = Rx.GetThrottle();
       Attitude.GetCurrPos(posCurr, speedCurr, loopTimeSec);
       if ( throttle > IDLE_THRESHOLD ) {
@@ -139,11 +139,11 @@ void loop() {
         pitchMotorPwr = pitchSpeedPID_Angle.ComputeCorrection( pitchPosCmd, speedCurr[1], loopTimeSec );
 
         yawMotorPwr = yawSpeedPID_Angle.ComputeCorrection( Rx.GetRudder(), speedCurr[2], loopTimeSec );
-        
+
         if ( Attitude.baro_available == true) {
           throttle = altiSpeedPID_Angle.ComputeCorrection( Rx.GetVerticalSpeed(), verticalSpeed, loopTimeSec );
         }
-        
+
         // Allow to change flying mode during flight
         tempState = Rx.GetFlyingMode();
         if ( tempState == accro ) {
@@ -152,7 +152,7 @@ void loop() {
         }
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 20 s without power.
-        ResetPIDCommand(rollMotorPwr, pitchMotorPwr, yawMotorPwr);
+        ResetPIDCommand(&rollMotorPwr, &pitchMotorPwr, &yawMotorPwr);
       }
       XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
 
@@ -175,7 +175,7 @@ void loop() {
         }
       } else {
         stateMachine.RefreshState();// Safety cut management: set safety cut after 5 s without power.
-        ResetPIDCommand(rollMotorPwr, pitchMotorPwr, yawMotorPwr);
+        ResetPIDCommand(&rollMotorPwr, &pitchMotorPwr, &yawMotorPwr);
       }
       XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
 
