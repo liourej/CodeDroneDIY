@@ -52,11 +52,9 @@ class StateMachine {
         Time time;
         time.Init(0);
         while ( (time.GetExecutionTimeMilliseconds(0)) < _duration) {
-          digitalWrite(12, HIGH);
-          digitalWrite(13, HIGH);
+          digitalWrite(BUZZER_PIN, HIGH);
           delayMicroseconds(1800);
-          digitalWrite(12, LOW);
-          digitalWrite(13, LOW);
+          digitalWrite(BUZZER_PIN, LOW);
           delay(10);
           wdt_reset();
           Serial.println(F("BUZZZZZ"));

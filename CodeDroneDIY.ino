@@ -18,16 +18,14 @@ void Pause500ms() {
 void setup() {
 
   // Buzzer
-  pinMode(12, OUTPUT);
-  pinMode(13, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
 
   // ESC
-  DDRD = 0b11110000;
-  /*ESC0.attach(4); // ESC0 on PD4 pin (physical pin 2)
-  ESC1.attach(5); // ESC1 on PD5 pin (physical pin 9)
-  ESC2.attach(6); // ESC2 on PD6 pin (physical pin 10)
-  ESC3.attach(7); // ESC3 on PD7 pin (physical pin 11)
-*/
+  ESC0.attach(4); // ESC0 on PD4 pin (Digital pin 4)
+  ESC1.attach(5); // ESC0 on PD4 pin (Digital pin 5)
+  ESC2.attach(6); // ESC0 on PD4 pin (Digital pin 6)
+  ESC3.attach(7); // ESC0 on PD4 pin (Digital pin 7)
+
   //IdleAllESC();
 
   InitTimer1();
@@ -246,11 +244,7 @@ if( calibrationESC ){
       if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
         stateMachine.state = starting;
 
-      // Get yaw PID Kp from thottle if inter is activated
-      if( Rx.GetSwitchH() == false ){
-          yawSpeedPIDParams[1] = map(Rx.GetThrottle(), MIN_POWER, MAX_THROTTLE, 0, 1000); // Adjust Kp from throttle
-          Serial.println(yawSpeedPIDParams[1]);
-      }
+
 
       if ( (stateMachine.state == angle) || (stateMachine.state == accro) ) {
         Serial.println(F("stateMachine.state != disarmed MODE"));
@@ -260,9 +254,10 @@ if( calibrationESC ){
         rollSpeedPID_Angle.SetGains(angleSpeedPIDParams);
         pitchSpeedPID_Angle.SetGains(angleSpeedPIDParams);
 
+        yawSpeedPIDParams[1] = map(analogRead(0), 0, 1023, 0, 500); // Adjust Kp from potentiometer on A0
         yawSpeedPID_Angle.SetGains(yawSpeedPIDParams);
 
-        altiSpeedPIDParams[1] = map(analogRead(2), 0, 1023, 0, 500); // Adjust Kp from potentiometer
+        altiSpeedPIDParams[1] = map(analogRead(2), 0, 1023, 0, 500); // Adjust Kp from potentiometer on A2
         altiSpeedPID_Angle.SetGains(altiSpeedPIDParams);
 
         //Accro mode PID config

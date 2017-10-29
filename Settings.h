@@ -5,8 +5,11 @@
 #define MAX_THROTTLE MAX_POWER*(MAX_THROTTLE_PERCENT/100.0) // Threshold on max throttle command (percent of max motor power)
 #define IDLE_THRESHOLD 1100
 
-//Reception setup
+// Reception setup
 #define CHANNELS_NB 7
+
+// Buzzer for lost model alarm
+#define BUZZER_PIN  8
 
 // PID setup
 #define GAIN 0.010
@@ -18,7 +21,8 @@ float altiSpeedPIDParams[4] = { 0.010, 10, 0.0, 0.0};
 
 // Accro mode
 //float accroSpeedPIDParams[4] = { 0.010, 192, 0.0, 0.0}; // 450mm frame, 10x4.5" bi-pale - Tested during flight test: OK
-float accroSpeedPIDParams[4] = {10.0, 0.80, 0.30, 0.005}; // 220 mm frame, 5x4.5" bi-pale
+float accroSpeedPIDParams[4] = {0.1, 80.0, 30.0, 0.5}; // 220 mm frame, 5x4.5" bi-pale
+
 #define ACCRO_YAW_KP 0 // Not used for now
 
 //Yaw PID
