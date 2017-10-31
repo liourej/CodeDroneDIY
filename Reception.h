@@ -20,9 +20,9 @@ class Reception
 
   public:
     void PrintCmd(void) {
-      Serial.print(F("Aile: ")); Serial.print(cPPM[0]); Serial.print(F("\tElev: ")); Serial.print(cPPM[1]);
-      Serial.print(F("\tThrot: ")); Serial.print(cPPM[2]); Serial.print(F("\tRudd: ")); Serial.println(cPPM[3]);
-      Serial.print(F("Switch1: ")); Serial.print(cPPM[4]); Serial.print(F("\tSwitch2: ")); Serial.println(cPPM[5]);
+      Serial.print(F("Aile: ")); Serial.print(cPPM[0]); Serial.print(F(" Elev: ")); Serial.print(cPPM[1]);
+      Serial.print(F(" Throt: ")); Serial.print(cPPM[2]); Serial.print(F(" Rudd: ")); Serial.println(cPPM[3]);
+      Serial.print(F("Switch1: ")); Serial.print(cPPM[4]); Serial.print(F(" Switch2: ")); Serial.println(cPPM[5]);
     }
 
     bool  IsReady() {
@@ -47,7 +47,7 @@ class Reception
     inline int GetThrottle() {
       return map(cPPM[2], 1080, 1900, MIN_POWER, MAX_THROTTLE);
     };
-    
+
     inline float GetVerticalSpeed() {
       if (cPPM[2] < ALTI_LOW_ZONE)
         return map(cPPM[2], 1080, ALTI_LOW_ZONE, -ALTI_MAX_VERTICAL_SPEED, 0);

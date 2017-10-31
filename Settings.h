@@ -1,7 +1,7 @@
 // Power setup
 #define MIN_POWER 1060
 #define MAX_POWER 1860 // Max power available to stabilize quardirotors - Set to 1860 to reach max power
-#define MAX_THROTTLE_PERCENT 80.0
+#define MAX_THROTTLE_PERCENT 100.0
 #define MAX_THROTTLE MAX_POWER*(MAX_THROTTLE_PERCENT/100.0) // Threshold on max throttle command (percent of max motor power)
 #define IDLE_THRESHOLD 1100
 
@@ -21,7 +21,7 @@ float altiSpeedPIDParams[4] = { 0.010, 10, 0.0, 0.0};
 
 // Accro mode
 //float accroSpeedPIDParams[4] = { 0.010, 192, 0.0, 0.0}; // 450mm frame, 10x4.5" bi-pale - Tested during flight test: OK
-float accroSpeedPIDParams[4] = {0.1, 80.0, 30.0, 0.5}; // 220 mm frame, 5x4.5" bi-pale
+float accroSpeedPIDParams[4] = {0.08, 80.0, 30.0, 0.5}; // 220 mm frame, 5x4.5" bi-pale
 
 #define ACCRO_YAW_KP 0 // Not used for now
 

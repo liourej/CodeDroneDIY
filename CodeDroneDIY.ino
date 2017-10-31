@@ -196,6 +196,7 @@ if( calibrationESC ){
       break;
     /*********** SAFETY STATE ***********/
     case safety:
+      IdleAllESC();
       stateMachine.state = Rx.GetFlyingMode();
       if ( stateMachine.state != disarmed ) {
         IdleAllESC();
@@ -206,6 +207,7 @@ if( calibrationESC ){
       break;
     /*********** DISARMED STATE ***********/
     case disarmed:
+      IdleAllESC();
       stateMachine.state = Rx.GetFlyingMode();
       Pause500ms();
       if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
@@ -255,6 +257,7 @@ if( calibrationESC ){
         pitchSpeedPID_Angle.SetGains(angleSpeedPIDParams);
 
         yawSpeedPIDParams[1] = map(analogRead(0), 0, 1023, 0, 500); // Adjust Kp from potentiometer on A0
+        Serial.print("Yaw kP: ");Serial.println(yawSpeedPIDParams[1]);
         yawSpeedPID_Angle.SetGains(yawSpeedPIDParams);
 
         altiSpeedPIDParams[1] = map(analogRead(2), 0, 1023, 0, 500); // Adjust Kp from potentiometer on A2
@@ -280,8 +283,8 @@ if( calibrationESC ){
   if ( ((stateMachine.state == angle) || (stateMachine.state == accro)) && ( throttle > IDLE_THRESHOLD )) {
     if ( loopNb > 1000) {
       meanLoopTime = meanLoopTime / loopNb;
-      Serial.println(meanLoopTime, 2);
-      Serial.println(yawSpeedPIDParams[1]);
+      //Serial.println(meanLoopTime, 2);
+      //Serial.println(yawSpeedPIDParams[1]);
       //Serial.println(Position.GetFilterTimeConstant(meanLoopTime));
       meanLoopTime = 0;
       loopNb = 0;

@@ -33,7 +33,7 @@ class ESC
     };
 
     inline void Idle(){
-     ticks = PWM = MIN_POWER;
+      ticks = PWM = MIN_POWER;
     }
 
     inline uint16_t GetTicks() {

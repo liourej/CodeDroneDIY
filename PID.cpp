@@ -25,5 +25,5 @@ int PID::ComputeCorrection( float _cmd, float _pos, float _loopTime ) {
 };
 
 void PID::PrintGains(void) {
-  Serial.print("G: "); Serial.print(G); Serial.print("\tKp: "); Serial.print(Kp); Serial.print("\tKd: "); Serial.print(Kd); Serial.print("\tKi: "); Serial.println(Ki);
+  Serial.print("G: "); Serial.print(G); Serial.print(" Kp: "); Serial.print(Kp); Serial.print(" Kd: "); Serial.print(Kd); Serial.print(" Ki: "); Serial.println(Ki);
 };

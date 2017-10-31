@@ -64,7 +64,7 @@ void PrintSettings(StateMachine _stateMachine) {
     pitchSpeedPID_Angle.PrintGains();
     yawSpeedPID_Angle.PrintGains();
     Serial.println(F("/********* Complementary filter *********/"));
-    Serial.print("Coefficient:\t"); Serial.print(Attitude.HighPassFilterCoeff); Serial.print(" Time constant: "); Serial.println(Attitude.GetFilterTimeConstant(0.00249));
+    Serial.print("Coefficient: "); Serial.print(Attitude.HighPassFilterCoeff); Serial.print(" Time constant: "); Serial.println(Attitude.GetFilterTimeConstant(0.00249));
   } else if ( _stateMachine.state == accro) {
     Serial.println(F("FLYING_MODE_ACCRO"));
     Serial.println(F("/********* PID settings *********/"));
@@ -77,7 +77,7 @@ void PrintSettings(StateMachine _stateMachine) {
     Serial.println(F("SAFETY"));
   }
 
-  Serial.print(F("Mixing:\t")); Serial.println(mixing);
+  Serial.print(F("Mixing: ")); Serial.println(mixing);
   Serial.println(F("/********* Receiver settings *********/"));
   Rx.PrintCmd();
   Serial.println(F("/********* MPU 6050 Configuration *********/"));
