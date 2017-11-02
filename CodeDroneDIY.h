@@ -2,12 +2,11 @@
 #include <avr/wdt.h>
 #include "Settings.h"
 #include "Attitude.h"
-#include "ESC.h"
 #include "Reception.h"
 #include "Time.h"
 #include "PID.h"
-#include "SetPWM.h"
 #include "StateMachine.h"
+#include "ESC.h"
 
 typedef enum { _timer1, _Nbr_16timers } timer16_Sequence_t;
 
@@ -15,6 +14,7 @@ Time time;
 Time altiTime;
 
 Reception Rx;
+ESC ESCs;
 
 PID rollPosPID_Angle, pitchPosPID_Angle, yawPosPID_Angle;
 PID rollSpeedPID_Angle, pitchSpeedPID_Angle, yawSpeedPID_Angle, altiSpeedPID_Angle;
@@ -22,15 +22,8 @@ PID rollSpeedPID_Accro, pitchSpeedPID_Accro, yawSpeedPID_Accro;
 Attitude Attitude;
 StateMachine stateMachine;
 
-void IdleAllESC() {
-  ESC0.Idle();
-  ESC1.Idle();
-  ESC2.Idle();
-  ESC3.Idle();
-}
-
 static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t *TCNTn, volatile uint16_t* OCRnA) {
-  SetPWM_f5(TCNTn, OCRnA);
+  ESCs.SetPWM_f5(TCNTn, OCRnA);
 }
 
 SIGNAL (TIMER1_COMPA_vect) {

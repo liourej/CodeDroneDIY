@@ -1,4 +1,3 @@
-
 #include "CodeDroneDIY.h"
 
 // 07/08/2017
@@ -21,12 +20,7 @@ void setup() {
   pinMode(BUZZER_PIN, OUTPUT);
 
   // ESC
-  ESC0.attach(4); // ESC0 on PD4 pin (Digital pin 4)
-  ESC1.attach(5); // ESC0 on PD4 pin (Digital pin 5)
-  ESC2.attach(6); // ESC0 on PD4 pin (Digital pin 6)
-  ESC3.attach(7); // ESC0 on PD4 pin (Digital pin 7)
-
-  //IdleAllESC();
+  ESCs.Init();
 
   InitTimer1();
 
@@ -46,7 +40,7 @@ void setup() {
 
   while ( !Rx.IsReady() ) {
     Serial.println(F("Rx not ready, try again, please wait. "));
-    IdleAllESC();
+   ESCs.Idle();
     wdt_reset();
     delay(200);
   }
@@ -81,10 +75,10 @@ void setup() {
 //     ESC3   ESC2(CCW)
 //
 void XConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotorPwr) {
-  ESC0.write( _throttle - _pitchMotorPwr * mixing + _rollMotorPwr * mixing - _YawMotorPwr * mixing);
-  ESC1.write( _throttle - _pitchMotorPwr * mixing - _rollMotorPwr * mixing + _YawMotorPwr * mixing);
-  ESC2.write( _throttle + _pitchMotorPwr * mixing - _rollMotorPwr * mixing - _YawMotorPwr * mixing);
-  ESC3.write( _throttle + _pitchMotorPwr * mixing + _rollMotorPwr * mixing  + _YawMotorPwr * mixing);
+  ESCs.write(0, _throttle - _pitchMotorPwr * mixing + _rollMotorPwr * mixing - _YawMotorPwr * mixing);
+  ESCs.write(1,  _throttle - _pitchMotorPwr * mixing - _rollMotorPwr * mixing + _YawMotorPwr * mixing);
+  ESCs.write(2,  _throttle + _pitchMotorPwr * mixing - _rollMotorPwr * mixing - _YawMotorPwr * mixing);
+  ESCs.write(3,  _throttle + _pitchMotorPwr * mixing + _rollMotorPwr * mixing  + _YawMotorPwr * mixing);
 }
 
 void ResetPIDCommand( int *_rollMotorPwr, int *_pitchMotorPwr, int *_yawMotorPwr ) {
@@ -118,10 +112,10 @@ void loop() {
 bool calibrationESC = false;
 if( calibrationESC ){
   throttle = Rx.GetThrottle();
-  ESC0.write( throttle );
-  ESC1.write( throttle );
-  ESC2.write( throttle );
-  ESC3.write( throttle );
+  ESCs.write( 0, throttle );
+  ESCs.write( 1, throttle );
+  ESCs.write( 2, throttle );
+  ESCs.write( 3, throttle );
   Serial.println(throttle);
   delay(50);
 }else{
@@ -196,10 +190,10 @@ if( calibrationESC ){
       break;
     /*********** SAFETY STATE ***********/
     case safety:
-      IdleAllESC();
+      ESCs.Idle();
       stateMachine.state = Rx.GetFlyingMode();
       if ( stateMachine.state != disarmed ) {
-        IdleAllESC();
+        ESCs.Idle();
         stateMachine.state = safety;
       }
 
@@ -207,7 +201,7 @@ if( calibrationESC ){
       break;
     /*********** DISARMED STATE ***********/
     case disarmed:
-      IdleAllESC();
+      ESCs.Idle();
       stateMachine.state = Rx.GetFlyingMode();
       Pause500ms();
       if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
@@ -226,7 +220,7 @@ if( calibrationESC ){
       break;
     /*********** INITIALIZATION STATE ***********/
     case initialization:
-      IdleAllESC();
+      ESCs.Idle();
       while (!Attitude.AreOffsetComputed())
         Attitude.ComputeOffsets();
 
@@ -240,7 +234,7 @@ if( calibrationESC ){
       break;
     /*********** STARTING STATE ***********/
     case starting:
-      IdleAllESC();
+      ESCs.Idle();
       stateMachine.state = Rx.GetFlyingMode();
       Pause500ms();
       if (  stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state

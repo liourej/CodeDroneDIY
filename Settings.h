@@ -1,3 +1,6 @@
+#ifndef SETTINGS_H
+#define SETTINGS_H
+
 // Power setup
 #define MIN_POWER 1060
 #define MAX_POWER 1860 // Max power available to stabilize quardirotors - Set to 1860 to reach max power
@@ -40,3 +43,5 @@ unsigned int ALTI_TEMP_REFRESH_PERIOD = 60000; // (ms)
 #define MAX_ROT_SPEED  135 // (°/s) Max roll and pitch speed in accro mode
 #define MAX_YAW_SPEED  135// (°/s) Max yaw speed in accro and angle modes
 // MAX_THROTTLE set at the top of this file
+
+#endif // not defined SETTINGS_H
