@@ -26,6 +26,12 @@ class Attitude
     bool baro_available = false;
 
   private:
+    bool initialized = false;
+    float altiPrev = 0.0;
+    float measures[10];
+    int indice = 0;
+    const int samplesNb = 10; // Samples number for altitude mean computation
+  private:
     MPU6050 accelgyro; // IMU
     MS5611 ms5611; // Barometer for altitude stabilization
     void GetCorrectedAccelGyro( float _accMeasures[], float _gyroMeasures[]);

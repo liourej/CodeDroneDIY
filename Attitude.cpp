@@ -153,11 +153,7 @@ void Attitude::GetCurrPos(float _pos[], float _speed[], float _loop_time)
 
 float Attitude::GetVerticalSpeed(void) {
   long realPressure = 0;
-  static bool initialized = false;
-  static float altiPrev = 0.0;
   float altiCurr = 0.0;
-  static float measures[10];
-  static int indice = 0;
   float mean = 0.0;
   float verticalSpeed = 0.0;
 
@@ -167,7 +163,7 @@ float Attitude::GetVerticalSpeed(void) {
   measures[indice] = ms5611.getAltitude(realPressure);
   indice++;
 
-  if ( indice > 9) {
+  if ( indice >= samplesNb) {
     indice = 0;
     initialized = true;
   }
@@ -177,11 +173,11 @@ float Attitude::GetVerticalSpeed(void) {
 
   // Compute mean altitude
   mean = 0.0;
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < samplesNb; i++)
     mean = mean + measures[indice];
 
   // Compute vertical speed
-  altiCurr = mean / 10;
+  altiCurr = mean / samplesNb;
   verticalSpeed = altiCurr - altiPrev;
   altiPrev = altiCurr;
 

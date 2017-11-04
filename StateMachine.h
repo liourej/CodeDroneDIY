@@ -46,8 +46,8 @@ class StateMachine {
       setBuzzer = false;
     }
 
+    // Activate buzzer after x minutes of power idle
     void ActivateBuzzer(int _duration) {
-
       if( setBuzzer ){
         Time time;
         time.Init(0);
@@ -63,6 +63,7 @@ class StateMachine {
         setBuzzer = true;
     }
 
+    // When accro or angle mode is enabled, this function is used to disarm ESC when throttle is set to idle for a long  period	
     void RefreshState() {
       if ( throttleWasHigh ) {
         Serial.println(F("Throttle just setted low!"));
