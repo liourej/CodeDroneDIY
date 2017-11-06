@@ -3,6 +3,9 @@ extern Reception Rx;
 
 class StateMachine {
   private:
+    // Buzzer for lost model alarm
+    const int BUZZER_PIN  = 7;
+
     const int delayThreshold = 5; // (s)
 
     Time elapsedTime;
@@ -41,6 +44,9 @@ class StateMachine {
 
     }
     void Init() {
+      // Buzzer
+      pinMode(BUZZER_PIN, OUTPUT);
+
       elapsedTime.Init(0);
       timeBuzzer.Init(0);
       setBuzzer = false;

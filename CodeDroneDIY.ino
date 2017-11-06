@@ -1,6 +1,5 @@
 #include <math.h>
 #include <avr/wdt.h>
-#include "Settings.h"
 #include "ESC.h"
 #include "Time.h"
 #include "Reception.h"
@@ -16,6 +15,8 @@ extern float accroSpeedPIDParams[4];
 extern float ACCRO_YAW_KP;
 extern float yawSpeedPIDParams[4];
 const float mixing = 0.5;
+const float ALTI_REFRESH_PERIOD = 95; // (ms)
+const unsigned int ALTI_TEMP_REFRESH_PERIOD = 60000; // (ms)
 
 Time time;
 Time altiTime;
@@ -100,10 +101,7 @@ void Pause500ms() {
 
 void setup() {
 
-  // Buzzer
-  pinMode(BUZZER_PIN, OUTPUT);
-
-  // ESC
+ // ESC
   ESCs.Init();
 
   InitTimer1();
@@ -181,9 +179,7 @@ void ResetPIDCommand( int *_rollMotorPwr, int *_pitchMotorPwr, int *_yawMotorPwr
 void loop() {
   static float speedCurr[3] = { 0.0, 0.0, 0.0 }; // Teta speed (°/s) (only use gyro)
   static float posCurr[3] = { 0.0, 0.0, 0.0 }; // Teta position (°) (use gyro + accelero)
-  static int g_iloop = 0;
-  static float g_MeanLoop = 0;
-  static int loopNb = 0;
+  static uint8_t loopNb = 0;
   static float meanLoopTime =  0;
   uint8_t throttle = 0;
   static float verticalSpeed = 0.0;
@@ -193,23 +189,23 @@ void loop() {
   static int tempState = disarmed;
   // State Machine
   // initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
-bool calibrationESC = false;
-if( calibrationESC ){
-  throttle = Rx.GetThrottle();
-  ESCs.write( ESC0, throttle );
-  ESCs.write( ESC1, throttle );
-  ESCs.write( ESC2, throttle );
-  ESCs.write( ESC3, throttle );
-  Serial.println(throttle);
-  delay(50);
-}else{
+  bool calibrationESC = false;
+  if( calibrationESC ){
+    throttle = Rx.GetThrottle();
+    ESCs.write( ESC0, throttle );
+    ESCs.write( ESC1, throttle );
+    ESCs.write( ESC2, throttle );
+    ESCs.write( ESC3, throttle );
+    Serial.println(throttle);
+    delay(50);
+  }else{
 
-  switch ( stateMachine.state )
-  {
-    /*********** ANGLE STATE ***********/
-    case angle:
-      if ( Attitude.baro_available ) {
-        // Compute vertical speed
+    switch ( stateMachine.state )
+    {
+      /*********** ANGLE STATE ***********/
+      case angle:
+	if ( Attitude.baro_available ) {
+	  // Compute vertical speed
         if ( altiTime.GetExecutionTimeMilliseconds(0) >= ALTI_REFRESH_PERIOD) {
           verticalSpeed = Attitude.GetVerticalSpeed();
           altiTime.Init(0);
@@ -361,7 +357,7 @@ if( calibrationESC ){
   if ( ((stateMachine.state == angle) || (stateMachine.state == accro)) && ( throttle > ESCs.IDLE_THRESHOLD )) {
     if ( loopNb > 1000) {
       meanLoopTime = meanLoopTime / loopNb;
-      //Serial.println(meanLoopTime, 2);
+      Serial.println(meanLoopTime, 2);
       //Serial.println(yawSpeedPIDParams[1]);
       //Serial.println(Position.GetFilterTimeConstant(meanLoopTime));
       meanLoopTime = 0;

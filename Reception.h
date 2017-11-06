@@ -16,6 +16,11 @@ class Reception
     const float MAX_ROT_SPEED  = 135; // (°/s) Max roll and pitch speed in accro mode
     const float MAX_YAW_SPEED  = 135;// (°/s) Max yaw speed in accro and angle modes
 
+    // Altitute hold parameters
+    const float ALTI_DEAD_ZONE = 0.4; // (%) altimeter dead zone
+    const float ALTI_LOW_ZONE = 1080+1900*((1-ALTI_DEAD_ZONE)/2); // Upper this limit, vertical speed is positive
+    const float ALTI_HIGH_ZONE = 1900-1900*((1-ALTI_DEAD_ZONE)/2); // Under this limit, vertical speed is negative
+
     // Channel 1: Ailerons 1.09 to 1.90 ms
     // Channel 2: Prof 1.09 to 1.90 ms
     // Channel 3: Throttle 1.09 to 1.90 ms
