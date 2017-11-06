@@ -3,8 +3,19 @@
 
 enum Mode { initialization, starting, safety, disarmed, accro, angle};
 
+#define CHANNELS_NB  7
+
+extern ESC ESCs;
+
 class Reception
 {
+  public:
+    // Reception setup
+    const float ALTI_MAX_VERTICAL_SPEED = 2; //(2 m.s-1)
+    const float MAX_ANGLE  = 45; // (°) Max roll and pitch angles reachable in angle mode
+    const float MAX_ROT_SPEED  = 135; // (°/s) Max roll and pitch speed in accro mode
+    const float MAX_YAW_SPEED  = 135;// (°/s) Max yaw speed in accro and angle modes
+
     // Channel 1: Ailerons 1.09 to 1.90 ms
     // Channel 2: Prof 1.09 to 1.90 ms
     // Channel 3: Throttle 1.09 to 1.90 ms
@@ -45,7 +56,7 @@ class Reception
       return (map(cPPM[1], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED));
     };
     inline int GetThrottle() {
-      return map(cPPM[2], 1080, 1900, MIN_POWER, MAX_THROTTLE);
+      return map(cPPM[2], 1080, 1900, ESCs.MIN_POWER, ESCs.MAX_THROTTLE);
     };
 
     inline float GetVerticalSpeed() {

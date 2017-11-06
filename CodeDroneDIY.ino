@@ -8,6 +8,15 @@
 #include "Attitude.h"
 #include "PID.h"
 
+extern const float GAIN;
+extern float anglePosPIDParams[4];
+extern float angleSpeedPIDParams[4];
+extern float altiSpeedPIDParams[4];
+extern float accroSpeedPIDParams[4];
+extern float ACCRO_YAW_KP;
+extern float yawSpeedPIDParams[4];
+const float mixing = 0.5;
+
 Time time;
 Time altiTime;
 Reception Rx;
@@ -37,7 +46,7 @@ void InitTimer1() {
   TCCR1A = 0;             // normal counting mode
   TCCR1B = _BV(CS10);     // no prescaler
   TCNT1 = 0;              // clear the timer count
-  OCR1A = usToTicks(MIN_POWER);
+  OCR1A = usToTicks(ESCs.MIN_POWER);
 
   TIFR1 |= _BV(OCF1A);      // clear any pending interrupts;
   TIMSK1 |=  _BV(OCIE1A) ;  // enable the output compare interrupt
@@ -127,14 +136,14 @@ void setup() {
   // Set watchdog reset
   wdt_enable(WDTO_250MS);
 
-  if ( (MAX_POWER == 1860) && (MAX_THROTTLE >= (1860 * 0.8)) )
+  if ( (ESCs.MAX_POWER == 1860) && (ESCs.MAX_THROTTLE >= (1860 * 0.8)) )
     Serial.println(F("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!FLYING MODE POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "));
-  else if ( (MAX_POWER <= 1300) )
+  else if ( (ESCs.MAX_POWER <= 1300) )
     Serial.println(F("DEBUG MODE POWER!!! "));
   else
     Serial.println(F("UNEXPECTED POWER "));
 
-  Serial.print(F("MAX_POWER: ")); Serial.print(MAX_POWER);  Serial.print(F(" MAX_THROTTLE_PERCENT: ")); Serial.println(MAX_THROTTLE_PERCENT);
+  Serial.print(F("MAX_POWER: ")); Serial.print(ESCs.MAX_POWER);  Serial.print(F(" MAX_THROTTLE_PERCENT: ")); Serial.println(ESCs.MAX_THROTTLE_PERCENT);
 
   // TODO dirty, but needed for BH_HELI_S, in order to avoid it enter in calibration mode (need to keep ESC idle some seconds):
   for (int pause = 0; pause < 10; pause++)
@@ -176,7 +185,7 @@ void loop() {
   static float g_MeanLoop = 0;
   static int loopNb = 0;
   static float meanLoopTime =  0;
-  int throttle = 0;
+  uint8_t throttle = 0;
   static float verticalSpeed = 0.0;
   float loopTimeSec = time.GetloopTimeMilliseconds(0);
   int rollPosCmd, pitchPosCmd = 0;
@@ -214,7 +223,7 @@ if( calibrationESC ){
 
       throttle = Rx.GetThrottle();
       Attitude.GetCurrPos(posCurr, speedCurr, loopTimeSec);
-      if ( throttle > IDLE_THRESHOLD ) {
+      if ( throttle > ESCs.IDLE_THRESHOLD ) {
         stateMachine.throttleWasHigh = true;
         rollPosCmd = rollPosPID_Angle.ComputeCorrection( Rx.GetAileronsAngle(), posCurr[0], loopTimeSec );
         rollMotorPwr = rollSpeedPID_Angle.ComputeCorrection( rollPosCmd, speedCurr[0], loopTimeSec );
@@ -245,7 +254,7 @@ if( calibrationESC ){
     case accro:
       throttle = Rx.GetThrottle();
       Attitude.GetCurrPos( posCurr, speedCurr, loopTimeSec);
-      if ( throttle > IDLE_THRESHOLD ) {
+      if ( throttle > ESCs.IDLE_THRESHOLD ) {
         stateMachine.throttleWasHigh = true;
         rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection( Rx.GetAileronsSpeed(), speedCurr[0], loopTimeSec );
         pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection( Rx.GetElevatorSpeed(), speedCurr[1], loopTimeSec );
@@ -349,7 +358,7 @@ if( calibrationESC ){
   }
 
   // Compute mean loop time and complementary filter time constant
-  if ( ((stateMachine.state == angle) || (stateMachine.state == accro)) && ( throttle > IDLE_THRESHOLD )) {
+  if ( ((stateMachine.state == angle) || (stateMachine.state == accro)) && ( throttle > ESCs.IDLE_THRESHOLD )) {
     if ( loopNb > 1000) {
       meanLoopTime = meanLoopTime / loopNb;
       //Serial.println(meanLoopTime, 2);

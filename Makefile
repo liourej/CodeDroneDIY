@@ -5,9 +5,12 @@
 # 3. In this file, update the Arduino.mk path according to the Arduino-Makefile-master folder location
 # 4. In this file, include your libraries
 
-BOARD_TAG    = nano328
-ARDUINO_LIBS = I2Cdev Wire MPU6050
-include /home/julien/Programmes/Arduino-Makefile-master/Arduino.mk
+#BOARD_TAG    = nano328
+BOARD_TAG   = nano
+BOARD_SUB   = atmega328
+USER_LIB_PATH = $(HOME)/sketchbook/libraries
+ARDUINO_LIBS = I2Cdev Wire MPU6050 MS5611
+include $(HOME)/Programmes/Arduino-Makefile-master/Arduino.mk
 
 #MONITOR_PORT  = /dev/ttyUSB0
 

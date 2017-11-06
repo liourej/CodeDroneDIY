@@ -1,5 +1,5 @@
 #include "MPU6050.h"
-#include "checkIMU.h"
+#include "CheckIMU.h"
 
 float ComputeAccFactoryTrimValue(float _accTestVal) {
   if ( _accTestVal == 0 )

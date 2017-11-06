@@ -1,6 +1,6 @@
 #include <avr/wdt.h>
 #include "Attitude.h"
-#include "checkIMU.h"
+#include "CheckIMU.h"
 
 void Attitude::Init() {
 
