@@ -1,10 +1,10 @@
 
-# <p align="center">DIY Flight Controller from Scratch</p>
+# <p align="center">DIY flight controller from scratch</p>
 
 <p align="center">
     <img src="/ReadmePictures/Drone.jpg">
     <img src="/ReadmePictures/v1_v2_boards.jpg">
-    Picture: v1 Arduino Uno board and v2 Arduino Nano board
+    Pictures: First hardware version using Arduino Uno board and second hardware version using Arduino Nano board
 </p>
 
 ---------------------------Table des matières----------------------------
@@ -63,24 +63,24 @@
 ## Warning
 ![Danger.jpg](/ReadmePictures/Danger.jpg "Danger")
 
-Before starting this project, you must know that using propellers at high speed is very dangerous for your eyes and the persons around.
-When testting, you must wear large protective glasses, and set up a power limits when you are testing inside a room.
+Before starting this project, you must know that spinning propellers are very dangerous for your eyes and the persons around.
+When testing using the benchtest indoor, you must wear large protective glasses, and set up a power limit.
 For outside tests, choose a very large area, with nobody around.
 
 ![Protection_glasses.jpg](/ReadmePictures/Protection_glasses.jpg "Protection_glasses")
 
 ## 1. Project purpose
 
-The aim of this project is to develop a quadrirotor flight controller from scratch, using an Arduino and sensors.
+The aim of this project is to develop a quadrirotor flight controller from scratch, using an Arduino and inertial sensors.
 There is two benefits:
 * to understand UAV flight stabilization
-* to have our own system, with no limits for customization: we can add all sensors we want.
+* to have our own system, with no limits for customization: you can add all the sensors you want.
 
 
 ## 2. Attitude computation <a id="Test"></a>
 
-The UAV attitude correspond to the UAV angles from horizontal: roll, pitch , yaw.
-UAV attitude is an entrey for automatic stabilization: when UAV receive no command from user, it automatically go back to horizontal.
+The UAV attitude correspond to the UAV angles from the horizontal: roll, pitch , yaw.
+UAV attitude is an entry for automatic stabilization: when UAV receive no command from user, it automatically goes back to horizontal.
 
 Attitude is computed from IMU data merging.
 
