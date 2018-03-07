@@ -219,6 +219,12 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 | **Frame** | Diatone Q450 Quad 450 V3. Wide 450 mm frame choosen for better stability and higher autonomy. ![Chassis](/ReadmePictures/Chassis.jpg "Chassis")|
 
 ### 7.2 Connexions
+TODO: add receiver in schematic
+![schemaElectriqueDroneFull](/ReadmePictures/schemaElectriqueDroneFull.jpg "schemaElectriqueDroneFull")
+<p align="center">Full view<p>
+![SchemaElectriqueDroneZoom](/ReadmePictures/SchemaElectriqueDroneZoom.jpg "SchemaElectriqueDroneZoom")
+<p align="center">Zoomed View<p>
+
 | Arduino pin      | Component      |
 | -------------- | -------------- |
 | PD2 | receiver |
