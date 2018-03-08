@@ -47,13 +47,7 @@
 
 **8.First Person View (FPV)**
 
-**9.Appendix**
-
-9.1.Flight modes
-
-9.2.Arduino UNO rev3
-
-**10.Bibliography**
+**9.Bibliography**
 
 -------------------------------------------------------------------
 ## Warning
@@ -261,32 +255,7 @@ Trasnmitter configuration used during the « bind » operation defines the «�
 | **Camera antenna** | Realacc 5.8G 5dBi 50W RHCP Omnidirectional 3 Leaf Clover FPV Antenna Red |
 | **Video transmitter** | Upgrade Aomway Mini 5.8Ghz 200mW 32CH AV Wireless Transmitter Module |
 
-## 9. Appendix
-
-### 9.1 Flight modes
-
-| Mode      | Gyro      | Acce      | Baro      | Compass      | GPS      | Description      |
-| -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
-| **ACRO** | X |||||Un mode généralement par défaut et son vol plus « acrobatique » (le quadrirotor ne peut faire de la mise à niveau automatique)|
-| **ANGLE** | X |X||||Mode stable ; va essayer de maintenir le niveau du modèle par rapport au sol (mais pas à une position fixe).|
-| **HORIZON** | X |||||Combine l’effet stable avec des commandes et des acrobaties RC lentes et avec des commandes RC rapides.|
-| **BARO (Maintien de l’altitude)** | X | X | X |||Le baromètre est utilisé afin de conserver une certaine hauteur (fixée) lorsqu’aucune autre commande n’est reçue.|
-| **MAG (Tenue du cap)** | X | X | | X | | Mode verrouillage de cap (direction à la boussole), pour essayer de maintenir son orientation en lacet. |
-| **HEADFREE (CareFree/ orientation indépendante du déplacement)** | X | X | | X | | Maintient l’orientation (lacet) du quadrirotor et se déplace toujours dans la même direction 2D pour le même mouvement du manche en ROULIS/TANGAGE.|
-| **GPS/ Retour à la base** | | X | | X | X | Utilise automatiquement une boussole et un GPS pour rentrer à la base, au point de départ GPS. |
-| **GPS/ Points de passage** | | X | | X | X | Suit automatiquement les points de cheminement GPS pré-configurés de manière autonome. |
-| **GPS/ Maintien de position** | | X | | X | X | Maintient la position actuelle en utilisant le GPS et le baromètre (si disponible). |
-
-### 9.2 Arduino UNO rev3
-
-ATmega328 microcontroller
-8 bits RISC architecture
-16Mhz => T = 0.0625us
-1MIPS by MHz
-Dimensions : 68.6 mm x 53.4 mm
-Weight : 25 g
-
-## 10. Bibliography
+## 9. Bibliography
 
 * Arduino
 
