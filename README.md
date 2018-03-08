@@ -51,11 +51,7 @@
 
 9.1.Flight modes
 
-9.2.PID tuning
-
-9.3.Arduino UNO rev3
-
-9.4.PWM generation at 400Hz
+9.2.Arduino UNO rev3
 
 **10.Bibliography**
 
@@ -281,35 +277,7 @@ Trasnmitter configuration used during the « bind » operation defines the «�
 | **GPS/ Points de passage** | | X | | X | X | Suit automatiquement les points de cheminement GPS pré-configurés de manière autonome. |
 | **GPS/ Maintien de position** | | X | | X | X | Maintient la position actuelle en utilisant le GPS et le baromètre (si disponible). |
 
-### 9.2 PID tuning
-
-**Le P**
-
-C’est le P qui va résoudre les problèmes de vibrations. Le I quant à lui, joue sur l’inertie de la machine et sur sa réactivité.
-Montez le P jusqu’à obtenir une machine qui vibre / oscille. Baissez le I également, ça aide.
-Descendez le P peu à peu jusqu’à ce que les vibrations disparaissent totalement, même à fond de gaz !
-
-**Le I**
-
-Il agît sur la dérive du multi est est lié au P. En acro, voltige ou FPV, il sera plus bas que pour une machine dédiée à la vidéo. Dans la vidéo en Français, vous apprendrez comment le régler à l’aide d’un truc connu : placer un poids sur un bras
-Montez le I jusqu’à obtenir des oscillations faibles en montée et ou en descente. Vous devriez en avoir aussi à fond de gaz.
-Si vous avez des oscillations en descente : montez le I
-Si vous avez des oscillations en montée : baissez le I
-Trouvez une valeur qui vous débarrasse des deux
-Si des vibrations réapparaissent, c’est normal. Retouchez le P. Baissez le légèrement, c’est selon.
-
-**Le D**
-
-Ce paramètre est le plus  » personnel  » des trois. Il influence la réactivité de la machine.
-Faites de grands mouvements de gauche à droite ou d’avant en arrière pour observer les réactions de la machine. Appréciez et réglez selon vos préférences.
-Des vibrations peuvent revenir : corrigez le P.
-
-Le Yaw
-Si votre machine continue à dériver après un ordre ou si elle dérive seule sur l’axe du lacet, changez la valeur. Elle est très souvent sur 8.5 et est correcte ainsi.
-tpa breakpoint
-Ce paramètre joue sur le ratio des PID. En effet, la tension et le niveau de gaz sont des variables qui agissent sur le comportement. Le TPA va faire varier vos PID selon ces facteurs.Si vous n’en mettez pas, il se peut que vous ayez des vibrations lorsque vous êtes à fond de gaz avec une lipo chargée à bloc. Pour être précis, les TPA ( Throtlle PID Attenuation ) jouent sur le P. ( Merci XKin Ai pour la précision )
-
-### 9.3 Arduino UNO rev3
+### 9.2 Arduino UNO rev3
 
 ATmega328 microcontroller
 8 bits RISC architecture
@@ -317,19 +285,6 @@ ATmega328 microcontroller
 1MIPS by MHz
 Dimensions : 68.6 mm x 53.4 mm
 Weight : 25 g
-
-### 9.4 PWM generation at 400Hz
-
-1. Classer les ESC par ordre croissant de largeur d’impulsion.
-2. Utiliser le « Timer1 ».
-3. Mettre toutes les sorties au niveau haut en une seule fois à l’aide de la commande « PORTB=0b00001111 ».
-4. Mettre à au niveau bas les sortie au fur et à mesure.
->* For every 2.5 ms period the first 1.5 is unused and can be used for main program logic.
->* From 1.5 to 2.5 ms every interrupt will disturb timing, but without communications most servo controllers are uninteresting.
->* We can use a loop to wait for the next "set servo low" time or we can use a timer interrupt
->* Best precision is if all the servo output pins are on the same AVR port and we directly write to the PORTx register. Then servos with equal timing can be handled with one port write.
->* The situation with the most difficult timing is when two servos are separated by 2-8 uS, less than an interrupt period.
->* After every 2.5 ms servo period we wait 7*2.5 ms for the next servo control period. We can use these periods to address  other groups of servos if we use demuxes to distribute the servo pulses to the groups.
 
 ## 10. Bibliography
 
