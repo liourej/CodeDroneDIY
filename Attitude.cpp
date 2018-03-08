@@ -3,10 +3,9 @@
 #include "CheckIMU.h"
 
 void Attitude::Init() {
-
   // Initialize MS5611 sensor (barometer for altitude)
-  if( baro_available){
-    while (!ms5611.begin(MS5611_ULTRA_HIGH_RES) ){
+  if (baro_available) {
+    while (!ms5611.begin(MS5611_ULTRA_HIGH_RES)) {
       delay(250);
     }
     delay(500);
@@ -15,40 +14,39 @@ void Attitude::Init() {
 
   // Initialize MPU 6050
   accelgyro.initialize();
-  accelgyro.setFullScaleGyroRange( MPU6050_GYRO_FS_1000); //  +-1000°s max  /!\ Be carrefull when changing this parameter: "GyroSensitivity" must be updated accordingly !!!
-  accelgyro.setFullScaleAccelRange( MPU6050_ACCEL_FS_8 );//  +-8g max /!\ Be carrefull when changing this parameter: "AcceleroSensitivity" must be updated accordingly !!!
+  //  +-1000°s max  /!\ Be carrefull when changing this parameter:
+  //  "GyroSensitivity" must be updated accordingly !!!
+  accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_1000);
+  //  +-8g max /!\ Be carrefull when changing this parameter:
+  //  "AcceleroSensitivity" must be updated accordingly !!!
+  accelgyro.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
   wdt_reset();
-  if ( !accelgyro.testConnection())
+  if (!accelgyro.testConnection())
     Serial.println(F("Test failed"));
 
   Serial.println(F("/********* IMU self-test *********/"));
-  if ( !CheckIMU(accelgyro, AcceleroSensitivity) )
+  if (!CheckIMU(accelgyro, AcceleroSensitivity))
     Serial.println(F("IMU SELF TEST FAILED !!!!!"));
   else
     Serial.println(F("IMU self test succeed"));
-
 }
 
-inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[])
-{
+inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]) {
   int16_t ax, ay, az, gx, gy, gz = 0;
 
   accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
   // Correct raw data with offset
-  _accMeasures[0] = (float)(ax - offset[0] ) / AcceleroSensitivity;
-  _accMeasures[1] = (float)(ay - offset[1] ) / AcceleroSensitivity;
-  _accMeasures[2] = (float)(az - offset[2] ) / AcceleroSensitivity;
-  _gyroMeasures[0] = (float)(gx - offset[3] ) / GyroSensitivity;
-  _gyroMeasures[1] = (float)(gy - offset[4] ) / GyroSensitivity;
-  _gyroMeasures[2] = (float)(gz - offset[5] ) / GyroSensitivity;
-
-  //Normalize(_data); // Normalize 3 first array cases (acceleration)
+  _accMeasures[0] = static_cast<float>(ax - offset[0]) / AcceleroSensitivity;
+  _accMeasures[1] = static_cast<float>(ay - offset[1]) / AcceleroSensitivity;
+  _accMeasures[2] = static_cast<float>(az - offset[2]) / AcceleroSensitivity;
+  _gyroMeasures[0] = static_cast<float>(gx - offset[3]) / GyroSensitivity;
+  _gyroMeasures[1] = static_cast<float>(gy - offset[4]) / GyroSensitivity;
+  _gyroMeasures[2] = static_cast<float>(gz - offset[5]) / GyroSensitivity;
 }
 
 // Compute accelerometer and gyroscope offsets
-void Attitude::ComputeOffsets()
-{
+void Attitude::ComputeOffsets() {
   int16_t accGyroRaw[6] = {0, 0, 0, 0, 0, 0};
   int32_t offsetSum[6] = {0, 0, 0, 0, 0, 0};
 
@@ -60,18 +58,16 @@ void Attitude::ComputeOffsets()
     offset[i] = 0;
 
   // mean on 10 samples during 2 sec
-  for (int sample = 0; sample < 10; sample++)
-  {
-    accelgyro.getMotion6(&accGyroRaw[0], &accGyroRaw[1], &accGyroRaw[2], &accGyroRaw[3], &accGyroRaw[4], &accGyroRaw[5]);
-    for ( int coord = 0; coord < 6; coord++) {
-      if ( accGyroRaw[coord] > maxVal[coord])
+  for (int sample = 0; sample < 10; sample++) {
+    accelgyro.getMotion6(&accGyroRaw[0], &accGyroRaw[1], &accGyroRaw[2], &accGyroRaw[3],
+        &accGyroRaw[4], &accGyroRaw[5]);
+    for (int coord = 0; coord < 6; coord++) {
+      if (accGyroRaw[coord] > maxVal[coord])
         maxVal[coord] = accGyroRaw[coord];
-      if ( accGyroRaw[coord] < minVal[coord])
+      if (accGyroRaw[coord] < minVal[coord])
         minVal[coord] = accGyroRaw[coord];
       offsetSum[coord] = offsetSum[coord] + accGyroRaw[coord];
-      //Serial.print(accGyroRaw[coord]); Serial.print("\t");
     }
-    //Serial.print("\n");
     wdt_reset();
     delay(200);
   }
@@ -90,14 +86,12 @@ void Attitude::ComputeOffsets()
   }
 
   for (int gyro = 3; gyro < 6; gyro++) {
-    if ( delta[gyro] > (10 * GyroSensitivity) ) // 10°/s max
+    if ( delta[gyro] > (10 * GyroSensitivity) )  // 10°/s max
       offsetComputed = false;
   }
 
   // Zacc is gravity, it should be 1G ie 4096 LSB/g at -+8g sensitivity
   offset[2] = offset[2] - AcceleroSensitivity;
-
-
 
   if (offsetComputed) {
     Serial.print(F("Offsets Computed :"));
@@ -110,27 +104,25 @@ void Attitude::ComputeOffsets()
     }
     Serial.print("(deg.s-1) ");
     Serial.print("\n");
-  } else
+  } else {
     Serial.println(F("ERROR DURING OFFSETS COMPUTATION !!"));
-};
+  }
+}
 
-inline void Attitude::Normalize( float _acc[] )
-{
-  float norm = sqrt( _acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2] );
+inline void Attitude::Normalize( float _acc[] ) {
+  float norm = sqrt(_acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2]);
 
   _acc[0] = _acc[0] / norm;
   _acc[1] = _acc[1] / norm;
   _acc[2] = _acc[2] / norm;
 }
 
-
 float Attitude::GetFilterTimeConstant(float _loopTimeSec) {
   return ( (HighPassFilterCoeff * _loopTimeSec) / (1 - HighPassFilterCoeff));
 }
 
 // Get position combining acc + gyro
-void Attitude::GetCurrPos(float _pos[], float _speed[], float _loop_time)
-{
+void Attitude::GetCurrPos(float _pos[], float _speed[], float _loop_time) {
   // float roll, pitch = 0;
   float accRaw[3] = {0, 0, 0};
   float gyroRaw[3] = {0, 0, 0};
@@ -146,9 +138,11 @@ void Attitude::GetCurrPos(float _pos[], float _speed[], float _loop_time)
   Normalize(accRaw);
 
   // Use complementary filter to merge gyro and accelerometer data
-  _pos[0] = HighPassFilterCoeff * (_pos[0] + (gyroRaw[0]) * _loop_time) + (1 - HighPassFilterCoeff) * ((atan(accRaw[1] / accRaw[2])) * 57.2957795130823); // High pass filter on gyro, and low pass filter on accelerometer
-  _pos[1] = HighPassFilterCoeff * (_pos[1] + (gyroRaw[1]) * _loop_time) + (1 - HighPassFilterCoeff) * ((-atan(accRaw[0] / accRaw[2])) * 57.2957795130823); // High pass filter on gyro, and low pass filter on accelerometer
-
+  // High pass filter on gyro, and low pass filter on accelerometer
+  _pos[0] = HighPassFilterCoeff * (_pos[0] + (gyroRaw[0]) * _loop_time) 
+    + (1 - HighPassFilterCoeff) * ((atan(accRaw[1] / accRaw[2])) * 57.2957795130823);
+  _pos[1] = HighPassFilterCoeff * (_pos[1] + (gyroRaw[1]) * _loop_time)
+    + (1 - HighPassFilterCoeff) * ((-atan(accRaw[0] / accRaw[2])) * 57.2957795130823);
 }
 
 float Attitude::GetVerticalSpeed(void) {
@@ -163,12 +157,12 @@ float Attitude::GetVerticalSpeed(void) {
   measures[indice] = ms5611.getAltitude(realPressure);
   indice++;
 
-  if ( indice >= samplesNb) {
+  if (indice >= samplesNb) {
     indice = 0;
     initialized = true;
   }
 
-  if ( initialized == false)
+  if (initialized == false)
     return 0.0;
 
   // Compute mean altitude
