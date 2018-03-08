@@ -109,7 +109,7 @@ void Attitude::ComputeOffsets() {
   }
 }
 
-inline void Attitude::Normalize( float _acc[] ) {
+inline void Attitude::Normalize(float _acc[]) {
   float norm = sqrt(_acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2]);
 
   _acc[0] = _acc[0] / norm;
@@ -139,7 +139,7 @@ void Attitude::GetCurrPos(float _pos[], float _speed[], float _loop_time) {
 
   // Use complementary filter to merge gyro and accelerometer data
   // High pass filter on gyro, and low pass filter on accelerometer
-  _pos[0] = HighPassFilterCoeff * (_pos[0] + (gyroRaw[0]) * _loop_time) 
+  _pos[0] = HighPassFilterCoeff * (_pos[0] + (gyroRaw[0]) * _loop_time)
     + (1 - HighPassFilterCoeff) * ((atan(accRaw[1] / accRaw[2])) * 57.2957795130823);
   _pos[1] = HighPassFilterCoeff * (_pos[1] + (gyroRaw[1]) * _loop_time)
     + (1 - HighPassFilterCoeff) * ((-atan(accRaw[0] / accRaw[2])) * 57.2957795130823);

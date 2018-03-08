@@ -1,3 +1,6 @@
+#ifndef ATTITUDE_H_
+#define ATTITUDE_H_
+
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
 #include "Wire.h"
@@ -36,8 +39,8 @@ class Attitude {
  private:
     MPU6050 accelgyro;  // IMU
     MS5611 ms5611;  // Barometer for altitude stabilization
-    void GetCorrectedAccelGyro( float _accMeasures[], float _gyroMeasures[]);
-    void Normalize( float _acc[] );
+    void GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]);
+    void Normalize(float _acc[]);
 
  public:
     void Init();
@@ -46,5 +49,7 @@ class Attitude {
     void ComputeOffsets();
     void GetCurrPos(float _pos[], float _speed[], float _loop_time);
     float GetVerticalSpeed(void);
-    void refreshTemperature(void) {ms5611.refreshTemperature();};
+    void refreshTemperature(void) {ms5611.refreshTemperature();}
 };
+
+#endif  // ATTITUDE_H_

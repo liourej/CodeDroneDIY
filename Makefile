@@ -8,8 +8,10 @@
 #BOARD_TAG    = nano328
 BOARD_TAG   = nano
 BOARD_SUB   = atmega328
-USER_LIB_PATH = $(HOME)/sketchbook/libraries
+USER_LIB_PATH = $(HOME)/sketchbook/CodeDroneDIY/libraries
 ARDUINO_LIBS = I2Cdev Wire MPU6050 MS5611
+ARDUINO_DIR = $(HOME)/Programmes/arduino-1.8.4
+ARDMK_DIR = $(HOME)/Programmes/Arduino-Makefile-master
 include $(HOME)/Programmes/Arduino-Makefile-master/Arduino.mk
 
 #MONITOR_PORT  = /dev/ttyUSB0

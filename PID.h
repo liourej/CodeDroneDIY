@@ -1,3 +1,6 @@
+#ifndef PID_H_
+#define PID_H_
+
 #include "Arduino.h"
 
 class PID {
@@ -19,3 +22,5 @@ class PID {
     int ComputeCorrection(float _cmd, float _pos, float _loopTime);
     void PrintGains(void);
 };
+
+#endif  // PID_H_

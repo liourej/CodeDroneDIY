@@ -1,3 +1,6 @@
+#ifndef STATEMACHINE_H_
+#define STATEMACHINE_H_
+
 extern int g_Flyingstate;
 extern Reception Rx;
 
@@ -5,12 +8,9 @@ class StateMachine {
  private:
     // Buzzer for lost model alarm
     const int BUZZER_PIN = 7;
-
     const int delayThreshold = 5;  // (s)
-
     Time elapsedTime;
     Time timeBuzzer;
-
     bool setBuzzer = false;
 
  public:
@@ -85,4 +85,6 @@ class StateMachine {
         Serial.print(delayThreshold); Serial.println(F(" sec without power, system DISARMED!"));
       }
     }
-}
+};
+
+#endif  // STATEMACHINE_H_

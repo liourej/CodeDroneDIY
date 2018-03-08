@@ -1,3 +1,6 @@
+#ifndef RECEPTION_H_
+#define RECEPTION_H_
+
 #define FLYING_MODE_ANGLE 0
 #define FLYING_MODE_ACCRO 1
 
@@ -113,7 +116,7 @@ class Reception {
       PWM_Width = PWM_Stop - PWM_Start;
       PWM_Start = PWM_Stop;
 
-      if (initialized  {
+      if (initialized)  {
         if (channel < CHANNELS_NB)
           cPPM[channel] = PWM_Width;
       }
@@ -125,4 +128,6 @@ class Reception {
         channel++;
       }
     }
-}
+};
+
+#endif  // RECEPTION_H_

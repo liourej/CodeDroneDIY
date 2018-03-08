@@ -1,3 +1,6 @@
+#ifndef ESC_H_
+#define ESC_H_
+
 // converts microseconds to tick (assumes prescale of 8)  // 12 Aug 2009
 #define usToTicks(_us)    ((clockCyclesPerMicrosecond()*_us))
 // converts from ticks back to microseconds
@@ -32,4 +35,6 @@ class ESC {
     void write(int _id, float _PWM);
     void Idle();
     void SetPWM_f5(volatile uint16_t *TCNTn, volatile uint16_t* OCRnA);
-}
+};
+
+#endif  // ESC_H_
