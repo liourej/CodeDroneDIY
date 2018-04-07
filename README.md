@@ -45,7 +45,7 @@
 
 7.4.The benchtest
 
-**8.Project setup
+**8.Project setup**
 
 8.1.Platformio installation
 ```sudo apt-get update
