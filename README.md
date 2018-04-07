@@ -48,20 +48,10 @@
 **8.Project setup**
 
 8.1.Platformio installation
-```sudo apt-get update
-sudo apt-get install python-pip
-sudo pip install --upgrade pip && sudo pip install -U platformio==3.5.2
-platformio platform install atmelavr --with-package=framework-arduinoavr
-platformio lib install MPU6050
-pio lib install "I2Cdevlib-MPU6050"
-```
+
 8.2.Build project
 
-```platformio run```
-
 8.3.Flash target
-
-```platformio upload --upload-port/ttyACM0 ```
 
 **9.First Person View (FPV)**
 
