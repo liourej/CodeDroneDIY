@@ -56,9 +56,11 @@ platformio lib install MPU6050
 pio lib install "I2Cdevlib-MPU6050"
 ```
 8.2.Build project
+
 ```platformio run```
 
 8.3.Flash target
+
 ```platformio upload --upload-port/ttyACM0 ```
 
 **9.First Person View (FPV)**
