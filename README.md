@@ -45,8 +45,9 @@
 
 7.4.The benchtest
 
-**Project setup
-*Platformio installation
+**8.Project setup
+
+8.1.Platformio installation
 ```sudo apt-get update
 sudo apt-get install python-pip
 sudo pip install --upgrade pip && sudo pip install -U platformio==3.5.2
@@ -54,15 +55,15 @@ platformio platform install atmelavr --with-package=framework-arduinoavr
 platformio lib install MPU6050
 pio lib install "I2Cdevlib-MPU6050"
 ```
-*Build project
+8.2.Build project
 ```platformio run```
 
-*Flash target
+8.3.Flash target
 ```platformio upload --upload-port/ttyACM0 ```
 
-**8.First Person View (FPV)**
+**9.First Person View (FPV)**
 
-**9.Bibliography**
+**10.Bibliography**
 
 -------------------------------------------------------------------
 ## Warning
@@ -259,7 +260,22 @@ Trasnmitter configuration used during the « bind » operation defines the «�
 
 ![BenchTest01](/ReadmePictures/BenchTest01.jpg "BenchTest01")
 
-## 8. FPV - First Person View
+## 8.Project setup
+#8.1.Platformio installation
+```sudo apt-get update
+sudo apt-get install python-pip
+sudo pip install --upgrade pip && sudo pip install -U platformio==3.5.2
+platformio platform install atmelavr --with-package=framework-arduinoavr
+platformio lib install MPU6050
+pio lib install "I2Cdevlib-MPU6050"
+```
+#8.2.Build project
+```platformio run```
+
+#8.3.Flash target
+```platformio upload --upload-port/ttyACM0 ```
+
+## 9. FPV - First Person View
 | Component      | Reference      |
 | -------------- | -------------- |
 | **Googgles** | Quanum DIY FPV Goggle V2 Pro |
@@ -270,7 +286,7 @@ Trasnmitter configuration used during the « bind » operation defines the «�
 | **Camera antenna** | Realacc 5.8G 5dBi 50W RHCP Omnidirectional 3 Leaf Clover FPV Antenna Red |
 | **Video transmitter** | Upgrade Aomway Mini 5.8Ghz 200mW 32CH AV Wireless Transmitter Module |
 
-## 9. Bibliography
+## 10. Bibliography
 
 * Arduino
 
