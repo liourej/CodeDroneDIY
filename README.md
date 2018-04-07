@@ -54,7 +54,11 @@ platformio platform install atmelavr --with-package=framework-arduinoavr
 platformio lib install MPU6050
 pio lib install "I2Cdevlib-MPU6050"
 ```
+*Build project
+```platformio run```
 
+*Flash target
+```platformio upload --upload-port/ttyACM0 ```
 
 **8.First Person View (FPV)**
 
