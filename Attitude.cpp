@@ -2,6 +2,8 @@
 #include "Attitude.h"
 #include "CheckIMU.h"
 
+#define RAD2DEG(angle) angle*180/PI
+
 void Attitude::Init() {
   // Initialize MS5611 sensor (barometer for altitude)
   if (baro_available) {
@@ -25,10 +27,11 @@ void Attitude::Init() {
     Serial.println(F("Test failed"));
 
   Serial.println(F("/********* IMU self-test *********/"));
-  if (!CheckIMU(accelgyro, AcceleroSensitivity))
+/*  if (!CheckIMU(accelgyro, AcceleroSensitivity))
     Serial.println(F("IMU SELF TEST FAILED !!!!!"));
   else
     Serial.println(F("IMU self test succeed"));
+*/
 }
 
 inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]) {
@@ -140,9 +143,9 @@ void Attitude::GetCurrPos(float _pos[], float _speed[], float _loop_time) {
   // Use complementary filter to merge gyro and accelerometer data
   // High pass filter on gyro, and low pass filter on accelerometer
   _pos[0] = HighPassFilterCoeff * (_pos[0] + (gyroRaw[0]) * _loop_time)
-    + (1 - HighPassFilterCoeff) * ((atan(accRaw[1] / accRaw[2])) * 57.2957795130823);
+    + (1 - HighPassFilterCoeff) * RAD2DEG(atan(accRaw[1] / accRaw[2]));
   _pos[1] = HighPassFilterCoeff * (_pos[1] + (gyroRaw[1]) * _loop_time)
-    + (1 - HighPassFilterCoeff) * ((-atan(accRaw[0] / accRaw[2])) * 57.2957795130823);
+    + (1 - HighPassFilterCoeff) * RAD2DEG(-atan(accRaw[0] / accRaw[2]));
 }
 
 float Attitude::GetVerticalSpeed(void) {
