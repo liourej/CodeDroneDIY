@@ -17,10 +17,10 @@
 #define MPU6050_ADDRESS_AD0_HIGH    0x69  // address pin high (VCC)
 #define MPU6050_DEFAULT_ADDRESS     MPU6050_ADDRESS_AD0_LOW
 
-float ComputeAccFactoryTrimValue(float _accTestVal);
+/*float ComputeAccFactoryTrimValue(float _accTestVal);
 float ComputeGyroFactoryTrimValue(float _gyroTestVal, bool _isYcoord);
 bool CheckGyro(MPU6050 _accelgyro);
 bool CheckAccelero(MPU6050 _accelgyro, const float _AcceleroSensitivity);
 bool CheckIMU(MPU6050 _accelgyro, const float _AcceleroSensitivity);
-
+*/
 #endif  // CHECKIMU_H_

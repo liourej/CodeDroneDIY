@@ -1,7 +1,7 @@
 #include "MPU6050.h"
 #include "CheckIMU.h"
 
-float ComputeAccFactoryTrimValue(float _accTestVal) {
+/*float ComputeAccFactoryTrimValue(float _accTestVal) {
   if (_accTestVal == 0)
     return 0;
   else
@@ -156,4 +156,4 @@ bool CheckIMU(MPU6050 _accelgyro, const float _AcceleroSensitivity) {
      testSucceed = false;
 
   return testSucceed;
-}
+}*/

@@ -1,6 +1,8 @@
 #ifndef TIME_H_
 #define TIME_H_
 
+#include <Arduino.h>
+
 #define COUNTER_NB 2
 
 class Time {
