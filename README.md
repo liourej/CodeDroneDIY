@@ -112,8 +112,9 @@ This projet use an MPU6050 IMU sensor which communicates with the microcontroler
 
 UAV vs horizon angles are computed by raw gyroscope data integration.
 
-```// currentPitch = previousPitch + rawSensorPitch*loopTime
-    _pos[0] = _pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time;
+```
+// currentPitch = previousPitch + rawSensorPitch*loopTime
+_pos[0] = _pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time;
 ```
 
 #### 2.1.2 Accelerometers
