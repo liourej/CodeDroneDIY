@@ -5,15 +5,6 @@
 #define RAD2DEG(angle) angle*180/PI
 
 void Attitude::Init() {
-  // Initialize MS5611 sensor (barometer for altitude)
-  if (baro_available) {
-    while (!ms5611.begin(MS5611_ULTRA_HIGH_RES)) {
-      delay(250);
-    }
-    delay(500);
-    ms5611.refreshTemperature();
-  }
-
   // Initialize MPU 6050
   accelgyro.initialize();
   //  +-1000°s max  /!\ Be carrefull when changing this parameter:
@@ -146,37 +137,4 @@ void Attitude::GetCurrPos(float _pos[], float _speed[], float _loop_time) {
     + (1 - HighPassFilterCoeff) * RAD2DEG(atan(accRaw[1] / accRaw[2]));
   _pos[1] = HighPassFilterCoeff * (_pos[1] + (gyroRaw[1]) * _loop_time)
     + (1 - HighPassFilterCoeff) * RAD2DEG(-atan(accRaw[0] / accRaw[2]));
-}
-
-float Attitude::GetVerticalSpeed(void) {
-  long realPressure = 0;
-  float altiCurr = 0.0;
-  float mean = 0.0;
-  float verticalSpeed = 0.0;
-
-  realPressure = ms5611.readPressureFast();
-
-  // Compute altitude mean
-  measures[indice] = ms5611.getAltitude(realPressure);
-  indice++;
-
-  if (indice >= samplesNb) {
-    indice = 0;
-    initialized = true;
-  }
-
-  if (initialized == false)
-    return 0.0;
-
-  // Compute mean altitude
-  mean = 0.0;
-  for (int i = 0; i < samplesNb; i++)
-    mean = mean + measures[indice];
-
-  // Compute vertical speed
-  altiCurr = mean / samplesNb;
-  verticalSpeed = altiCurr - altiPrev;
-  altiPrev = altiCurr;
-
-  return verticalSpeed;
 }

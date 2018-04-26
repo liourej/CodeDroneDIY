@@ -10,20 +10,16 @@
 extern const float GAIN;
 extern float anglePosPIDParams[4];
 extern float angleSpeedPIDParams[4];
-extern float altiSpeedPIDParams[4];
 extern float accroSpeedPIDParams[4];
 extern float ACCRO_YAW_KP;
 extern float yawSpeedPIDParams[4];
 const float mixing = 0.5;
-const float ALTI_REFRESH_PERIOD = 95;  // (ms)
-const unsigned int ALTI_TEMP_REFRESH_PERIOD = 60000;  // (ms)
 
 Time time;
-Time altiTime;
 Reception Rx;
 ESC ESCs;
 PID rollPosPID_Angle, pitchPosPID_Angle, yawPosPID_Angle;
-PID rollSpeedPID_Angle, pitchSpeedPID_Angle, yawSpeedPID_Angle, altiSpeedPID_Angle;
+PID rollSpeedPID_Angle, pitchSpeedPID_Angle, yawSpeedPID_Angle;
 PID rollSpeedPID_Accro, pitchSpeedPID_Accro, yawSpeedPID_Accro;
 Attitude Attitude;
 StateMachine stateMachine;
@@ -131,7 +127,6 @@ void setup() {
   }
 
   time.InitAllCounters();
-  altiTime.InitAllCounters();
   stateMachine.Init();
 
   // Set watchdog reset
@@ -184,7 +179,6 @@ void ResetPIDCommand(int *_rollMotorPwr, int *_pitchMotorPwr, int *_yawMotorPwr)
   rollSpeedPID_Accro.Reset();
   pitchSpeedPID_Accro.Reset();
   yawSpeedPID_Accro.Reset();
-  altiSpeedPID_Angle.Reset();
 }
 
 void loop() {
@@ -193,7 +187,6 @@ void loop() {
   static uint8_t loopNb = 0;
   static float meanLoopTime =  0;
   uint8_t throttle = 0;
-  static float verticalSpeed = 0.0;
   float loopTimeSec = time.GetloopTimeMilliseconds(0);
   int rollPosCmd, pitchPosCmd = 0;
   int rollMotorPwr, pitchMotorPwr, yawMotorPwr = 0;
@@ -213,19 +206,6 @@ void loop() {
     switch (stateMachine.state) {
       /*********** ANGLE STATE ***********/
       case angle:
-        if (Attitude.baro_available) {
-          // Compute vertical speed
-          if (altiTime.GetExecutionTimeMilliseconds(0) >= ALTI_REFRESH_PERIOD) {
-            verticalSpeed = Attitude.GetVerticalSpeed();
-            altiTime.Init(0);
-          }
-          // refresh temperature for altitude estimation
-          if (altiTime.GetExecutionTimeMilliseconds(1) >= ALTI_TEMP_REFRESH_PERIOD) {
-            Attitude.refreshTemperature();
-            altiTime.Init(1);
-          }
-        }
-
         throttle = Rx.GetThrottle();
         Attitude.GetCurrPos(posCurr, speedCurr, loopTimeSec);
         if (throttle > ESCs.IDLE_THRESHOLD) {
@@ -242,11 +222,6 @@ void loop() {
 
           yawMotorPwr = yawSpeedPID_Angle.ComputeCorrection(Rx.GetRudder(), speedCurr[2],
                                                             loopTimeSec);
-
-          if (Attitude.baro_available == true) {
-            throttle = altiSpeedPID_Angle.ComputeCorrection(Rx.GetVerticalSpeed(), verticalSpeed,
-                                                            loopTimeSec);
-          }
 
           // Allow to change flying mode during flight
           tempState = Rx.GetFlyingMode();
@@ -351,10 +326,6 @@ void loop() {
           Serial.print("Yaw kP: ");
           Serial.println(yawSpeedPIDParams[1]);
           yawSpeedPID_Angle.SetGains(yawSpeedPIDParams);
-
-          // Adjust Kp from potentiometer on A2
-          altiSpeedPIDParams[1] = map(analogRead(2), 0, 1023, 0, 500);
-          altiSpeedPID_Angle.SetGains(altiSpeedPIDParams);
 
           // Accro mode PID config
           rollSpeedPID_Accro.SetGains(accroSpeedPIDParams);

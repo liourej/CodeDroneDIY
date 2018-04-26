@@ -8,7 +8,6 @@
 // for both classes must be in the include path of your project
 #include "I2Cdev.h"
 #include "MPU6050.h"
-#include "MS5611.h"
 
 class Attitude {
  public:
@@ -27,18 +26,14 @@ class Attitude {
 
     bool offsetComputed = false;
     int16_t offset[6] = {0, 0, 0, 0, 0, 0};
-    bool baro_available = false;
 
  private:
     bool initialized = false;
-    float altiPrev = 0.0;
     float measures[10];
     int indice = 0;
-    const int samplesNb = 10;  // Samples number for altitude mean computation
 
  private:
     MPU6050 accelgyro;  // IMU
-    MS5611 ms5611;  // Barometer for altitude stabilization
     void GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]);
     void Normalize(float _acc[]);
 
@@ -48,8 +43,6 @@ class Attitude {
     bool AreOffsetComputed(void) { return offsetComputed; }
     void ComputeOffsets();
     void GetCurrPos(float _pos[], float _speed[], float _loop_time);
-    float GetVerticalSpeed(void);
-    void refreshTemperature(void) {ms5611.refreshTemperature();}
 };
 
 #endif  // ATTITUDE_H_
