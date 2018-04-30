@@ -1,6 +1,6 @@
+#include <avr/wdt.h>
 #include "Attitude.h"
 #include "CheckIMU.h"
-#include <avr/wdt.h>
 
 #define RAD2DEG(angle) angle * 180 / PI
 

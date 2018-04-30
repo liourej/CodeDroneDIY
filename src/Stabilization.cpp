@@ -1,5 +1,5 @@
-#include "Stabilization.h"
 #include <avr/wdt.h>
+#include "Stabilization.h"
 
 void Stabilization::Init(Reception &_Rx)
 {

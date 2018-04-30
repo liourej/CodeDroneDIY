@@ -1,9 +1,10 @@
+#include <avr/wdt.h>
+#include <math.h>
+
+#include "Time.h"
 #include "Reception.h"
 #include "Stabilization.h"
 #include "StateMachine.h"
-#include "Time.h"
-#include <avr/wdt.h>
-#include <math.h>
 
 Time time;
 Reception Rx;
