@@ -5,16 +5,12 @@
 #include "StateMachine.h"
 #include "Stabilization.h"
 
-extern const float GAIN;
-extern float ACCRO_YAW_KP;
-extern float yawSpeedPIDParams[4];
-
 Time time;
 Reception Rx;
 Stabilization stabilization;
-Attitude attitude;
 StateMachine stateMachine;
 
+// Timer interrupt to set PWM to motors controllers
 typedef enum { _timer1, _Nbr_16timers } timer16_Sequence_t;
 
 static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t *TCNTn,
@@ -26,10 +22,6 @@ SIGNAL(TIMER1_COMPA_vect) {
   handle_interrupts(_timer1, &TCNT1, &OCR1A);
 }
 
-void RxInterrupt() {
-  Rx.GetWidth();
-}
-
 void InitTimer1() {
   // Timer
   TCCR1A = 0;  // normal counting mode
@@ -39,6 +31,11 @@ void InitTimer1() {
 
   TIFR1 |= _BV(OCF1A);  // clear any pending interrupts;
   TIMSK1 |=  _BV(OCIE1A);  // enable the output compare interrupt
+}
+
+// Interrupt to decode cppm signal received from RC transmitter
+void RxInterrupt() {
+  Rx.GetWidth();
 }
 
 void PrintSettings(StateMachine _stateMachine) {
@@ -60,13 +57,7 @@ void PrintSettings(StateMachine _stateMachine) {
   Serial.println(F("/********* MPU 6050 Configuration *********/"));
 }
 
-void Pause500ms() {
-  for (int loop = 0; loop < 5; loop++) {
-    delay(100);
-    wdt_reset();
-  }
-}
-
+// Initialiaze all sensors and communication pipes
 void setup() {
   InitTimer1();
 
@@ -83,7 +74,7 @@ void setup() {
   stateMachine.Init();
 
   // Set watchdog reset
-  wdt_enable(WDTO_250MS);
+  wdt_enable(WDTO_1S);
 
   if ((stabilization.GetESCsMaxPower() == 1860) && (stabilization.GetESCsMaxThrottle() >= (1860 * 0.8)))
     Serial.println(F("!!!!!!!!!!!!!!!!!!!!FLYING MODE POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "));
@@ -100,8 +91,7 @@ void setup() {
   Serial.println(F("Setup Finished"));
 }
 
-
-
+// Main loop
 void loop() {
   static uint8_t loopNb = 0;
   static float meanLoopTime =  0;
@@ -109,7 +99,7 @@ void loop() {
   float loopTimeSec = time.GetloopTimeMilliseconds(0);
   static int tempState = disarmed;
   // State Machine
-  // initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
+  // Sequence : initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
   switch (stateMachine.state) {
     /*********** ANGLE STATE ***********/
     case angle:
@@ -167,7 +157,7 @@ void loop() {
     case disarmed:
       stabilization.Idle();
       stateMachine.state = Rx.GetFlyingMode();
-      Pause500ms();
+      delay(500); 
       // Check it was not a transitory switch state
       if (stateMachine.state != Rx.GetFlyingMode())
         stateMachine.state = disarmed;
@@ -186,13 +176,13 @@ void loop() {
       /*********** INITIALIZATION STATE ***********/
     case initialization:
       stabilization.Idle();
-      while (!attitude.AreOffsetComputed())
-        attitude.ComputeOffsets();
+      while (!stabilization.AreAttitudeOffsetsComputed())
+        stabilization.AttitudeComputeOffsets();
 
       stateMachine.state = Rx.GetFlyingMode();
       if (stateMachine.state != disarmed)
         stateMachine.state = initialization;
-      else if (attitude.AreOffsetComputed())
+      else if (stabilization.AreAttitudeOffsetsComputed())
         stateMachine.state =  starting;
       else
         stateMachine.state =  initialization;
@@ -201,7 +191,7 @@ void loop() {
     case starting:
       stabilization.Idle();
       stateMachine.state = Rx.GetFlyingMode();
-      Pause500ms();
+      delay(500);
       if (stateMachine.state != Rx.GetFlyingMode())  // Check it was not a transitory switch state
         stateMachine.state = starting;
       if ((stateMachine.state == angle) || (stateMachine.state == accro)) {
@@ -234,6 +224,3 @@ void loop() {
   }
   wdt_reset();
 }
-
-// Notes:
-// Inter pos 0: 1900; Inter pos 1: 1496; Inter pos 3: 1088

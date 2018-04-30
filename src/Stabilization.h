@@ -9,19 +9,19 @@
 class Stabilization {
   private:
     const float mixing = 0.5;
+
     // PID setup
     const float GAIN = 0.010;
 
     // Angle mode
+    // These parameters are very important for flight success
+    // They must be tuned for each frame type, motors, and propeller used
     float anglePosPIDParams[4] = {0.010, 268, 0.5, 0.0};  // G, Kp, Kd, Ki
     float angleSpeedPIDParams[4] = {0.010, 192, 0.0, 0.0};
-    float altiSpeedPIDParams[4] = {0.010, 10, 0.0, 0.0};
 
     // Accro mode
-    // 450mm frame, 10x4.5" bi-pale - Tested during flight test: OK
+    // 450mm frame, 10x4.5" 2 blades propellers - Tested during flight test: OK
     float accroSpeedPIDParams[4] = { 0.010, 192, 0.0, 0.0};
-
-    float ACCRO_YAW_KP = 0;  // Not used for now
 
     // Yaw PID
     float yawSpeedPIDParams[4] = { 0.010, 150.0, 0.0, 0.0};  // G, Kp, Kd, Ki
@@ -51,5 +51,7 @@ class Stabilization {
     int GetESCsMaxThrottlePercent() { return ESCs.MAX_THROTTLE_PERCENT;}
     int GetESCsMaxThrottle() { return ESCs.MAX_THROTTLE;}
     int GetESCIdleThreshold() { return ESCs.IDLE_THRESHOLD;}
+    bool AreAttitudeOffsetsComputed() { return attitude.AreOffsetComputed(); }
+    void AttitudeComputeOffsets() { attitude.ComputeOffsets();}
 };
 #endif // STABILIZATION_H_
