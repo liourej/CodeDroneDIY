@@ -4,28 +4,18 @@
 #define FLYING_MODE_ANGLE 0
 #define FLYING_MODE_ACCRO 1
 
-enum Mode { initialization, starting, safety, disarmed, accro, angle};
-
 #define CHANNELS_NB  7
 
-extern ESC ESCs;
+#include "Arduino.h"
+
+enum Mode { initialization, starting, safety, disarmed, accro, angle};
 
 class Reception {
  public:
     // Reception setup
-    const float ALTI_MAX_VERTICAL_SPEED = 2;  // (2 m.s-1)
     const float MAX_ANGLE  = 45;  // (°) Max roll and pitch angles reachable in angle mode
     const float MAX_ROT_SPEED  = 135;  // (°/s) Max roll and pitch speed in accro mode
     const float MAX_YAW_SPEED  = 135;  // (°/s) Max yaw speed in accro and angle modes
-
-    // Altitute hold parameters
-    const float ALTI_DEAD_ZONE = 0.4;  // (%) altimeter dead zone
-
-    // Upper this limit, vertical speed is positive
-    const float ALTI_LOW_ZONE = 1080+1900*((1-ALTI_DEAD_ZONE)/2);
-
-    // Under this limit, vertical speed is negative
-    const float ALTI_HIGH_ZONE = 1900-1900*((1-ALTI_DEAD_ZONE)/2);
 
     // Channel 1: Ailerons 1.09 to 1.90 ms
     // Channel 2: Prof 1.09 to 1.90 ms
@@ -76,20 +66,10 @@ class Reception {
     inline float GetElevatorSpeed() {
       return (map(cPPM[1], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED));
     }
-    inline int GetThrottle() {
-      return map(cPPM[2], 1080, 1900, ESCs.MIN_POWER, ESCs.MAX_THROTTLE);
+    inline int GetThrottle(const int _minPower, const int _maxThrottle) {
+      return map(cPPM[2], 1080, 1900, _minPower, _maxThrottle);
     }
 
-    inline float GetVerticalSpeed() {
-      if (cPPM[2] < ALTI_LOW_ZONE)
-        return map(cPPM[2], 1080, ALTI_LOW_ZONE, -ALTI_MAX_VERTICAL_SPEED, 0);
-
-      if (cPPM[2] > ALTI_HIGH_ZONE)
-        return map(cPPM[2], ALTI_HIGH_ZONE, 1900, 0, ALTI_MAX_VERTICAL_SPEED);
-
-      // Throttle stick is in dead zone
-      return 0.0;
-    }
     inline int GetRudder() {
       return map(cPPM[3], 1080, 1900, -MAX_YAW_SPEED, MAX_YAW_SPEED);
     }

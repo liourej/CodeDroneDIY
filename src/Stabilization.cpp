@@ -1,12 +1,15 @@
 #include <avr/wdt.h>
 #include "Stabilization.h"
 
-void Stabilization::Init() {
-  // MPU6050: join I2C bus
+void Stabilization::Init(Reception &_Rx) {
+  // ESC
+  ESCs.Init();
+
+ // MPU6050: join I2C bus
   Wire.begin();
   Wire.setClock(400000L);  // Communication with MPU-6050 at 400KHz
 
-  while (!Rx.IsReady()) {
+  while (!_Rx.IsReady()) {
     Serial.println(F("Rx not ready, try again, please wait. "));
     ESCs.Idle();
     wdt_reset();
@@ -14,7 +17,7 @@ void Stabilization::Init() {
   }
   // MPU6050, MS5611: initialize MPU6050 and MS5611 devices (IMU and barometer)
 
-  Attitude.Init();
+  attitude.Init();
 
   if ((ESCs.MAX_POWER == 1860) && (ESCs.MAX_THROTTLE >= (1860 * 0.8)))
     Serial.println(F("!!!!!!!!!!!!!!!!!!!!FLYING MODE POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "));
@@ -46,7 +49,7 @@ void Stabilization::Init() {
 }
 
 void Stabilization::Accro(float _loopTimeSec, Reception &_Rx) {
-  Attitude.GetCurrPos(posCurr, speedCurr, _loopTimeSec);
+  attitude.GetCurrPos(posCurr, speedCurr, _loopTimeSec);
   rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection(_Rx.GetAileronsSpeed(), speedCurr[0],
         _loopTimeSec);
     pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection(_Rx.GetElevatorSpeed(), speedCurr[1],
@@ -56,8 +59,7 @@ void Stabilization::Accro(float _loopTimeSec, Reception &_Rx) {
 }
 
 void Stabilization::Angle(float _loopTimeSec, Reception &_Rx) {
-  Attitude.GetCurrPos(posCurr, speedCurr, _loopTimeSec);
-  stateMachine.throttleWasHigh = true;
+  attitude.GetCurrPos(posCurr, speedCurr, _loopTimeSec);
     rollPosCmd = rollPosPID_Angle.ComputeCorrection(_Rx.GetAileronsAngle(), posCurr[0],
         _loopTimeSec);
     rollMotorPwr = rollSpeedPID_Angle.ComputeCorrection(rollPosCmd, speedCurr[0],
@@ -77,6 +79,8 @@ void Stabilization::PrintAccroModeParameters() {
     rollSpeedPID_Accro.PrintGains();
     pitchSpeedPID_Accro.PrintGains();
     yawSpeedPID_Accro.PrintGains();
+  Serial.print(F("Mixing: "));
+  Serial.println(mixing);
 }
 
 void Stabilization::PrintAngleModeParameters() {
@@ -89,13 +93,15 @@ void Stabilization::PrintAngleModeParameters() {
   yawSpeedPID_Angle.PrintGains();
   Serial.println(F("/********* Complementary filter *********/"));
   Serial.print("Coefficient: ");
-  Serial.print(Attitude.HighPassFilterCoeff);
+  Serial.print(attitude.HighPassFilterCoeff);
   Serial.print(" Time constant: ");
-  Serial.println(Attitude.GetFilterTimeConstant(0.00249));
+  Serial.println(attitude.GetFilterTimeConstant(0.00249));
+  Serial.print(F("Mixing: "));
+  Serial.println(mixing);
 }
 
-void Stabilization::ResetPID(int *_rollMotorPwr, int *_pitchMotorPwr, int *_yawMotorPwr) {
-  *_pitchMotorPwr = *_rollMotorPwr = *_yawMotorPwr = 0;  // No correction if throttle put to min
+void Stabilization::ResetPID() {
+  pitchMotorPwr = rollMotorPwr = yawMotorPwr = 0;  // No correction if throttle put to min
   rollPosPID_Angle.Reset();
   pitchPosPID_Angle.Reset();
   rollSpeedPID_Angle.Reset();
@@ -104,4 +110,21 @@ void Stabilization::ResetPID(int *_rollMotorPwr, int *_pitchMotorPwr, int *_yawM
   rollSpeedPID_Accro.Reset();
   pitchSpeedPID_Accro.Reset();
   yawSpeedPID_Accro.Reset();
+}
+
+//    X configuration:
+//  ESC0(CCW)  ESC1
+//         \  /
+//         /  \
+//     ESC3   ESC2(CCW)
+//
+void Stabilization::XConfig(const int _throttle) {
+  ESCs.write(ESC0, _throttle - pitchMotorPwr * mixing + rollMotorPwr * mixing - yawMotorPwr * mixing);
+  ESCs.write(ESC1,  _throttle - pitchMotorPwr * mixing - rollMotorPwr * mixing + yawMotorPwr * mixing);
+  ESCs.write(ESC2,  _throttle + pitchMotorPwr * mixing - rollMotorPwr * mixing - yawMotorPwr * mixing);
+  ESCs.write(ESC3,  _throttle + pitchMotorPwr * mixing + rollMotorPwr * mixing  + yawMotorPwr * mixing);
+}
+
+void Stabilization::Idle() {
+  ESCs.Idle();
 }
