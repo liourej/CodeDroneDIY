@@ -6,6 +6,7 @@
 #include "StateMachine.h"
 #include "Attitude.h"
 #include "PID.h"
+#include "Stabilization.h"
 
 extern const float GAIN;
 extern float anglePosPIDParams[4];
@@ -18,9 +19,7 @@ const float mixing = 0.5;
 Time time;
 Reception Rx;
 ESC ESCs;
-PID rollPosPID_Angle, pitchPosPID_Angle, yawPosPID_Angle;
-PID rollSpeedPID_Angle, pitchSpeedPID_Angle, yawSpeedPID_Angle;
-PID rollSpeedPID_Accro, pitchSpeedPID_Accro, yawSpeedPID_Accro;
+Stabilization Stabilization;
 Attitude Attitude;
 StateMachine stateMachine;
 
@@ -54,25 +53,11 @@ void PrintSettings(StateMachine _stateMachine) {
   Serial.println(F("/********* settings *********/"));
   if (_stateMachine.state == angle) {
     Serial.println(F("FLYING_MODE_ANGLE"));
-    Serial.println(F("/********* PID settings *********/"));
-    rollPosPID_Angle.PrintGains();
-    pitchPosPID_Angle.PrintGains();
-
-    rollSpeedPID_Angle.PrintGains();
-    pitchSpeedPID_Angle.PrintGains();
-    yawSpeedPID_Angle.PrintGains();
-    Serial.println(F("/********* Complementary filter *********/"));
-    Serial.print("Coefficient: ");
-    Serial.print(Attitude.HighPassFilterCoeff);
-    Serial.print(" Time constant: ");
-    Serial.println(Attitude.GetFilterTimeConstant(0.00249));
+    Stabilization.PrintAngleModeParameters();
   } else if (_stateMachine.state == accro) {
     Serial.println(F("FLYING_MODE_ACCRO"));
-    Serial.println(F("/********* PID settings *********/"));
-    rollSpeedPID_Accro.PrintGains();
-    pitchSpeedPID_Accro.PrintGains();
-    yawSpeedPID_Accro.PrintGains();
-  } else if (_stateMachine.state == disarmed) {
+   Stabilization.PrintAccroModeParameters();
+     } else if (_stateMachine.state == disarmed) {
     Serial.println(F("DISARMED"));
   } else if (_stateMachine.state == safety) {
     Serial.println(F("SAFETY"));
@@ -169,17 +154,7 @@ void XConfig(int _throttle, int _pitchMotorPwr, int _YawMotorPwr, int _rollMotor
       + _rollMotorPwr * mixing  + _YawMotorPwr * mixing);
 }
 
-void ResetPIDCommand(int *_rollMotorPwr, int *_pitchMotorPwr, int *_yawMotorPwr) {
-  *_pitchMotorPwr = *_rollMotorPwr = *_yawMotorPwr = 0;  // No correction if throttle put to min
-  rollPosPID_Angle.Reset();
-  pitchPosPID_Angle.Reset();
-  rollSpeedPID_Angle.Reset();
-  pitchSpeedPID_Angle.Reset();
-  yawSpeedPID_Angle.Reset();
-  rollSpeedPID_Accro.Reset();
-  pitchSpeedPID_Accro.Reset();
-  yawSpeedPID_Accro.Reset();
-}
+
 
 void loop() {
   static float speedCurr[3] = { 0.0, 0.0, 0.0 };  // Teta speed (°/s) (only use gyro)
@@ -210,18 +185,7 @@ void loop() {
         Attitude.GetCurrPos(posCurr, speedCurr, loopTimeSec);
         if (throttle > ESCs.IDLE_THRESHOLD) {
           stateMachine.throttleWasHigh = true;
-          rollPosCmd = rollPosPID_Angle.ComputeCorrection(Rx.GetAileronsAngle(), posCurr[0],
-                                                          loopTimeSec);
-          rollMotorPwr = rollSpeedPID_Angle.ComputeCorrection(rollPosCmd, speedCurr[0],
-                                                              loopTimeSec);
-
-          pitchPosCmd = pitchPosPID_Angle.ComputeCorrection(Rx.GetElevatorAngle(), posCurr[1],
-                                                            loopTimeSec);
-          pitchMotorPwr = pitchSpeedPID_Angle.ComputeCorrection(pitchPosCmd, speedCurr[1],
-                                                                loopTimeSec);
-
-          yawMotorPwr = yawSpeedPID_Angle.ComputeCorrection(Rx.GetRudder(), speedCurr[2],
-                                                            loopTimeSec);
+          Stabilization.Angle(loopTimeSec);
 
           // Allow to change flying mode during flight
           tempState = Rx.GetFlyingMode();
@@ -231,7 +195,7 @@ void loop() {
           }
         } else {
           stateMachine.RefreshState();  // Safety cut mngt: set safety cut after 20s without pwr
-          ResetPIDCommand(&rollMotorPwr, &pitchMotorPwr, &yawMotorPwr);
+          Stabilization.ResetPID(&rollMotorPwr, &pitchMotorPwr, &yawMotorPwr);
         }
         XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
 
@@ -242,12 +206,9 @@ void loop() {
         Attitude.GetCurrPos(posCurr, speedCurr, loopTimeSec);
         if (throttle > ESCs.IDLE_THRESHOLD) {
           stateMachine.throttleWasHigh = true;
-          rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection(Rx.GetAileronsSpeed(), speedCurr[0],
-                                                              loopTimeSec);
-          pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection(Rx.GetElevatorSpeed(), speedCurr[1],
-                                                                loopTimeSec);
-          yawMotorPwr = yawSpeedPID_Accro.ComputeCorrection(Rx.GetRudder(), speedCurr[2],
-                                                            loopTimeSec);
+          
+          Stabilization.Accro(loopTimeSec);
+
           // Allow to change flying mode during flight
           tempState = Rx.GetFlyingMode();
           if (tempState == angle) {
@@ -256,7 +217,7 @@ void loop() {
           }
         } else {
           stateMachine.RefreshState();  // Safety cut management:set safety cut after 5s without pwr
-          ResetPIDCommand(&rollMotorPwr, &pitchMotorPwr, &yawMotorPwr);
+          Stabilization.ResetPID(&rollMotorPwr, &pitchMotorPwr, &yawMotorPwr);
         }
         XConfig(throttle, pitchMotorPwr, yawMotorPwr, rollMotorPwr);
 
@@ -315,24 +276,8 @@ void loop() {
           stateMachine.state = starting;
         if ((stateMachine.state == angle) || (stateMachine.state == accro)) {
           Serial.println(F("stateMachine.state != disarmed MODE"));
-          // Angle mode PID config
-          rollPosPID_Angle.SetGains(anglePosPIDParams);
-          pitchPosPID_Angle.SetGains(anglePosPIDParams);
-          rollSpeedPID_Angle.SetGains(angleSpeedPIDParams);
-          pitchSpeedPID_Angle.SetGains(angleSpeedPIDParams);
-
-          // Adjust Kp from potentiometer on A0
-          yawSpeedPIDParams[1] = map(analogRead(0), 0, 1023, 0, 500);
-          Serial.print("Yaw kP: ");
-          Serial.println(yawSpeedPIDParams[1]);
-          yawSpeedPID_Angle.SetGains(yawSpeedPIDParams);
-
-          // Accro mode PID config
-          rollSpeedPID_Accro.SetGains(accroSpeedPIDParams);
-          pitchSpeedPID_Accro.SetGains(accroSpeedPIDParams);
-          yawSpeedPID_Accro.SetGains(yawSpeedPIDParams);
-
-          PrintSettings(stateMachine);
+        
+                   PrintSettings(stateMachine);
         } else {
           stateMachine.state = starting;
         }
