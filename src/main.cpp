@@ -97,13 +97,6 @@ void setup() {
   // Serial.begin(250000);
   Serial.begin(230400);
 
-  // MPU6050: join I2C bus
-  Wire.begin();
-  Wire.setClock(400000L);  // Communication with MPU-6050 at 400KHz
-
-  // MPU6050, MS5611: initialize MPU6050 and MS5611 devices (IMU and barometer)
-  Attitude.Init();
-
   while (!Rx.IsReady()) {
     Serial.println(F("Rx not ready, try again, please wait. "));
     ESCs.Idle();
@@ -182,10 +175,9 @@ void loop() {
       /*********** ANGLE STATE ***********/
       case angle:
         throttle = Rx.GetThrottle();
-        Attitude.GetCurrPos(posCurr, speedCurr, loopTimeSec);
         if (throttle > ESCs.IDLE_THRESHOLD) {
           stateMachine.throttleWasHigh = true;
-          Stabilization.Angle(loopTimeSec);
+          Stabilization.Angle(loopTimeSec, Rx);
 
           // Allow to change flying mode during flight
           tempState = Rx.GetFlyingMode();
@@ -203,11 +195,10 @@ void loop() {
         /*********** ACCRO STATE ***********/
       case accro:
         throttle = Rx.GetThrottle();
-        Attitude.GetCurrPos(posCurr, speedCurr, loopTimeSec);
         if (throttle > ESCs.IDLE_THRESHOLD) {
           stateMachine.throttleWasHigh = true;
           
-          Stabilization.Accro(loopTimeSec);
+          Stabilization.Accro(loopTimeSec, Rx);
 
           // Allow to change flying mode during flight
           tempState = Rx.GetFlyingMode();

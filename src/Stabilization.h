@@ -41,8 +41,8 @@ class Stabilization {
     Attitude Attitude;
   public:
     void Init();
-    void Accro(float _loopTimeSec);
-    void Angle(float _loopTimeSec);
+    void Accro(float _loopTimeSec, Reception &_Rx);
+    void Angle(float _loopTimeSec, Reception &_Rx);
     void PrintAccroModeParameters();
     void PrintAngleModeParameters();
     void ResetPID(int *_rollMotorPwr, int *_pitchMotorPwr, int *_yawMotorPwr);

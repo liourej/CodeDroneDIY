@@ -45,28 +45,30 @@ void Stabilization::Init() {
   yawSpeedPID_Accro.SetGains(yawSpeedPIDParams);
 }
 
-void Stabilization::Accro(float _loopTimeSec) {
-    rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection(Rx.GetAileronsSpeed(), speedCurr[0],
+void Stabilization::Accro(float _loopTimeSec, Reception &_Rx) {
+  Attitude.GetCurrPos(posCurr, speedCurr, _loopTimeSec);
+  rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection(_Rx.GetAileronsSpeed(), speedCurr[0],
         _loopTimeSec);
-    pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection(Rx.GetElevatorSpeed(), speedCurr[1],
+    pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection(_Rx.GetElevatorSpeed(), speedCurr[1],
         _loopTimeSec);
-    yawMotorPwr = yawSpeedPID_Accro.ComputeCorrection(Rx.GetRudder(), speedCurr[2],
+    yawMotorPwr = yawSpeedPID_Accro.ComputeCorrection(_Rx.GetRudder(), speedCurr[2],
         _loopTimeSec);
 }
 
-void Stabilization::Angle(float _loopTimeSec) {
-    stateMachine.throttleWasHigh = true;
-    rollPosCmd = rollPosPID_Angle.ComputeCorrection(Rx.GetAileronsAngle(), posCurr[0],
+void Stabilization::Angle(float _loopTimeSec, Reception &_Rx) {
+  Attitude.GetCurrPos(posCurr, speedCurr, _loopTimeSec);
+  stateMachine.throttleWasHigh = true;
+    rollPosCmd = rollPosPID_Angle.ComputeCorrection(_Rx.GetAileronsAngle(), posCurr[0],
         _loopTimeSec);
     rollMotorPwr = rollSpeedPID_Angle.ComputeCorrection(rollPosCmd, speedCurr[0],
         _loopTimeSec);
 
-    pitchPosCmd = pitchPosPID_Angle.ComputeCorrection(Rx.GetElevatorAngle(), posCurr[1],
+    pitchPosCmd = pitchPosPID_Angle.ComputeCorrection(_Rx.GetElevatorAngle(), posCurr[1],
         _loopTimeSec);
     pitchMotorPwr = pitchSpeedPID_Angle.ComputeCorrection(pitchPosCmd, speedCurr[1],
         _loopTimeSec);
 
-    yawMotorPwr = yawSpeedPID_Angle.ComputeCorrection(Rx.GetRudder(), speedCurr[2],
+    yawMotorPwr = yawSpeedPID_Angle.ComputeCorrection(_Rx.GetRudder(), speedCurr[2],
         _loopTimeSec);
 }
 
