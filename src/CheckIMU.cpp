@@ -1,11 +1,12 @@
-#include "MPU6050.h"
 #include "CheckIMU.h"
+#include "MPU6050.h"
 
 /*float ComputeAccFactoryTrimValue(float _accTestVal) {
   if (_accTestVal == 0)
     return 0;
   else
-    return (4096 * 0.34 * pow(0.92, ((_accTestVal - 1) / (pow(2, 5) - 2))) / 0.34);
+    return (4096 * 0.34 * pow(0.92, ((_accTestVal - 1) / (pow(2, 5) - 2))) /
+0.34);
 }
 
 float ComputeGyroFactoryTrimValue(float _gyroTestVal, bool _isYcoord) {
@@ -30,14 +31,18 @@ bool CheckGyro(MPU6050 _accelgyro) {
   _accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
 
   delay(500);
-  _accelgyro.getMotion6(&dataTestDisabled[0], &dataTestDisabled[1], &dataTestDisabled[2],
+  _accelgyro.getMotion6(&dataTestDisabled[0], &dataTestDisabled[1],
+&dataTestDisabled[2],
   &dataTestDisabled[3], &dataTestDisabled[4], &dataTestDisabled[5]);
 
-  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT,
+  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG,
+MPU6050_GCONFIG_XG_ST_BIT,
   true);
-  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT,
+  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG,
+MPU6050_GCONFIG_XG_ST_BIT,
   true);
-  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT,
+  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG,
+MPU6050_GCONFIG_XG_ST_BIT,
   true);
 
   delay(500);
@@ -48,9 +53,12 @@ bool CheckGyro(MPU6050 _accelgyro) {
   rawData[3] = _accelgyro.getAccelMixedSelfTestVal();
 
   // Extract the gyration test results first
-  dataTestEnabled[3] = rawData[0]  & 0x1F;  // XG_TEST result is a five-bit unsigned integer
-  dataTestEnabled[4] = rawData[1]  & 0x1F;  // YG_TEST result is a five-bit unsigned integer
-  dataTestEnabled[5] = rawData[2]  & 0x1F;  // ZG_TEST result is a five-bit unsigned integer
+  dataTestEnabled[3] = rawData[0]  & 0x1F;  // XG_TEST result is a five-bit
+unsigned integer
+  dataTestEnabled[4] = rawData[1]  & 0x1F;  // YG_TEST result is a five-bit
+unsigned integer
+  dataTestEnabled[5] = rawData[2]  & 0x1F;  // ZG_TEST result is a five-bit
+unsigned integer
 
   for (int axis = 3; axis < 6; axis ++) {  // Gyro data
     if ( axis == 4)  // If axis is Y, computation is different (negative sign)
@@ -71,11 +79,14 @@ bool CheckGyro(MPU6050 _accelgyro) {
   Serial.println(trimChange[5]);
 
   // Restore normal operating
-  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT,
+  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG,
+MPU6050_GCONFIG_XG_ST_BIT,
   false);
-  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT,
+  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG,
+MPU6050_GCONFIG_XG_ST_BIT,
   false);
-  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_XG_ST_BIT,
+  I2Cdev::writeBit(MPU6050_DEFAULT_ADDRESS, MPU6050_RA_GYRO_CONFIG,
+MPU6050_GCONFIG_XG_ST_BIT,
   false);
   _accelgyro.setFullScaleGyroRange(storeGyroSensitivity);
 
@@ -95,9 +106,11 @@ bool CheckAccelero(MPU6050 _accelgyro, const float _acceleroSensitivity) {
   _accelgyro.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
 
   delay(500);
-  _accelgyro.getMotion6(&dataTestDisabled[0], &dataTestDisabled[1], &dataTestDisabled[2],
+  _accelgyro.getMotion6(&dataTestDisabled[0], &dataTestDisabled[1],
+&dataTestDisabled[2],
   &dataTestDisabled[3], &dataTestDisabled[4], &dataTestDisabled[5]);
-  dataTestDisabled[2] = dataTestDisabled[2] - _acceleroSensitivity;  // Remove gravity
+  dataTestDisabled[2] = dataTestDisabled[2] - _acceleroSensitivity;  // Remove
+gravity
   _accelgyro.setAccelXSelfTest(true);
   _accelgyro.setAccelYSelfTest(true);
   _accelgyro.setAccelZSelfTest(true);

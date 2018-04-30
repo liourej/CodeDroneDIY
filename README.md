@@ -265,6 +265,9 @@ platformio platform install atmelavr --with-package=framework-arduinoavr
 platformio lib install MPU6050
 pio lib install "I2Cdevlib-MPU6050"
 ```
+Optional, for code format:
+```sudo apt-get install -y clang-format```
+
 ### 8.2.Build project
 ```platformio run```
 
