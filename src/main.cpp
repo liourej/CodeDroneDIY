@@ -120,7 +120,7 @@ void loop()
                                   stabilization.GetESCsMaxThrottle());
         if (throttle > stabilization.GetESCIdleThreshold()) {
             stateMachine.throttleWasHigh = true;
-            stabilization.Angle(loopTimeSec, Rx);
+            stabilization.Angle(loopTimeSec, Rx, throttle);
 
             // Allow to change flying mode during flight
             tempState = Rx.GetFlyingMode();
@@ -131,10 +131,8 @@ void loop()
         } else {
             stateMachine.RefreshState(); // Safety cut mngt: set safety cut
                                          // after 20s without pwr
-            stabilization.ResetPID();
+            stabilization.ResetPID(throttle);
         }
-        stabilization.XConfig(throttle);
-
         break;
     /*********** ACCRO STATE ***********/
     case accro:
@@ -143,7 +141,7 @@ void loop()
         if (throttle > stabilization.GetESCIdleThreshold()) {
             stateMachine.throttleWasHigh = true;
 
-            stabilization.Accro(loopTimeSec, Rx);
+            stabilization.Accro(loopTimeSec, Rx, throttle);
 
             // Allow to change flying mode during flight
             tempState = Rx.GetFlyingMode();
@@ -154,10 +152,8 @@ void loop()
         } else {
             stateMachine.RefreshState(); // Safety cut management:set safety cut
                                          // after 5s without pwr
-            stabilization.ResetPID();
+            stabilization.ResetPID(throttle);
         }
-        stabilization.XConfig(throttle);
-
         break;
     /*********** SAFETY STATE ***********/
     case safety:

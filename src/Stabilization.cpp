@@ -52,32 +52,52 @@ void Stabilization::Init(Reception &_Rx)
     yawSpeedPID_Accro.SetGains(yawSpeedPIDParams);
 }
 
-void Stabilization::Accro(float _loopTimeSec, Reception &_Rx)
+void Stabilization::Accro(float _loopTimeSec, Reception &_Rx,
+                          const int _throttle)
 {
+    // Get current attitude (roll, pitch, yaw speeds)
     attitude.GetCurrPos(posCurr, speedCurr, _loopTimeSec);
+
+    // Compute new speed commandi for each axis
     rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection(
             _Rx.GetAileronsSpeed(), speedCurr[0], _loopTimeSec);
     pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection(
             _Rx.GetElevatorSpeed(), speedCurr[1], _loopTimeSec);
     yawMotorPwr = yawSpeedPID_Accro.ComputeCorrection(
             _Rx.GetRudder(), speedCurr[2], _loopTimeSec);
+
+    // Apply computed speed command to motors
+    SetMotorsPwrXConfig(_throttle);
 }
 
-void Stabilization::Angle(float _loopTimeSec, Reception &_Rx)
+void Stabilization::Angle(float _loopTimeSec, Reception &_Rx,
+                          const int _throttle)
 {
+    // Get current attitude (roll, pitch, yaw angles and speeds)
     attitude.GetCurrPos(posCurr, speedCurr, _loopTimeSec);
+
+    // Compute roll position command
     rollPosCmd = rollPosPID_Angle.ComputeCorrection(_Rx.GetAileronsAngle(),
                                                     posCurr[0], _loopTimeSec);
+
+    // Compute roll speed command
     rollMotorPwr = rollSpeedPID_Angle.ComputeCorrection(
             rollPosCmd, speedCurr[0], _loopTimeSec);
 
+    // Compute pitch position command
     pitchPosCmd = pitchPosPID_Angle.ComputeCorrection(_Rx.GetElevatorAngle(),
                                                       posCurr[1], _loopTimeSec);
+
+    // Compute pitch speed command
     pitchMotorPwr = pitchSpeedPID_Angle.ComputeCorrection(
             pitchPosCmd, speedCurr[1], _loopTimeSec);
 
+    // Compute yaw speed command
     yawMotorPwr = yawSpeedPID_Angle.ComputeCorrection(
             _Rx.GetRudder(), speedCurr[2], _loopTimeSec);
+
+    // Apply computed command to motors
+    SetMotorsPwrXConfig(_throttle);
 }
 
 void Stabilization::PrintAccroModeParameters()
@@ -108,7 +128,7 @@ void Stabilization::PrintAngleModeParameters()
     Serial.println(mixing);
 }
 
-void Stabilization::ResetPID()
+void Stabilization::ResetPID(const int _throttle)
 {
     pitchMotorPwr = rollMotorPwr = yawMotorPwr =
             0; // No correction if throttle put to min
@@ -120,6 +140,8 @@ void Stabilization::ResetPID()
     rollSpeedPID_Accro.Reset();
     pitchSpeedPID_Accro.Reset();
     yawSpeedPID_Accro.Reset();
+
+    SetMotorsPwrXConfig(_throttle);
 }
 
 //    X configuration:
@@ -128,7 +150,7 @@ void Stabilization::ResetPID()
 //         /  \
 //     ESC3   ESC2(CCW)
 //
-void Stabilization::XConfig(const int _throttle)
+void Stabilization::SetMotorsPwrXConfig(const int _throttle)
 {
     ESCs.write(ESC0,
                _throttle - pitchMotorPwr * mixing + rollMotorPwr * mixing

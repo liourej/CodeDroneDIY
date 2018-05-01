@@ -40,14 +40,14 @@ class Stabilization
     Attitude attitude;
 
   public:
-    void XConfig(const int _throttle);
+    void SetMotorsPwrXConfig(const int _throttle);
     void Init(Reception &_Rx);
     void Idle();
-    void Accro(float _loopTimeSec, Reception &_Rx);
-    void Angle(float _loopTimeSec, Reception &_Rx);
+    void Accro(float _loopTimeSec, Reception &_Rx, const int _throttle);
+    void Angle(float _loopTimeSec, Reception &_Rx, const int _throttle);
     void PrintAccroModeParameters();
     void PrintAngleModeParameters();
-    void ResetPID();
+    void ResetPID(const int _throttle);
     void SetESCsPWM(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA)
     {
         ESCs.SetPWM_f5(TCNTn, OCRnA);
