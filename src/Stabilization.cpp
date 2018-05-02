@@ -152,18 +152,14 @@ void Stabilization::ResetPID(const int _throttle)
 //
 void Stabilization::SetMotorsPwrXConfig(const int _throttle)
 {
-    ESCs.write(ESC0,
-               _throttle - pitchMotorPwr * mixing + rollMotorPwr * mixing
-                       - yawMotorPwr * mixing);
-    ESCs.write(ESC1,
-               _throttle - pitchMotorPwr * mixing - rollMotorPwr * mixing
-                       + yawMotorPwr * mixing);
-    ESCs.write(ESC2,
-               _throttle + pitchMotorPwr * mixing - rollMotorPwr * mixing
-                       - yawMotorPwr * mixing);
-    ESCs.write(ESC3,
-               _throttle + pitchMotorPwr * mixing + rollMotorPwr * mixing
-                       + yawMotorPwr * mixing);
+    ESCs.write(ESC0, _throttle - pitchMotorPwr * mixing + rollMotorPwr * mixing
+                             - yawMotorPwr * mixing);
+    ESCs.write(ESC1, _throttle - pitchMotorPwr * mixing - rollMotorPwr * mixing
+                             + yawMotorPwr * mixing);
+    ESCs.write(ESC2, _throttle + pitchMotorPwr * mixing - rollMotorPwr * mixing
+                             - yawMotorPwr * mixing);
+    ESCs.write(ESC3, _throttle + pitchMotorPwr * mixing + rollMotorPwr * mixing
+                             + yawMotorPwr * mixing);
 }
 
 void Stabilization::Idle()

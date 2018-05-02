@@ -19,11 +19,10 @@ void Attitude::Init()
         Serial.println(F("Test failed"));
 
     Serial.println(F("/********* IMU self-test *********/"));
-    /*  if (!CheckIMU(accelgyro, AcceleroSensitivity))
+    if (!CheckIMU(accelgyro, AcceleroSensitivity))
         Serial.println(F("IMU SELF TEST FAILED !!!!!"));
-      else
+    else
         Serial.println(F("IMU self test succeed"));
-    */
 }
 
 inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[],
