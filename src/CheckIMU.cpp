@@ -1,26 +1,22 @@
 #include "CheckIMU.h"
 #include "MPU6050.h"
 
-float ComputeAccFactoryTrimValue(float _accTestVal)
+bool CheckIMU::All(MPU6050 &_accelgyro, const float _AcceleroSensitivity)
 {
-    if (_accTestVal == 0)
-        return 0;
-    else
-        return (4096 * 0.34 * pow(0.92, ((_accTestVal - 1) / (pow(2, 5) - 2)))
-                / 0.34);
+    bool testSucceed = true;
+
+    // Check accelerometers
+    if (!Accelero(_accelgyro, _AcceleroSensitivity))
+        testSucceed = false;
+
+    // Check Gyroscopes
+    if (!Gyro(_accelgyro))
+        testSucceed = false;
+
+    return testSucceed;
 }
 
-float ComputeGyroFactoryTrimValue(float _gyroTestVal, bool _isYcoord)
-{
-    if (_gyroTestVal == 0)
-        return 0;
-    else if (_isYcoord)
-        return (-25 * 131 * pow(1.046, _gyroTestVal - 1));
-    else
-        return (25 * 131 * pow(1.046, _gyroTestVal - 1));
-}
-
-bool CheckGyro(MPU6050 _accelgyro)
+bool CheckIMU::Gyro(MPU6050 &_accelgyro)
 {
     float dataTestEnabled[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     int16_t dataTestDisabled[6] = {0, 0, 0, 0, 0, 0};
@@ -96,7 +92,7 @@ bool CheckGyro(MPU6050 _accelgyro)
     return testSucceed;
 }
 
-bool CheckAccelero(MPU6050 _accelgyro, const float _acceleroSensitivity)
+bool CheckIMU::Accelero(MPU6050 &_accelgyro, const float _acceleroSensitivity)
 {
     float dataTestEnabled[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     int16_t dataTestDisabled[6] = {0, 0, 0, 0, 0, 0};
@@ -115,9 +111,7 @@ bool CheckAccelero(MPU6050 _accelgyro, const float _acceleroSensitivity)
                           &dataTestDisabled[4], &dataTestDisabled[5]);
     dataTestDisabled[2] = dataTestDisabled[2] - _acceleroSensitivity; // Remove
                                                                       // gravity
-    _accelgyro.setAccelXSelfTest(true);
-    _accelgyro.setAccelYSelfTest(true);
-    _accelgyro.setAccelZSelfTest(true);
+    SetAccelSelfTest(_accelgyro, true);
 
     delay(500);
     uint8_t rawData[3];
@@ -157,26 +151,35 @@ bool CheckAccelero(MPU6050 _accelgyro, const float _acceleroSensitivity)
     Serial.println(trimChange[2]);
 
     // Restore normal operating
-    _accelgyro.setAccelXSelfTest(false);
-    _accelgyro.setAccelYSelfTest(false);
-    _accelgyro.setAccelZSelfTest(false);
+    SetAccelSelfTest(_accelgyro, false);
     _accelgyro.setFullScaleAccelRange(storeAccSensitivity);
     delay(500);
 
     return testSucceed;
 }
 
-bool CheckIMU(MPU6050 _accelgyro, const float _AcceleroSensitivity)
+void CheckIMU::SetAccelSelfTest(MPU6050 &_accelgyro, const bool _enable)
 {
-    bool testSucceed = true;
+    _accelgyro.setAccelXSelfTest(_enable);
+    _accelgyro.setAccelYSelfTest(_enable);
+    _accelgyro.setAccelZSelfTest(_enable);
+}
 
-    // Check accelerometers
-    if (!CheckAccelero(_accelgyro, _AcceleroSensitivity))
-        testSucceed = false;
+float CheckIMU::ComputeAccFactoryTrimValue(float _accTestVal)
+{
+    if (_accTestVal == 0)
+        return 0;
+    else
+        return (4096 * 0.34 * pow(0.92, ((_accTestVal - 1) / (pow(2, 5) - 2)))
+                / 0.34);
+}
 
-    // Check Gyroscopes
-    if (!CheckGyro(_accelgyro))
-        testSucceed = false;
-
-    return testSucceed;
+float CheckIMU::ComputeGyroFactoryTrimValue(float _gyroTestVal, bool _isYcoord)
+{
+    if (_gyroTestVal == 0)
+        return 0;
+    else if (_isYcoord)
+        return (-25 * 131 * pow(1.046, _gyroTestVal - 1));
+    else
+        return (25 * 131 * pow(1.046, _gyroTestVal - 1));
 }

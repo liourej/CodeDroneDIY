@@ -8,6 +8,7 @@
 // for both classes must be in the include path of your project
 #include "I2Cdev.h"
 #include "MPU6050.h"
+#include "CheckIMU.h"
 
 class Attitude
 {
@@ -37,6 +38,7 @@ class Attitude
     int indice = 0;
 
   private:
+    CheckIMU checkIMU;
     MPU6050 accelgyro; // IMU
     void GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]);
     void Normalize(float _acc[]);

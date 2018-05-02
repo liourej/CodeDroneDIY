@@ -19,7 +19,7 @@ void Attitude::Init()
         Serial.println(F("Test failed"));
 
     Serial.println(F("/********* IMU self-test *********/"));
-    if (!CheckIMU(accelgyro, AcceleroSensitivity))
+    if (!checkIMU.All(accelgyro, AcceleroSensitivity))
         Serial.println(F("IMU SELF TEST FAILED !!!!!"));
     else
         Serial.println(F("IMU self test succeed"));
