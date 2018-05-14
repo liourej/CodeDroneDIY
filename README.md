@@ -54,6 +54,13 @@
 8.2.1. PlatformIO installation
 
 8.2.2. Build project
+<<<<<<< HEAD
+=======
+
+8.2.3. Flash target
+
+8.3. Using Docker
+>>>>>>> 1fc94811a941961231386a1c8a73fe795028b923
 
 8.2.3. Flash target
 
@@ -87,6 +94,7 @@ horizontal
 
 I strongly advice to start by implementing the accrobatic mode, since a good accro mode will be a solid fundation
 for angle mode, and it is easy and fast to implement.
+<<<<<<< HEAD
 
 ### 1.2 Progress state
 Releases have been successfully tested during flights tests: I have some nice flights in FPV on a
@@ -98,6 +106,17 @@ Note that you may also have to tune PID according to your configuration.
 
 I advice you to use a large frame (450mm for exemple), because it is more stable, and I did not test the software on smaller frames.
 
+=======
+
+### 1.2 Progress state
+Releases have been successfully tested during flights tests: I have some nice flights in FPV on a
+450mm frame, both in accro and angle modes.
+BUT, this project is sometimes updated, mainly for code format, and unfortunately, I cannot realize flight tests for each submit.
+So, I cannot garantee that the last commit will allow to flight without some corrections.
+note that you may also have to tune PID according to your configuration.
+I advice you to use a large frame (450mm for exemple), because it is more stable, and I did not test the software on smaller frames.
+
+>>>>>>> 1fc94811a941961231386a1c8a73fe795028b923
 ## 2. Attitude computation <a id="Test"></a>
 
 The first step to stabilize an UAV is to compute its attitude: the angles from the horizontal (roll,
@@ -123,6 +142,7 @@ This projet use an MPU6050 IMU sensor which communicates with the microcontroler
 
 #### 2.1.1 Gyroscopes
 
+<<<<<<< HEAD
 **Flight modes involved:** Both
 
 **Output data:** Attitude rotation speeds. They  are the only physical quantity needed for accro mode
@@ -131,6 +151,19 @@ stabilization.
 **Computed data:** Attitude angles are computed from raw gyroscope data integration. These computed data are needed for
 angle mode stabilization.
 
+=======
+** Flight modes involved **
+Both
+
+** Output data **
+Attitude rotation speeds. They  are the only physical quantity needed for accro mode
+stabilization.
+
+** Computed data **
+Attitude angles are computed from raw gyroscope data integration. These computed data are needed for
+angle mode stabilization.
+
+>>>>>>> 1fc94811a941961231386a1c8a73fe795028b923
 Exemple of pitch attitude angle computation using gyroscopes:
 ```
 // currentPitch = previousPitch + rawSensorPitch*loopTime
@@ -139,11 +172,22 @@ _pos[0] = _pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time;
 
 #### 2.1.2 Accelerometers
 
+<<<<<<< HEAD
 **Flight modes involved:** Only angle mode stabilization.
 
 **Output data:** Acceleration on each axis
 
 **Computed data:** Attitude angles are computed from accelerations:
+=======
+** Flight modes involved **
+Only angle mode stabilization.
+
+** Output data **
+Acceleration on each axis
+
+** Computed data **
+Attitude angles are computed from accelerations:
+>>>>>>> 1fc94811a941961231386a1c8a73fe795028b923
 when UAV is not moving, or if it is moving at constant speed, accelerometers measure gravity, ie
 vertical acceleration.
 Angle between UAV and the gravity vector is computed by trigonometry.
@@ -154,9 +198,17 @@ Exemple of pitch attitude angl ecomputation using accelerometers:
 
 ## 2.2 Data merging: the complementary filter
 
+<<<<<<< HEAD
 **Flight modes involved:** Data mergin is only needed for angle mode stabilization: it is use to compute attitude angles.
 
 **Explanation:** The gyroscope sensor drift.
+=======
+** Flight modes involved **
+Data mergin is only needed for angle mode stabilization: it is use to compute attitude angles.
+
+** Explanation **
+The gyroscope sensor drift.
+>>>>>>> 1fc94811a941961231386a1c8a73fe795028b923
 Accelerometers are not fast enougth, they are noizy, and they are usable only when the UAV is not moving, and when UAV receive only earth acceleration.
 
 The complementary filter is a very simple filter which allows to merge data from gyroscopes and accelerometers, and mask their respective errors:
@@ -170,6 +222,7 @@ Complementary filter time constant is a compromise between UAV acceleration filt
 * Too low, accelerometer noize are not eliminated
 * Too high, gyroscopes drift is not compensated
 
+<<<<<<< HEAD
 **Computation:**
 
   ```
@@ -179,13 +232,24 @@ Complementary filter time constant is a compromise between UAV acceleration filt
 Remark: LowPassFilterCoeff = 1 - HighPassFilterCoeff
 
 Time constant in this project is set to 5 seconds. It implies a coefficient "HighPassFilterCoeff" of 0.9995 for a loop time of 2.49 ms.
+=======
+** Computation **
+Time constant in this project is set to 5 seconds. It implies a coefficient of 0.9995 for a loop time of 2.49 ms.
+>>>>>>> 1fc94811a941961231386a1c8a73fe795028b923
 Be carefull, the time constant depends on the control loop time:
 
 timeCste = HighPassFilterCoeff*dt/(1-coeff)
 
 HighPassFilterCoeff = timeCste/(dt + timeCste)
 
+<<<<<<< HEAD
 **Note:** More efficient filters like the Kalman one are used in UAV, but they are more complicated to understand, and we want a very simple DIY software!
+=======
+  ```
+ _pos[0] = HighPassFilterCoeff*(_pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time) +
+ LowPassFilterCoeff*((atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI));
+```
+>>>>>>> 1fc94811a941961231386a1c8a73fe795028b923
 
 ## 3. Stabilization
 ### 3.1 Accro mode (gyroscopes only)
@@ -300,10 +364,17 @@ With minor modifications, project can be build using Arduino IDE:
 * rename "main.cpp" to "CodeDroneDIY.ino"
 * copy all source files from "CodeDroneDIY/src" to "CodeDroneDIY"
 * Launch and compile "CodeDroneDIY.ino" using Arduino IDE
+<<<<<<< HEAD
 
 ### 8.2. Using PlatformIO
 PlatformIO is an open source ecosystem for IoT development.
 
+=======
+
+### 8.2. Using PlatformIO
+PlatformIO is an open source ecosystem for IoT development.
+
+>>>>>>> 1fc94811a941961231386a1c8a73fe795028b923
 #### 8.2.1. PlatformIO installation
 ```sudo apt-get update
 sudo apt-get install python-pip
