@@ -23,7 +23,7 @@
 
 **3.Stabilization**
 
-3.1. Accro mode (gyroscopes only)
+3.1.Accro mode (gyroscopes only)
 
 3.2.Angle mode (gyroscopes and accelerometers)
 
@@ -33,7 +33,7 @@
 
 **5.CPPM Reception**
 
-**6. Source code organization « CodeDroneDIY »**
+**6.Source code organization « CodeDroneDIY »**
 
 **7.Hardware configuration**
 
@@ -47,11 +47,13 @@
 
 **8.Project setup**
 
-8.1.Platformio installation
+8.1.1.Platformio installation
 
-8.2.Build project
+8.1.2.Build project
 
-8.3.Flash target
+8.1.3.Flash target
+
+8.2.Using Docker
 
 **9.First Person View (FPV)**
 
@@ -157,13 +159,6 @@ Attitude is computed using a complementary filter, merging gyroscope dans accele
 
 ![AsservissementAngle](/ReadmePictures/AsservissementAngle.jpg "AsservissementAngle")
 
-## 3.3 Height stabilization
-
-Measuring pressure using a barometer sensor allows to compute the UAV height.
-This sensor is light and pressure sensitive: it needs to be isolated from propeller blow and air circulation due to UAV moves.
-
-This project uses a MS5611 choosen for its accuracy. It uses I2C communication with the microcontroller.
-
 ## 4. State machine
 
 The system has 6 states:
@@ -189,17 +184,15 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 
 | File      | Description      |
 | -------------- | -------------- |
-| CodeDroneDIY.ino | Initialization fucntion and main loop |
-| GetPosition.cpp | Gyro and accelero raw data intergration and merging, attitude angles computation |
-| MPU6050.cpp | Library for MPU6050 raw data acquisition |
-| PID.cpp | Proportionnal, integral, derivative loop correction |
+| main.cpp | Contains initialization function "setup()" and main loop "loop()" |
+| Attitude.cpp/h | Attitude angles computation (roll, pitch, yaw angles) |
+| Stabilization.cpp/h | Closed loop correction: computes new command from tx sticks and attitude |
+| PID.cpp/h | Proportionnal, integral, derivative loop correction |
 | Reception.h | Receiver CPPM signal acquisition using INT0 |
-| ESC.h | Manage an ESC: pin, PWM to set |
-| SetPWM.h | Set PWM to ESC using timer 0 |
-| Settings.h | All parameters: max power, PID settings... |
+| ESC.cpp/h | Manage an ESC: pin, PWM to set |
 | StateMachine.h | State machine |
 | Time.h | To measure loop time and elapsed time |
-| checkIMU.cpp | IMU checking before using |
+| checkIMU.cpp/h | To check IMU sensors |
 
 ## 7. Hardware configuration
 
@@ -208,13 +201,12 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 | Component      | Reference      |
 | -------------- | -------------- |
 | **Microcontroller board** | Arduino Nano |
-| **ESC** | Afro 20A-Simonk firmware 500Hz, BEC 0.5A 1060 à 1860 us de largeur d'impulsion |
+| **ESC** | Afro 20A-Simonk firmware 500Hz, BEC 0.5A 1060 to 1860 us pulse width |
 | **Motors** | Multistar 2216-800Kv 14 Poles - 222W Current max: 20A Shaft: 3mm 2-4S|
 | **Propellers** | 10x4.5 SF Props 2pc CW 2 pc CCW Rotation (Orange) |
 | **Battery** | Zippy Flightmax 3000mAh 4S |
 | **Receiver** | OrangeRx R617XL CPPM DSM2/DSMX 6 ch |
 | **IMU** | MPU6050 (GY-86 breakout board)|
-| **Barometer** | MS5611 (GY-86 breakout board) |
 | **Compass** | HMC5883L (GY-86 breakout board) |
 | **Buzzer** | Matek lost model beeper - Built-in MCU |
 | **Frame** | Diatone Q450 Quad 450 V3. Wide 450 mm frame choosen for better stability and higher autonomy. ![Chassis](/ReadmePictures/Chassis.jpg "Chassis")|
@@ -235,8 +227,8 @@ TODO: add receiver in schematic
 | PD6 | ESC2 |
 | PD7 | ESC3 |
 | PC0 | potentiometer |
-| PC4 | SDA MPU6050 & MS5611 |
-| PC5 | SCL MPU6050 & MS5611 |
+| PC4 | SDA MPU6050 |
+| PC5 | SCL MPU6050 |
 
 ![flightConfiguration](/ReadmePictures/flightConfiguration.jpg "flightConfiguration")
 
@@ -246,10 +238,10 @@ TODO: add receiver in schematic
 For security, you must set the failsafe to cut motors power when radio link is lost.
 
 To set the failsafe:
-1. Put transmitter commands in the configuration wanted when reception is lost
+1. Put transmitter sticks in the configuration wanted when reception is lost
 2. Bind the receiver with the transmitter
 
-Trasnmitter configuration used during the « bind » operation defines the « failsafe. »
+Transmitter configuration used during the « bind » operation defines the « failsafe. »
 
 ### 7.4 The benchtest
 
@@ -257,19 +249,33 @@ Trasnmitter configuration used during the « bind » operation defines the «�
 
 ## 8.Project setup
 
-### 8.1.Platformio installation
+### 8.1. Using PlatformIO
+
+#### 8.1.1. PlatformIO installation
 ```sudo apt-get update
 sudo apt-get install python-pip
 sudo pip install --upgrade pip && sudo pip install -U platformio==3.5.2
 platformio platform install atmelavr --with-package=framework-arduinoavr
 platformio lib install MPU6050
-pio lib install "I2Cdevlib-MPU6050"
-```
-### 8.2.Build project
+pio lib install "I2Cdevlib-MPU6050"```
+
+Optional, for code format:
+
+```sudo apt-get install -y clang-format```
+
+### 8.1.2. Build project
 ```platformio run```
 
-### 8.3.Flash target
+### 8.1.3. Flash target
 ```platformio upload --upload-port/ttyACM0 ```
+
+### 8.2. Using Docker
+
+* Install Docker
+* Move inside docker's folder: ```cd docker```
+* Build docker image: ```make image```
+* Format code: ```make format-all```
+* build project: ```make build-codedronediy```
 
 ## 9. FPV - First Person View
 | Component      | Reference      |

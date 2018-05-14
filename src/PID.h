@@ -3,8 +3,9 @@
 
 #include "Arduino.h"
 
-class PID {
- private:
+class PID
+{
+  private:
     float G = 0;
     float Kp, Kd, Ki = 0;
     float speedCmd = 0;
@@ -16,11 +17,11 @@ class PID {
     float errorPrev = 0;
     float integrator = 0;
 
- public:
+  public:
     void SetGains(float _params[4]);
     void Reset();
     int ComputeCorrection(float _cmd, float _pos, float _loopTime);
     void PrintGains(void);
 };
 
-#endif  // PID_H_
+#endif // PID_H_

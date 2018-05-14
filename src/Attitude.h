@@ -8,18 +8,23 @@
 // for both classes must be in the include path of your project
 #include "I2Cdev.h"
 #include "MPU6050.h"
+#include "CheckIMU.h"
 
-class Attitude {
- public:
-    /* /!\ HighPassFilterCoeff is an important coeff for complementary filter /!\
-      Too high, position will drift, to low, there will be noise from accelerometer
+class Attitude
+{
+  public:
+    /* /!\ HighPassFilterCoeff is an important coeff for complementary filter
+      /!\
+      Too high, position will drift, to low, there will be noise from
+      accelerometer
       14-Jul-2017: loop time = 2.49ms. Gyro does not drift with coef =< 0.999
       timeCste = (coeff*dt)/(1-coeff)
-       coeff = timeCste/(dt + timeCste) If we want 0.5sec, coeff = 0.5/(0.003 + 0.5) = 0.994
+       coeff = timeCste/(dt + timeCste) If we want 0.5sec, coeff = 0.5/(0.003 +
+      0.5) = 0.994
     */
-    float HighPassFilterCoeff = 0.9995;  // 0.994;
+    float HighPassFilterCoeff = 0.9995; // 0.994;
 
-    const float AcceleroSensitivity = 4096;  // LSB/g at -+8g sensitivity
+    const float AcceleroSensitivity = 4096; // LSB/g at -+8g sensitivity
 
     // LSB/°/s  250=>131 or 500=>65.5 or 1000=>32.8 or 2000=>16.4
     const float GyroSensitivity = 32.8;
@@ -27,22 +32,26 @@ class Attitude {
     bool offsetComputed = false;
     int16_t offset[6] = {0, 0, 0, 0, 0, 0};
 
- private:
+  private:
     bool initialized = false;
     float measures[10];
     int indice = 0;
 
- private:
-    MPU6050 accelgyro;  // IMU
+  private:
+    CheckIMU checkIMU;
+    MPU6050 accelgyro; // IMU
     void GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]);
     void Normalize(float _acc[]);
 
- public:
+  public:
     void Init();
     float GetFilterTimeConstant(float _loopTime);
-    bool AreOffsetComputed(void) { return offsetComputed; }
+    bool AreOffsetComputed(void)
+    {
+        return offsetComputed;
+    }
     void ComputeOffsets();
     void GetCurrPos(float _pos[], float _speed[], float _loop_time);
 };
 
-#endif  // ATTITUDE_H_
+#endif // ATTITUDE_H_
