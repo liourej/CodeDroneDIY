@@ -47,13 +47,17 @@
 
 **8.Project setup**
 
-8.1.1.Platformio installation
+8.1 Using Arduino IDE
 
-8.1.2.Build project
+8.2 Using PlatformIO
 
-8.1.3.Flash target
+8.2.1. PlatformIO installation
 
-8.2.Using Docker
+8.2.2. Build project
+
+8.2.3. Flash target
+
+8.3. Using Docker
 
 **9.First Person View (FPV)**
 
@@ -69,41 +73,66 @@ For outside tests, choose a very large area, with nobody around.
 
 ![Protection_glasses.jpg](/ReadmePictures/Protection_glasses.jpg "Protection_glasses")
 
-## 1. Project purpose
-
-The aim of this project is to develop a quadrirotor flight controller from scratch, using an Arduino and inertial sensors.
+## 1. Project introduction
+### 1.1 Purpose
+The aim of this project is to develop a very simple quadrirotor flight controller from scratch, using an Arduino and inertial sensors.
 There is two benefits:
 * to understand UAV flight stabilization
 * to have our own system, with no limits for customization: you can add all the sensors you want.
 
+In this project, the two main flight mode are addressed:
+* Accrobatic mode (or manual mode): the simplest to code, but it requires flight skills
+* Angle mode: more complex to implement, but easier to fly: UAV automatically goes back to
+horizontal
+
+I strongly advice to start by implementing the accrobatic mode, since a good accro mode will be a solid fundation
+for angle mode, and it is easy and fast to implement.
+
+### 1.2 Progress state
+Releases have been successfully tested during flights tests: I have some nice flights in FPV on a
+450mm frame, both in accro and angle modes.
+BUT, this project is sometimes updated, mainly for code format, and unfortunately, I cannot realize flight tests for each submit.
+So, I cannot garantee that the last commit will allow to flight without some corrections.
+note that you may also have to tune PID according to your configuration.
+I advice you to use a large frame (450mm for exemple), because it is more stable, and I did not test the software on smaller frames.
 
 ## 2. Attitude computation <a id="Test"></a>
 
-The UAV attitude correspond to the UAV angles from the horizontal: roll, pitch , yaw.
-UAV attitude is an entry for automatic stabilization: when UAV receive no command from user, it automatically goes back to horizontal.
-
-Attitude is computed from IMU data merging.
+The first step to stabilize an UAV is to compute its attitude: the angles from the horizontal (roll,
+    pitch, yaw) and the rotation speeds.
+UAV attitude is an entry for automatic stabilization, computed from IMU data.
 
 ### 2.1 IMU
 
-« Inertial Measurement Unit » is a MEMS, "Microelectromechanical system",
-composed by a 3 axis gyroscope and a 3 axis accelerometer.
+An IMU, « Inertial Measurement Unit » is a MEMS, "Microelectromechanical system", composed by 3 axis gyroscope and 3 axis accelerometer sensors.
 
 | Sensor      | Function |Pros      | Cons |
 | -------------- | -------------- | -------------- | -------------- |
 | Gyroscope | Measure angular speed around each axis in degrees by second | Fast | Drift along time |
 | Accelerometer | Measure linear acceleration on each axis in "g" | Slow |  Noizy and not usable when UAV is moving |
 
-These 2 sensors are complementary to compute attitude: merging their data compensate their defaults
+These 2 sensors are complementary to compute attitude angles: merging their data compensate their
+defaults.
+Attitude rotation speeds are given by gyroscopes, no computation is needed.
 
 ![IMU](/ReadmePictures/IMU.jpg "IMU")
 
-This projet use an MPU6050 IMU sensor which communicates with the microcontroler using I2C.
+This projet use an MPU6050 IMU sensor which communicates with the microcontroler using I2C protocol.
 
 #### 2.1.1 Gyroscopes
 
-UAV vs horizon angles are computed by raw gyroscope data integration.
+** Flight modes involved **
+Both
 
+** Output data **
+Attitude rotation speeds. They  are the only physical quantity needed for accro mode
+stabilization.
+
+** Computed data **
+Attitude angles are computed from raw gyroscope data integration. These computed data are needed for
+angle mode stabilization.
+
+Exemple of pitch attitude angle computation using gyroscopes:
 ```
 // currentPitch = previousPitch + rawSensorPitch*loopTime
 _pos[0] = _pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time;
@@ -111,14 +140,28 @@ _pos[0] = _pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time;
 
 #### 2.1.2 Accelerometers
 
-When UAV is not moving, or it is moving at a constant speed, accelerometers measure gravity.
-Angle between UAV and the horizon is computed by trigonometry.
+** Flight modes involved **
+Only angle mode stabilization.
+
+** Output data **
+Acceleration on each axis
+
+** Computed data **
+Attitude angles are computed from accelerations:
+when UAV is not moving, or if it is moving at constant speed, accelerometers measure gravity, ie
+vertical acceleration.
+Angle between UAV and the gravity vector is computed by trigonometry.
 Be carefull, this measure is faulty when UAV accelerates.
 
+Exemple of pitch attitude angl ecomputation using accelerometers:
     _pos[0] = atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI);
 
 ## 2.2 Data merging: the complementary filter
 
+** Flight modes involved **
+Data mergin is only needed for angle mode stabilization: it is use to compute attitude angles.
+
+** Explanation **
 The gyroscope sensor drift.
 Accelerometers are not fast enougth, they are noizy, and they are usable only when the UAV is not moving, and when UAV receive only earth acceleration.
 
@@ -133,25 +176,29 @@ Complementary filter time constant is a compromise between UAV acceleration filt
 * Too low, accelerometer noize are not eliminated
 * Too high, gyroscopes drift is not compensated
 
+** Computation **
 Time constant in this project is set to 5 seconds. It implies a coefficient of 0.9995 for a loop time of 2.49 ms.
-
 Be carefull, the time constant depends on the control loop time:
 
 timeCste = coeff*dt/(1-coeff)
 coeef = timeCste/(dt + timeCste)
 
-    _pos[0] = HighPassFilterCoeff*(_pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time) + LowPassFilterCoeff*((atan(accGyroRaw[1]/accGyroRaw[2]))*57.2957795130823);
+  ```
+ _pos[0] = HighPassFilterCoeff*(_pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time) +
+ LowPassFilterCoeff*((atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI));
+```
 
-## 3. stabilization
+## 3. Stabilization
 ### 3.1 Accro mode (gyroscopes only)
 It is a speed control loop. The pilot controls rotation speeds around each axis.
-Only gryroscopics data are used: there is no need for a complementary filter.
+Only gyroscopics data are used: there is no need for a complementary filter.
 
 ![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
 
 ### 3.2 Angle mode (gyroscopes and accelerometers)
 
-It is a position control loop. the pilot controls each attitude angle.
+It is a position control loop. The pilot controls each attitude angle. If transmitter sticks are
+centered, command is 0°, and UAV automatically goes back to horizontal.
 
 It consists in a speed control loop inside a position control loop.
 
@@ -200,7 +247,7 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 
 | Component      | Reference      |
 | -------------- | -------------- |
-| **Microcontroller board** | Arduino Nano |
+| **Microcontroller board** | Arduino Nano/Uno |
 | **ESC** | Afro 20A-Simonk firmware 500Hz, BEC 0.5A 1060 to 1860 us pulse width |
 | **Motors** | Multistar 2216-800Kv 14 Poles - 222W Current max: 20A Shaft: 3mm 2-4S|
 | **Propellers** | 10x4.5 SF Props 2pc CW 2 pc CCW Rotation (Orange) |
@@ -249,9 +296,16 @@ Transmitter configuration used during the « bind » operation defines the «�
 
 ## 8.Project setup
 
-### 8.1. Using PlatformIO
+### 8.1 Using Arduino IDE
+With minor modifications, project can be build using Arduino IDE:
+* rename "main.cpp" to "CodeDroneDIY.ino"
+* copy all source files from "CodeDroneDIY/src" to "CodeDroneDIY"
+* Launch and compile "CodeDroneDIY.ino" using Arduino IDE
 
-#### 8.1.1. PlatformIO installation
+### 8.2. Using PlatformIO
+PlatformIO is an open source ecosystem for IoT development.
+
+#### 8.2.1. PlatformIO installation
 ```sudo apt-get update
 sudo apt-get install python-pip
 sudo pip install --upgrade pip && sudo pip install -U platformio==3.5.2
@@ -263,14 +317,16 @@ Optional, for code format:
 
 ```sudo apt-get install -y clang-format```
 
-### 8.1.2. Build project
+#### 8.2.2. Build project
 ```platformio run```
 
-### 8.1.3. Flash target
+#### 8.2.3. Flash target
 ```platformio upload --upload-port/ttyACM0 ```
 
-### 8.2. Using Docker
-
+### 8.3. Using Docker
+The development tool "Docker" is a container platoform: it is a stand-alone, executable package
+of a piece of software that includes everything needed to run it: code, runtime, system tools,
+ system libraries, settings. It isolates software from its surroundings.
 * Install Docker
 * Move inside docker's folder: ```cd docker```
 * Build docker image: ```make image```
@@ -310,11 +366,11 @@ http://frskytaranis.forumactif.org/t4426-tuto-pwm-cppm-ccpm-ppm-s-bus-s-port-kes
 
 http://www.fpv-passion.fr/docteur-pid/
 
-* Quadrirotor
+* Quadricopter
 
 https://www.mondrone.net/fabriquer-quadricoptere-la-propulsion/
 
-* Traitement de données
+* Data processing
 
 https://ericjformanteaching.wordpress.com/2013/10/08/smoothing-sensor-input/
 
