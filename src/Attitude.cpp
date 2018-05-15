@@ -1,8 +1,11 @@
 #include <avr/wdt.h>
 #include "Attitude.h"
 #include "CheckIMU.h"
+#include <limits.h>
 
 #define AXIS_NB 3
+#define SAMPLES_NB 10
+
 #define RAD2DEG(angle) angle * 180 / PI
 
 void Attitude::Init()
@@ -41,11 +44,34 @@ inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[],
     }
 }
 
-void ComputeGyroOffsets() {
-    int16_t gyroRaw[AXIS_NB] = {0, 0, 0};
-    int32_t offsetSum[AXIS_NB] = {0, 0, 0};
+int16_t Attitude::ComputeDelta(int16_t _list[], int _size) {
+  int16_t maxVal = 0;
+  int16_t minVal = INT_MAX;
 
-    int16_t maxVal[AXIS_NB] = {-32768, -32768, -32768};
+  for (int sample = 0; sample < _size; sample++) {
+    if (_list[sample] > maxVal)
+      maxVal = _list[axis];
+    if (_list[sample] < minVal)
+      minVal = _list[axis];
+  }
+  return (maxVal - minVal);
+}
+
+float Attitude::ComputeMean(int16_t _list[], int _size) {
+  int16_t mean = 0;
+  for (int sample = 0; sample < _size; sample++) {
+    mean = mean + _list[sample];
+  }
+  return (mean/_size);
+}
+void Attitude::ComputeGyroOffsets() {
+  int16_t gyroRawX[SAMPLES_NB];
+  int16_t gyroRawY[SAMPLES_NB];
+  int16_t gyroRawZ[SAMPLES_NB];
+  
+  int32_t offsetSum[AXIS_NB] = {0, 0, 0};
+
+  int16_t maxVal[AXIS_NB] = {-32768, -32768, -32768};
     int16_t minVal[AXIS_NB] = {32767, 32767, 32767};
     int16_t delta[AXIS_NB] = {0, 0, 0};
 
@@ -54,13 +80,7 @@ void ComputeGyroOffsets() {
 
     // mean on 10 samples during 2 sec
     for (int sample = 0; sample < 10; sample++) {
-        accelgyro.getRotation(&gyroRaw[0], &gyroRaw[1], &gyroRaw[2]);
-        for (int axis = 0; axis < AXIS_NB; axis++) {
-            if (gyroRaw[axis] > maxVal[axis])
-                maxVal[axis] = gyroRaw[axis];
-            if (gyroRaw[axis] < minVal[axis])
-                minVal[axis] = gyroRaw[axis];
-            offsetSum[axis] = offsetSum[axis] + gyroRaw[axis];
+        accelgyro.getRotation(&gyroRawX[sample], &gyroRawY[sample], &gyroRawZ[samples]);
         }
         wdt_reset();
         delay(200);
@@ -68,7 +88,7 @@ void ComputeGyroOffsets() {
 
     // Compute mean and delta max
     for (int axis = 0; axis < AXIS_NB; axis++) {
-        offset[axis] = offsetSum[axis] / 10;
+        offset[axis] = ComputeMean(
         delta[axis] = maxVal[axis] - minVal[axis];
     }
 
