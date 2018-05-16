@@ -1,7 +1,6 @@
 #include <avr/wdt.h>
 #include "Attitude.h"
 #include "CheckIMU.h"
-#include <limits.h>
 
 void Attitude::Init()
 {
@@ -37,45 +36,6 @@ inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[],
     _accMeasures[axis] = static_cast<float>(accel[axis] - accOffsets[axis]) / AcceleroSensitivity;
     _gyroMeasures[axis] = static_cast<float>(speed[axis] - gyroOffsets[axis]) / GyroSensitivity;
   }
-}
-
-bool Attitude::ComputeDelta(int16_t _list[SAMPLES_NB], int _size, int16_t* _delta) {
-  int16_t maxVal = 0;
-  int16_t minVal = INT_MAX;
-
-  if (_size <= 2)
-    return -1;
-
-  for (int sample = 0; sample < _size; sample++) {
-    if (_list[sample] > maxVal)
-      maxVal = _list[sample];
-    if (_list[sample] < minVal)
-      minVal = _list[sample];
-  }
-  (*_delta) = maxVal - minVal;
-
-  return 0;
-}
-
-bool Attitude::ComputeMean(int16_t _list[SAMPLES_NB], int _size, int16_t _deltaThreshold, float* _mean) {
-  if (_size <= 0)
-    return false;
-
-  // Check delta before computing mean
-  int16_t delta = 0;
-  if (ComputeDelta(_list, SAMPLES_NB, &delta) != 0)
-      return false;
-  if (delta > _deltaThreshold)
-    return false;
-
-  // Compute mean
-  (*_mean) = 0;
-  for (int sample = 0; sample < _size; sample++) {
-    (*_mean) = (*_mean) + _list[sample];
-  }
-  (*_mean) = (*_mean)/_size;
-
-  return true;
 }
 
 bool Attitude::ComputeGyroOffsets() {

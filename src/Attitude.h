@@ -13,9 +13,11 @@
 #define AXIS_NB 3
 #define SAMPLES_NB 10
 
+#include "Math.h"
+
 #define RAD2DEG(angle) angle * 180 / PI
 
-class Attitude
+class Attitude : public Math
 {
   public:
     /* /!\ HighPassFilterCoeff is an important coeff for complementary filter
@@ -48,8 +50,6 @@ class Attitude
     MPU6050 accelgyro; // IMU
     void GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]);
     void Normalize(float _acc[]);
-    bool ComputeDelta(int16_t _list[], int _size, int16_t* _delta);
-    bool ComputeMean(int16_t _list[], int _size, int16_t _deltaThreshold, float* _mean);
     bool ComputeGyroOffsets();
     bool ComputeAccelOffsets();
 
