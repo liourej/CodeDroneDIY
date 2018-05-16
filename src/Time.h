@@ -5,8 +5,7 @@
 
 #define COUNTER_NB 2
 
-class Time
-{
+class Time {
   private:
     float startTime[COUNTER_NB] = {0.0, 0.0};
     float prev_time[COUNTER_NB] = {0.0, 0.0};
@@ -14,16 +13,14 @@ class Time
     bool first_loop[COUNTER_NB] = {true, true};
 
   public:
-    void InitAllCounters()
-    {
+    void InitAllCounters() {
         for (int i = 0; i < COUNTER_NB; i++) {
             startTime[COUNTER_NB] = millis();
             prev_time[COUNTER_NB] = millis();
         }
     }
 
-    void Init(int _counter)
-    {
+    void Init(int _counter) {
         if (_counter > COUNTER_NB)
             return;
 
@@ -31,18 +28,15 @@ class Time
         prev_time[_counter] = millis();
     }
 
-    inline float GetloopTimeSeconds(int _counter)
-    {
+    inline float GetloopTimeSeconds(int _counter) {
         return (GetloopTimeMilliseconds(_counter) / 1000);
     }
 
-    float GetExecutionTimeSeconds(int _counter)
-    {
+    float GetExecutionTimeSeconds(int _counter) {
         return (GetExecutionTimeMilliseconds(_counter) / 1000);
     }
 
-    inline float GetloopTimeMilliseconds(int _counter)
-    {
+    inline float GetloopTimeMilliseconds(int _counter) {
         if (_counter > COUNTER_NB)
             return -1;
 
@@ -52,8 +46,7 @@ class Time
         return loop_time[_counter];
     }
 
-    float GetExecutionTimeMilliseconds(int _counter)
-    {
+    float GetExecutionTimeMilliseconds(int _counter) {
         if (_counter > COUNTER_NB)
             return -1;
 

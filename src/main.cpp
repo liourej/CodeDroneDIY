@@ -14,20 +14,16 @@ StateMachine stateMachine;
 // Timer interrupt to set PWM to motors controllers
 typedef enum { _timer1, _Nbr_16timers } timer16_Sequence_t;
 
-static inline void handle_interrupts(timer16_Sequence_t timer,
-                                     volatile uint16_t *TCNTn,
-                                     volatile uint16_t *OCRnA)
-{
+static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t *TCNTn,
+                                     volatile uint16_t *OCRnA) {
     stabilization.SetESCsPWM(TCNTn, OCRnA);
 }
 
-SIGNAL(TIMER1_COMPA_vect)
-{
+SIGNAL(TIMER1_COMPA_vect) {
     handle_interrupts(_timer1, &TCNT1, &OCR1A);
 }
 
-void InitTimer1()
-{
+void InitTimer1() {
     // Timer
     TCCR1A = 0;         // normal counting mode
     TCCR1B = _BV(CS10); // no prescaler
@@ -39,13 +35,11 @@ void InitTimer1()
 }
 
 // Interrupt to decode cppm signal received from RC transmitter
-void RxInterrupt()
-{
+void RxInterrupt() {
     Rx.GetWidth();
 }
 
-void PrintSettings(StateMachine _stateMachine)
-{
+void PrintSettings(StateMachine _stateMachine) {
     Serial.println(F("/********* settings *********/"));
     if (_stateMachine.state == angle) {
         Serial.println(F("FLYING_MODE_ANGLE"));
@@ -65,8 +59,7 @@ void PrintSettings(StateMachine _stateMachine)
 }
 
 // Initialiaze all sensors and communication pipes
-void setup()
-{
+void setup() {
     InitTimer1();
 
     // Receiver
@@ -103,8 +96,7 @@ void setup()
 }
 
 // Main loop
-void loop()
-{
+void loop() {
     static uint8_t loopNb = 0;
     static float meanLoopTime = 0;
     uint8_t throttle = 0;
@@ -116,8 +108,8 @@ void loop()
     switch (stateMachine.state) {
     /*********** ANGLE STATE ***********/
     case angle:
-        throttle = Rx.GetThrottle(stabilization.GetESCsMinPower(),
-                                  stabilization.GetESCsMaxThrottle());
+        throttle =
+                Rx.GetThrottle(stabilization.GetESCsMinPower(), stabilization.GetESCsMaxThrottle());
         if (throttle > stabilization.GetESCIdleThreshold()) {
             stateMachine.throttleWasHigh = true;
             stabilization.Angle(loopTimeSec, Rx, throttle);
@@ -136,8 +128,8 @@ void loop()
         break;
     /*********** ACCRO STATE ***********/
     case accro:
-        throttle = Rx.GetThrottle(stabilization.GetESCsMinPower(),
-                                  stabilization.GetESCsMaxThrottle());
+        throttle =
+                Rx.GetThrottle(stabilization.GetESCsMinPower(), stabilization.GetESCsMaxThrottle());
         if (throttle > stabilization.GetESCIdleThreshold()) {
             stateMachine.throttleWasHigh = true;
 
@@ -205,8 +197,7 @@ void loop()
         stabilization.Idle();
         stateMachine.state = Rx.GetFlyingMode();
         delay(500);
-        if (stateMachine.state
-            != Rx.GetFlyingMode()) // Check it was not a transitory switch state
+        if (stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
             stateMachine.state = starting;
         if ((stateMachine.state == angle) || (stateMachine.state == accro)) {
             Serial.println(F("stateMachine.state != disarmed MODE"));

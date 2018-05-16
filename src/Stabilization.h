@@ -6,8 +6,7 @@
 #include "PID.h"
 #include "Reception.h"
 
-class Stabilization
-{
+class Stabilization {
   private:
     const float mixing = 0.5;
 
@@ -30,8 +29,7 @@ class Stabilization
     int rollPosCmd, pitchPosCmd = 0;
     int rollMotorPwr, pitchMotorPwr, yawMotorPwr = 0;
     float speedCurr[3] = {0.0, 0.0, 0.0}; // Teta speed (°/s) (only use gyro)
-    float posCurr[3] = {0.0, 0.0,
-                        0.0}; // Teta position (°) (use gyro + accelero)
+    float posCurr[3] = {0.0, 0.0, 0.0};   // Teta position (°) (use gyro + accelero)
     uint8_t throttle = 0;
     ESC ESCs;
     PID rollPosPID_Angle, pitchPosPID_Angle, yawPosPID_Angle;
@@ -48,36 +46,28 @@ class Stabilization
     void PrintAccroModeParameters();
     void PrintAngleModeParameters();
     void ResetPID(const int _throttle);
-    void SetESCsPWM(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA)
-    {
+    void SetESCsPWM(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA) {
         ESCs.SetPWM_f5(TCNTn, OCRnA);
     }
-    int GetESCsMaxPower()
-    {
+    int GetESCsMaxPower() {
         return ESCs.MAX_POWER;
     }
-    int GetESCsMinPower()
-    {
+    int GetESCsMinPower() {
         return ESCs.MIN_POWER;
     }
-    int GetESCsMaxThrottlePercent()
-    {
+    int GetESCsMaxThrottlePercent() {
         return ESCs.MAX_THROTTLE_PERCENT;
     }
-    int GetESCsMaxThrottle()
-    {
+    int GetESCsMaxThrottle() {
         return ESCs.MAX_THROTTLE;
     }
-    int GetESCIdleThreshold()
-    {
+    int GetESCIdleThreshold() {
         return ESCs.IDLE_THRESHOLD;
     }
-    bool AreAttitudeOffsetsComputed()
-    {
+    bool AreAttitudeOffsetsComputed() {
         return attitude.AreOffsetComputed();
     }
-    void AttitudeComputeOffsets()
-    {
+    void AttitudeComputeOffsets() {
         attitude.ComputeOffsets();
     }
 };

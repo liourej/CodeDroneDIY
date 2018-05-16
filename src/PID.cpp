@@ -1,26 +1,21 @@
 #include "PID.h"
-void PID::SetGains(float _params[4])
-{
+void PID::SetGains(float _params[4]) {
     G = _params[0];
     Kp = _params[1];
     Kd = _params[2];
     Ki = _params[3];
 }
 
-void PID::Reset()
-{
+void PID::Reset() {
     errorPrev = 0;
     integrator = 0;
 }
 
-int PID::ComputeCorrection(float _cmd, float _pos, float _loopTime)
-{
+int PID::ComputeCorrection(float _cmd, float _pos, float _loopTime) {
     float correction = 0;
     error = _cmd - _pos;
     integrator = integrator + error;
-    correction = G
-                 * (Kp * error + Kd * ((error - errorPrev) / (_loopTime))
-                    + Ki * integrator);
+    correction = G * (Kp * error + Kd * ((error - errorPrev) / (_loopTime)) + Ki * integrator);
 
     errorPrev = error;
 
@@ -28,8 +23,7 @@ int PID::ComputeCorrection(float _cmd, float _pos, float _loopTime)
     return correction;
 }
 
-void PID::PrintGains(void)
-{
+void PID::PrintGains(void) {
     Serial.print("G: ");
     Serial.print(G);
     Serial.print(" Kp: ");

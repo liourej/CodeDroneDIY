@@ -16,8 +16,7 @@ typedef struct {
 
 enum ESCId { ESC0, ESC1, ESC2, ESC3 };
 
-class ESC
-{
+class ESC {
   public:
     // Power setup
     const int MIN_POWER = 1060;

@@ -3,8 +3,7 @@
 
 #include "Arduino.h"
 
-class PID
-{
+class PID {
   private:
     float G = 0;
     float Kp, Kd, Ki = 0;

@@ -4,8 +4,7 @@
 extern unsigned int MIN_POWER;
 extern unsigned int MAX_POWER;
 
-void ESC::Init()
-{
+void ESC::Init() {
     attach(ESC0, 4);
     attach(ESC1, 5);
     attach(ESC2, 6);
@@ -13,22 +12,19 @@ void ESC::Init()
     Idle();
 }
 
-void ESC::attach(int _id, int _pin)
-{
+void ESC::attach(int _id, int _pin) {
     ESCList[_id].pin = _pin;
     pinMode(_pin, OUTPUT);
 } // set servo pin to output};
 
-void ESC::Idle()
-{
+void ESC::Idle() {
     for (int id = 0; id < 4; id++) {
         ESCList[id].ticks = usToTicks(MIN_POWER);
         ESCList[id].PWM = MIN_POWER;
     }
 }
 
-void ESC::write(int _id, float _PWM)
-{
+void ESC::write(int _id, float _PWM) {
     if (_PWM < MIN_POWER) {
         ESCList[_id].PWM = MIN_POWER;
     } else if (_PWM > MAX_POWER) { // Check max power
@@ -41,8 +37,7 @@ void ESC::write(int _id, float _PWM)
     ESCList[_id].ticks = usToTicks(_PWM);
 }
 
-void ESC::SetPWM_f5(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA)
-{
+void ESC::SetPWM_f5(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA) {
     static bool firstLoop = true;
     if (firstLoop) {
         currESC = 0;

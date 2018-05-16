@@ -4,8 +4,7 @@
 
 #define MPU6050_GCONFIG_XG_ST_BIT 7
 
-class CheckIMU
-{
+class CheckIMU {
   private:
     float ComputeAccFactoryTrimValue(float _accTestVal);
     float ComputeGyroFactoryTrimValue(float _gyroTestVal, bool _isYcoord);
