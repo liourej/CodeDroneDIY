@@ -31,19 +31,15 @@ class Attitude : public Math
     */
     float HighPassFilterCoeff = 0.9995; // 0.994;
 
-    const float AcceleroSensitivity = 4096; // LSB/g at -+8g sensitivity
-
-    // LSB/°/s  250=>131 or 500=>65.5 or 1000=>32.8 or 2000=>16.4
-    const float GyroSensitivity = 32.8;
-
-    bool offsetComputed = false;
-
   private:
+    float AcceleroSensitivity = -1;
+    float GyroSensitivity = -1;
     int16_t gyroOffsets[AXIS_NB] = {0, 0, 0};
     int16_t accOffsets[AXIS_NB] = {0, 0, 0};
     bool initialized = false;
-    float measures[10];
-    int indice = 0;
+//    float measures[10];
+//    int indice = 0;
+    bool offsetComputed = false;
 
   private:
     CheckIMU checkIMU;
@@ -52,6 +48,8 @@ class Attitude : public Math
     void Normalize(float _acc[]);
     bool ComputeGyroOffsets();
     bool ComputeAccelOffsets();
+    void SetAccRange(uint8_t _range);
+    void SetGyroRange(uint8_t _range);
 
   public:
     void Init();

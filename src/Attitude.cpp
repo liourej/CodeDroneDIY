@@ -6,12 +6,8 @@ void Attitude::Init()
 {
   // Initialize MPU 6050
   accelgyro.initialize();
-  //  +-1000°s max  /!\ Be carrefull when changing this parameter:
-  //  "GyroSensitivity" must be updated accordingly !!!
-  accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_1000);
-  //  +-8g max /!\ Be carrefull when changing this parameter:
-  //  "AcceleroSensitivity" must be updated accordingly !!!
-  accelgyro.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
+  SetGyroRange(MPU6050_GYRO_FS_1000);
+  SetAccRange(MPU6050_ACCEL_FS_8);
   wdt_reset();
   if (!accelgyro.testConnection())
     Serial.println(F("Test failed"));
@@ -36,6 +32,43 @@ inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[],
     _accMeasures[axis] = static_cast<float>(accel[axis] - accOffsets[axis]) / AcceleroSensitivity;
     _gyroMeasures[axis] = static_cast<float>(speed[axis] - gyroOffsets[axis]) / GyroSensitivity;
   }
+}
+
+void Attitude::SetAccRange(uint8_t _range) {
+  switch(_range) {
+    case MPU6050_ACCEL_FS_2:
+      GyroSensitivity = 16384;
+      break;
+    case MPU6050_ACCEL_FS_4:
+      GyroSensitivity = 8192;
+      break;
+    case MPU6050_ACCEL_FS_8:
+      GyroSensitivity = 4096;
+      break;
+    case MPU6050_ACCEL_FS_16:
+      GyroSensitivity = 2048;
+      break;
+  }
+  accelgyro.setFullScaleAccelRange(_range);
+
+}
+
+void Attitude::SetGyroRange(uint8_t _range) {
+  switch(_range) {
+    case MPU6050_GYRO_FS_250:
+      GyroSensitivity = 131;
+      break;
+    case MPU6050_GYRO_FS_500:
+      GyroSensitivity = 65.5;
+      break;
+    case MPU6050_GYRO_FS_1000:
+      GyroSensitivity = 32.8;
+      break;
+    case MPU6050_GYRO_FS_2000:
+      GyroSensitivity = 16.4;
+      break;
+  }
+  accelgyro.setFullScaleGyroRange(_range);
 }
 
 bool Attitude::ComputeGyroOffsets() {
