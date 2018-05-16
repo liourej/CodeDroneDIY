@@ -15,10 +15,7 @@
 
 #include "Math.h"
 
-#define RAD2DEG(angle) angle * 180 / PI
-
-class Attitude : public Math
-{
+class Attitude : public Math {
   public:
     /* /!\ HighPassFilterCoeff is an important coeff for complementary filter
       /!\
@@ -29,7 +26,7 @@ class Attitude : public Math
        coeff = timeCste/(dt + timeCste) If we want 0.5sec, coeff = 0.5/(0.003 +
       0.5) = 0.994
     */
-    float HighPassFilterCoeff = 0.9995; // 0.994;
+    float HighPassFilterCoeff = 0.9995;
 
   private:
     float AcceleroSensitivity = -1;
@@ -37,8 +34,8 @@ class Attitude : public Math
     int16_t gyroOffsets[AXIS_NB] = {0, 0, 0};
     int16_t accOffsets[AXIS_NB] = {0, 0, 0};
     bool initialized = false;
-//    float measures[10];
-//    int indice = 0;
+    //    float measures[10];
+    //    int indice = 0;
     bool offsetComputed = false;
 
   private:
@@ -54,8 +51,7 @@ class Attitude : public Math
   public:
     void Init();
     float GetFilterTimeConstant(float _loopTime);
-    bool AreOffsetComputed(void)
-    {
+    bool AreOffsetComputed(void) {
         return offsetComputed;
     }
     void ComputeOffsets();

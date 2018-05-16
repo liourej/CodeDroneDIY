@@ -2,7 +2,7 @@ BasedOnStyle: LLVM
 Language: Cpp
 IndentWidth: 4
 UseTab: Never
-BreakBeforeBraces: Linux
+BreakBeforeBraces: "Attach"
 AlwaysBreakBeforeMultilineStrings: true
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
@@ -13,9 +13,9 @@ AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: false
 AlignAfterOpenBracket: true
 SpaceAfterCStyleCast: false
-MaxEmptyLinesToKeep: 2
+MaxEmptyLinesToKeep: 1
 BreakBeforeBinaryOperators: NonAssignment
 BreakStringLiterals: false
 SortIncludes:    false
 ContinuationIndentWidth: 8
-ColumnLimit: 80
+ColumnLimit: 100
