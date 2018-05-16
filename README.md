@@ -121,7 +121,9 @@ These 2 sensors are complementary to compute attitude angles: merging their data
 defaults.
 Attitude rotation speeds are given by gyroscopes, no computation is needed.
 
-![IMU](/ReadmePictures/IMU.jpg "IMU")
+<p align="center">
+<img src="/ReadmePictures/IMU.jpg" width="24%" />
+</p>
 
 This projet use an MPU6050 IMU sensor which communicates with the microcontroler using I2C protocol.
 
@@ -239,6 +241,7 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 | ESC.cpp/h | Manage an ESC: pin, PWM to set |
 | StateMachine.h | State machine |
 | Time.h | To measure loop time and elapsed time |
+| Math.h | Mathermatical functions: mean and delta max computations|
 | checkIMU.cpp/h | To check IMU sensors |
 
 ## 7. Hardware configuration
@@ -256,15 +259,18 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 | **IMU** | MPU6050 (GY-86 breakout board)|
 | **Compass** | HMC5883L (GY-86 breakout board) |
 | **Buzzer** | Matek lost model beeper - Built-in MCU |
-| **Frame** | Diatone Q450 Quad 450 V3. Wide 450 mm frame choosen for better stability and higher autonomy. ![Chassis](/ReadmePictures/Chassis.jpg "Chassis")|
+| **Frame** | Diatone Q450 Quad 450 V3. 450 mm wide frame choosen for better stability and higher autonomy (the lower the size, the lower the stability).|
 
 ### 7.2 Connexions
 TODO: add receiver in schematic
-![schemaElectriqueDroneFull](/ReadmePictures/schemaElectriqueDroneFull.jpg "schemaElectriqueDroneFull")
-<p align="center">Full view<p>
 
-![SchemaElectriqueDroneZoom](/ReadmePictures/SchemaElectriqueDroneZoom.jpg "SchemaElectriqueDroneZoom")
-<p align="center">Zoomed View<p>
+**Full view:**
+
+<img src="/ReadmePictures/schemaElectriqueDroneFull.jpg" width="80%"/>
+
+**Zoomed view:**
+
+<img src="/ReadmePictures/SchemaElectriqueDroneZoom.jpg" width="50%"/>
 
 | Arduino pin      | Component      |
 | -------------- | -------------- |
@@ -292,7 +298,7 @@ Transmitter configuration used during the « bind » operation defines the «�
 
 ### 7.4 The benchtest
 
-![BenchTest01](/ReadmePictures/BenchTest01.jpg "BenchTest01")
+<img src="/ReadmePictures/BenchTest01.jpg" width="40%"/>
 
 ## 8.Project setup
 
