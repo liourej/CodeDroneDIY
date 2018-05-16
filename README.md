@@ -223,7 +223,7 @@ To arm again the system, pilot has to disarm it, and then he has to choose a fli
 CPPM (Pulse Position Modulation) reception  allows to receive all channels using only one entry pin. Each rising edge correpond to the end of the previous channel impulsion, and at the beginning of the next channel impulsion.
 Elapsed time between two rising edge correspond to the pulse width of a given channel.
 
-![CPPM](/ReadmePictures/CPPM.JPG "CPPM")
+![CPPM](/ReadmePictures/CPPM.jpg "CPPM")
 
 In this projet, each pulse width is measured using INT0, and then stored in the correponding channel of an array.
 
