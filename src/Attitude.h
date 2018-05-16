@@ -10,6 +10,11 @@
 #include "MPU6050.h"
 #include "CheckIMU.h"
 
+#define AXIS_NB 3
+#define SAMPLES_NB 10
+
+#define RAD2DEG(angle) angle * 180 / PI
+
 class Attitude
 {
   public:
@@ -30,9 +35,10 @@ class Attitude
     const float GyroSensitivity = 32.8;
 
     bool offsetComputed = false;
-    int16_t offset[6] = {0, 0, 0, 0, 0, 0};
 
   private:
+    int16_t gyroOffsets[AXIS_NB] = {0, 0, 0};
+    int16_t accOffsets[AXIS_NB] = {0, 0, 0};
     bool initialized = false;
     float measures[10];
     int indice = 0;
@@ -42,6 +48,10 @@ class Attitude
     MPU6050 accelgyro; // IMU
     void GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]);
     void Normalize(float _acc[]);
+    bool ComputeDelta(int16_t _list[], int _size, int16_t* _delta);
+    bool ComputeMean(int16_t _list[], int _size, int16_t _deltaThreshold, float* _mean);
+    bool ComputeGyroOffsets();
+    bool ComputeAccelOffsets();
 
   public:
     void Init();
