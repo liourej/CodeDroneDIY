@@ -13,45 +13,14 @@ class Time {
     bool first_loop[COUNTER_NB] = {true, true};
 
   public:
-    void InitAllCounters() {
-        for (int i = 0; i < COUNTER_NB; i++) {
-            startTime[COUNTER_NB] = millis();
-            prev_time[COUNTER_NB] = millis();
-        }
-    }
+    void InitAllCounters();
+    void Init(int _counter);
 
-    void Init(int _counter) {
-        if (_counter > COUNTER_NB)
-            return;
+    float GetloopTimeSeconds(int _counter);
+    float GetExecutionTimeSeconds(int _counter);
 
-        startTime[_counter] = millis();
-        prev_time[_counter] = millis();
-    }
-
-    inline float GetloopTimeSeconds(int _counter) {
-        return (GetloopTimeMilliseconds(_counter) / 1000);
-    }
-
-    float GetExecutionTimeSeconds(int _counter) {
-        return (GetExecutionTimeMilliseconds(_counter) / 1000);
-    }
-
-    inline float GetloopTimeMilliseconds(int _counter) {
-        if (_counter > COUNTER_NB)
-            return -1;
-
-        loop_time[_counter] = (millis() - prev_time[_counter]);
-        prev_time[_counter] = millis();
-
-        return loop_time[_counter];
-    }
-
-    float GetExecutionTimeMilliseconds(int _counter) {
-        if (_counter > COUNTER_NB)
-            return -1;
-
-        return (millis() - startTime[_counter]);
-    }
+    float GetloopTimeMilliseconds(int _counter);
+    float GetExecutionTimeMilliseconds(int _counter);
 };
 
 #endif // TIME_H_

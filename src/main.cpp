@@ -92,19 +92,19 @@ typedef void *(*StateFunc)();
 
 // Main loop
 void loop() {
-    StateFunc statefunc;
+    StateFunc statefunc = initState;
     static uint8_t loopNb = 0;
     static float meanLoopTime = 0;
-    uint8_t throttle = 0;
     loopTimeSec = time.GetloopTimeMilliseconds(0);
 
     // State Machine initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
     statefunc = (StateFunc)(*statefunc)();
 
     // Compute mean loop time and complementary filter time constant
-    int state = Rx.GetFlyingMode();
-    if (((state == angle) || (state == accro))
-        && (throttle > stabilization.GetESCIdleThreshold())) {
+    int flyingMode = Rx.GetFlyingMode();
+    if (((flyingMode == angle) || (flyingMode == accro))
+        && (Rx.GetThrottle(stabilization.GetESCsMinPower(), stabilization.GetESCsMaxThrottle())
+            > stabilization.GetESCIdleThreshold())) {
         if (loopNb > 1000) {
             meanLoopTime = meanLoopTime / loopNb;
             Serial.println(meanLoopTime, 2);
