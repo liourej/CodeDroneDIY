@@ -39,19 +39,12 @@ void RxInterrupt() {
     Rx.GetWidth();
 }
 
-void PrintSettings(StateMachine _stateMachine) {
+void PrintSettings() {
     Serial.println(F("/********* settings *********/"));
-    if (_stateMachine.state == angle) {
-        Serial.println(F("FLYING_MODE_ANGLE"));
-        stabilization.PrintAngleModeParameters();
-    } else if (_stateMachine.state == accro) {
-        Serial.println(F("FLYING_MODE_ACCRO"));
-        stabilization.PrintAccroModeParameters();
-    } else if (_stateMachine.state == disarmed) {
-        Serial.println(F("DISARMED"));
-    } else if (_stateMachine.state == safety) {
-        Serial.println(F("SAFETY"));
-    }
+    Serial.println(F("FLYING_MODE_ANGLE"));
+    stabilization.PrintAngleModeParameters();
+    Serial.println(F("FLYING_MODE_ACCRO"));
+    stabilization.PrintAccroModeParameters();
 
     Serial.println(F("/********* Receiver settings *********/"));
     Rx.PrintCmd();
@@ -66,7 +59,6 @@ void setup() {
     attachInterrupt(0, RxInterrupt, RISING); // Receiver interrupt on PD2 (INT0)
 
     // Console print: initialize serial communication
-    // Serial.begin(250000);
     Serial.begin(230400);
 
     stabilization.Init(Rx);
@@ -95,127 +87,23 @@ void setup() {
     Serial.println(F("Setup Finished"));
 }
 
+float loopTimeSec = 0;
+typedef void *(*StateFunc)();
+
 // Main loop
 void loop() {
+    StateFunc statefunc;
     static uint8_t loopNb = 0;
     static float meanLoopTime = 0;
     uint8_t throttle = 0;
-    float loopTimeSec = time.GetloopTimeMilliseconds(0);
-    static int tempState = disarmed;
-    // State Machine
-    // Sequence : initialization -> starting -> angle/accro -> safety ->
-    // disarmed -> angle/accro
-    switch (stateMachine.state) {
-    /*********** ANGLE STATE ***********/
-    case angle:
-        throttle =
-                Rx.GetThrottle(stabilization.GetESCsMinPower(), stabilization.GetESCsMaxThrottle());
-        if (throttle > stabilization.GetESCIdleThreshold()) {
-            stateMachine.throttleWasHigh = true;
-            stabilization.Angle(loopTimeSec, Rx, throttle);
+    loopTimeSec = time.GetloopTimeMilliseconds(0);
 
-            // Allow to change flying mode during flight
-            tempState = Rx.GetFlyingMode();
-            if (tempState == accro) {
-                stateMachine.state = accro;
-                Serial.println(F("Flying mode changed from angle to accro"));
-            }
-        } else {
-            stateMachine.RefreshState(); // Safety cut mngt: set safety cut
-                                         // after 20s without pwr
-            stabilization.ResetPID(throttle);
-        }
-        break;
-    /*********** ACCRO STATE ***********/
-    case accro:
-        throttle =
-                Rx.GetThrottle(stabilization.GetESCsMinPower(), stabilization.GetESCsMaxThrottle());
-        if (throttle > stabilization.GetESCIdleThreshold()) {
-            stateMachine.throttleWasHigh = true;
-
-            stabilization.Accro(loopTimeSec, Rx, throttle);
-
-            // Allow to change flying mode during flight
-            tempState = Rx.GetFlyingMode();
-            if (tempState == angle) {
-                stateMachine.state = angle;
-                Serial.println(F("Flying mode changed from accro to angle"));
-            }
-        } else {
-            stateMachine.RefreshState(); // Safety cut management:set safety cut
-                                         // after 5s without pwr
-            stabilization.ResetPID(throttle);
-        }
-        break;
-    /*********** SAFETY STATE ***********/
-    case safety:
-        stabilization.Idle();
-        stateMachine.state = Rx.GetFlyingMode();
-        if (stateMachine.state != disarmed) {
-            stabilization.Idle();
-            stateMachine.state = safety;
-        }
-
-        stateMachine.ActivateBuzzer(500);
-        break;
-    /*********** DISARMED STATE ***********/
-    case disarmed:
-        stabilization.Idle();
-        stateMachine.state = Rx.GetFlyingMode();
-        delay(500);
-        // Check it was not a transitory switch state
-        if (stateMachine.state != Rx.GetFlyingMode())
-            stateMachine.state = disarmed;
-        if (stateMachine.state != disarmed) {
-            stateMachine.throttleWasHigh = true;
-            if (stateMachine.state == angle)
-                Serial.println(F("ANGLE MODE"));
-            else if (stateMachine.state == accro)
-                Serial.println(F("ACCRO MODE"));
-            else
-                stateMachine.state = disarmed;
-        }
-
-        stateMachine.ActivateBuzzer(500);
-        break;
-    /*********** INITIALIZATION STATE ***********/
-    case initialization:
-        stabilization.Idle();
-        while (!stabilization.AreAttitudeOffsetsComputed())
-            stabilization.AttitudeComputeOffsets();
-
-        stateMachine.state = Rx.GetFlyingMode();
-        if (stateMachine.state != disarmed)
-            stateMachine.state = initialization;
-        else if (stabilization.AreAttitudeOffsetsComputed())
-            stateMachine.state = starting;
-        else
-            stateMachine.state = initialization;
-        break;
-    /*********** STARTING STATE ***********/
-    case starting:
-        stabilization.Idle();
-        stateMachine.state = Rx.GetFlyingMode();
-        delay(500);
-        if (stateMachine.state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
-            stateMachine.state = starting;
-        if ((stateMachine.state == angle) || (stateMachine.state == accro)) {
-            Serial.println(F("stateMachine.state != disarmed MODE"));
-
-            PrintSettings(stateMachine);
-        } else {
-            stateMachine.state = starting;
-        }
-
-        stateMachine.ActivateBuzzer(500);
-        break;
-    default:
-        Serial.print(F("UNDEFINED STATE!"));
-        break;
-    }
+    // State Machine initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
+    statefunc = (StateFunc)(*statefunc)();
 
     // Compute mean loop time and complementary filter time constant
-    if (((stateMachine.state == angle) || (stateMachine.state == accro))
+    int state = Rx.GetFlyingMode();
+    if (((state == angle) || (state == accro))
         && (throttle > stabilization.GetESCIdleThreshold())) {
         if (loopNb > 1000) {
             meanLoopTime = meanLoopTime / loopNb;
