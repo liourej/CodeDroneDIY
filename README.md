@@ -11,7 +11,7 @@
 
 **1. Project purpose**
 
-**2. Attitude computation**
+[**2. Attitude computation**](#attitudeComputation)
 
 2.1. IMU
 
@@ -102,7 +102,7 @@ Note that you may also have to tune PID according to your configuration.
 
 I advice you to use a large frame (450mm for exemple), because it is more stable, and I did not test the software on smaller frames.
 
-## 2. Attitude computation
+## 2. Attitude computation <a id="attitudeComputation"></a>
 
 The first step to stabilize an UAV is to compute its attitude: the angles from the horizontal (roll,
     pitch, yaw) and the rotation speeds.
