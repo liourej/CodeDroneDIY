@@ -9,7 +9,7 @@
 
 ---------------------------Table of contents----------------------------
 
-**1. Project purpose**
+[**1. Project introduction**](#projectIntro)
 
 [**2. Attitude computation**](#attitudeComputation)
 
@@ -21,7 +21,7 @@
 
 2.2 .Data merging: the complementary filter
 
-**3. Stabilization**
+[**3. Stabilization**](#stabilization)
 
 3.1. Accro mode (gyroscopes only)
 
@@ -29,13 +29,13 @@
 
 3.3. Height stabilization
 
-**4. State machine**
+[**4. State machine**](#stateMachine)
 
-**5. CPPM Reception**
+[**5. CPPM Reception**](#cppmReception)
 
-**6. Source code organization « CodeDroneDIY »**
+[**6. Source code organization « CodeDroneDIY »**](#sourceCodeOrganization)
 
-**7. Hardware configuration**
+[**7. Hardware configuration**](#hardwareConfiguration)
 
 7.1. Components list
 
@@ -45,7 +45,7 @@
 
 7.4. The benchtest
 
-**8. Project setup**
+[**8. Project setup**](#projectSetup)
 
 8.1 Using Arduino IDE
 
@@ -63,9 +63,9 @@
 
 8.3. Using Docker
 
-**9. First Person View (FPV)**
+[**9. First Person View (FPV)**](#firstPersonView)
 
-**10. Bibliography**
+[**10. Bibliography**](#bibliography)
 
 -------------------------------------------------------------------
 ## Warning
@@ -77,7 +77,7 @@ For outside tests, choose a very large area, with nobody around.
 
 ![Protection_glasses.jpg](/ReadmePictures/Protection_glasses.jpg "Protection_glasses")
 
-## 1. Project introduction
+## 1. Project introduction <a id="projectIntro"></a>
 ### 1.1 Purpose
 The aim of this project is to develop a very simple quadrirotor flight controller from scratch, using an Arduino and inertial sensors.
 There is two benefits:
@@ -190,7 +190,7 @@ Time constant in this project is set to 5 seconds. It implies a coefficient "Hig
 
 **Note:** More efficient filters like the Kalman one are used in UAV, but they are more complicated to understand, and we want a very simple DIY software!
 
-## 3. Stabilization
+## 3. Stabilization  <a id="stabilization"></a>
 ### 3.1 Accro mode (gyroscopes only)
 It is a speed control loop. The pilot controls rotation speeds around each axis.
 Only gyroscopics data are used: there is no need for a complementary filter.
@@ -208,7 +208,7 @@ Attitude is computed using a complementary filter, merging gyroscope dans accele
 
 ![AsservissementAngle](/ReadmePictures/AsservissementAngle.jpg "AsservissementAngle")
 
-## 4. State machine
+## 4. State machine <a id="stateMachine"></a>
 
 The system has 6 states:
 
@@ -218,7 +218,7 @@ After 5 secondes of power idle, the system is set into "security" state: throttl
 
 To arm again the system, pilot has to disarm it, and then he has to choose a flight mode "angle" or "accro".
 
-## 5. CPPM reception
+## 5. CPPM reception <a id="cppmReception"></a>
 
 CPPM (Pulse Position Modulation) reception  allows to receive all channels using only one entry pin. Each rising edge correpond to the end of the previous channel impulsion, and at the beginning of the next channel impulsion.
 Elapsed time between two rising edge correspond to the pulse width of a given channel.
@@ -227,7 +227,7 @@ Elapsed time between two rising edge correspond to the pulse width of a given ch
 
 In this projet, each pulse width is measured using INT0, and then stored in the correponding channel of an array.
 
-## 6. Source code organization « CodeDroneDIY »
+## 6. Source code organization « CodeDroneDIY » <a id="sourceCodeOrganization"></a>
 
 ![DiagrammeUML](/ReadmePictures/DiagrammeUML.jpg "DiagrammeUML")
 
@@ -244,7 +244,7 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 | Math.h | Mathermatical functions: mean and delta max computations|
 | checkIMU.cpp/h | To check IMU sensors |
 
-## 7. Hardware configuration
+## 7. Hardware configuration <a id="hardwareConfiguration"></a>
 
 ### 7.1 Components list
 
@@ -300,7 +300,7 @@ Transmitter configuration used during the « bind » operation defines the «�
 
 <img src="/ReadmePictures/BenchTest01.jpg" width="40%"/>
 
-## 8.Project setup
+## 8.Project setup <a id="projectSetup"></a>
 
 ### 8.1 Using Arduino IDE
 With minor modifications, project can be build using Arduino IDE:
@@ -340,7 +340,7 @@ of a piece of software that includes everything needed to run it: code, runtime,
 * Format code: ```make format-all```
 * build project: ```make build-codedronediy```
 
-## 9. FPV - First Person View
+## 9. FPV - First Person View  <a id="firstPersonView"></a>
 | Component      | Reference      |
 | -------------- | -------------- |
 | **Googgles** | Quanum DIY FPV Goggle V2 Pro |
@@ -351,7 +351,7 @@ of a piece of software that includes everything needed to run it: code, runtime,
 | **Camera antenna** | Realacc 5.8G 5dBi 50W RHCP Omnidirectional 3 Leaf Clover FPV Antenna Red |
 | **Video transmitter** | Upgrade Aomway Mini 5.8Ghz 200mW 32CH AV Wireless Transmitter Module |
 
-## 10. Bibliography
+## 10. Bibliography <a id="bibliography"></a>
 
 * Arduino
 
