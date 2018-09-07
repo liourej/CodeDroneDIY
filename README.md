@@ -110,9 +110,9 @@ I advice you to use a large frame (450mm for exemple), because it is more stable
 
 ### 1.3 Videos
 
-<a href="https://www.youtube.com/watch?v=niiIYhLCFx0" target="_blank">Loop control indoor test</a>
+<a href="https://www.youtube.com/watch?v=niiIYhLCFx0" target="_blank" rel="noopener noreferrer">Loop control indoor test</a>
 
-<a href="https://www.youtube.com/watch?v=C8MZH-K4qus" target="_blank">Outdoor flight test</a>
+<a href="https://www.youtube.com/watch?v=C8MZH-K4qus" target="_blank" rel="noopener noreferrer">Outdoor flight test</a>
 
 ## 2. Attitude computation <a id="attitudeComputation"></a>
 
