@@ -11,6 +11,12 @@
 
 [**1. Project introduction**](#projectIntro)
 
+1.1. Purpose
+
+1.2. Progress state
+
+1.3. Videos
+
 [**2. Attitude computation**](#attitudeComputation)
 
 2.1. IMU
@@ -84,7 +90,7 @@ There is two benefits:
 * to understand UAV flight stabilization
 * to have our own system, with no limits for customization: you can add all the sensors you want.
 
-In this project, the two main flight mode are addressed:
+In this project, the two main flight modes are addressed:
 * Accrobatic mode (or manual mode): the simplest to code, but it requires flight skills
 * Angle mode: more complex to implement, but easier to fly: UAV automatically goes back to
 horizontal
@@ -101,6 +107,12 @@ So, I cannot garantee that the last commit will allow to flight without some cor
 Note that you may also have to tune PID according to your configuration.
 
 I advice you to use a large frame (450mm for exemple), because it is more stable, and I did not test the software on smaller frames.
+
+### 1.3 Videos
+
+[Loop control indoor test](https://www.youtube.com/watch?v=niiIYhLCFx0)
+
+[Outdoor flight test](https://pages.github.com/)
 
 ## 2. Attitude computation <a id="attitudeComputation"></a>
 
