@@ -17,41 +17,37 @@
 
 1.3. Videos
 
-[**2. Attitude computation**](#attitudeComputation)
+[**2. IMU**](#IMU)
 
-2.1. IMU
+[**3. Accro mode (aka manual)**](#accroMode)
 
-2.1.1. Gyroscopes
+3.1. Angle feedback
 
-2.1.2. Accelerometers
+3.2. Speed stabilization
 
-2.2 .Data merging: the complementary filter
+[**4. Angle mode (aka automatic leveling mode)**](#angleMode)
 
-[**3. Stabilization**](#stabilization)
+4.1. Angle feedback
 
-3.1. Accro mode (gyroscopes only)
+4.2. Stabilization
 
-3.2. Angle mode (gyroscopes and accelerometers)
+[**5. State machine**](#stateMachine)
 
-3.3. Height stabilization
+[**6. CPPM Reception**](#cppmReception)
 
-[**4. State machine**](#stateMachine)
+[**7. Source code organization « CodeDroneDIY »**](#sourceCodeOrganization)
 
-[**5. CPPM Reception**](#cppmReception)
+[**8. Hardware configuration**](#hardwareConfiguration)
 
-[**6. Source code organization « CodeDroneDIY »**](#sourceCodeOrganization)
+8.1. Components list
 
-[**7. Hardware configuration**](#hardwareConfiguration)
+8.2. Connexions
 
-7.1. Components list
+8.3. Failsafe
 
-7.2. Connexions
+8.4. The benchtest
 
-7.3. Failsafe
-
-7.4. The benchtest
-
-[**8. Project setup**](#projectSetup)
+[**9. Project setup**](#projectSetup)
 
 8.1 Using Arduino IDE
 
@@ -75,13 +71,17 @@
 
 -------------------------------------------------------------------
 ## Warning
+<p align="left">
 ![Danger.jpg](/ReadmePictures/Danger.jpg "Danger")
+</p>
 
 Before starting this project, you must know that spinning propellers are very dangerous for your eyes and the persons around.
 When testing using the benchtest indoor, you must wear large protective glasses, and set up a power limit.
 For outside tests, choose a very large area, with nobody around.
 
+<p align="left">
 ![Protection_glasses.jpg](/ReadmePictures/Protection_glasses.jpg "Protection_glasses")
+</p>
 
 ## 1. Project introduction <a id="projectIntro"></a>
 ### 1.1 Purpose
@@ -114,13 +114,9 @@ I advice you to use a large frame (450mm for exemple), because it is more stable
 
 <a href="https://www.youtube.com/watch?v=C8MZH-K4qus" target="_blank" rel="noopener noreferrer">Outdoor flight test</a>
 
-## 2. Attitude computation <a id="attitudeComputation"></a>
+## 2. IMU <a id="IMU"></a>
 
-The first step to stabilize an UAV is to compute its attitude: the angles from the horizontal (roll,
-    pitch, yaw) and the rotation speeds.
-UAV attitude is an entry for automatic stabilization, computed from IMU data.
-
-### 2.1 IMU
+It is the main UAV sensor, required to make flight possible.
 
 An IMU, « Inertial Measurement Unit » is a MEMS, "Microelectromechanical system", composed by 3 axis gyroscope and 3 axis accelerometer sensors.
 
@@ -129,9 +125,10 @@ An IMU, « Inertial Measurement Unit » is a MEMS, "Microelectromechanical sys
 | Gyroscope | Measure angular speed around each axis in degrees by second | Fast | Drift along time |
 | Accelerometer | Measure linear acceleration on each axis in "g" | Slow |  Noizy and not usable when UAV is moving |
 
-These 2 sensors are complementary to compute attitude angles: merging their data compensate their
-defaults.
 Attitude rotation speeds are given by gyroscopes, no computation is needed.
+
+These two sensors are complementary to compute attitude angles: merging their data compensate their
+drawbacks.
 
 <p align="center">
 <img src="/ReadmePictures/IMU.jpg" width="24%" />
@@ -139,31 +136,51 @@ Attitude rotation speeds are given by gyroscopes, no computation is needed.
 
 This projet use an MPU6050 IMU sensor which communicates with the microcontroler using I2C protocol.
 
-#### 2.1.1 Gyroscopes
+## 3. Accro mode (aka manual) <a id="accroMode"></a>
 
-**Flight modes involved:** Both
+Accrobatic mode is the required base for the angle mode, and is easier to realize: do not try to code angle mode if accro mode is not working fine.
 
-**Output data:** Attitude rotation speeds. They  are the only physical quantity needed for accro mode
-stabilization.
+In this mode, the UAV is able to flight, but not to auto-leveling: pilot skills are required.
 
-**Computed data:** Attitude angles are computed from raw gyroscope data integration. These computed data are needed for
-angle mode stabilization.
+### 3.1 Compute angle speed feedback
 
-Exemple of pitch attitude angle computation using gyroscopes:
+Accro mode only need UAV angles speed.
+
+Angles speed are computed from raw gyroscope data integration.
+
+Exemple of pitch angle speed computation using gyroscopes:
 ```
 // currentPitch = previousPitch + rawSensorPitch*loopTime
 _pos[0] = _pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time;
 ```
+### 3.2 Speed stabilization  <a id="stabilization"></a>
 
-#### 2.1.2 Accelerometers
+Using angles speed feedback, a speed control loop can be realized. The pilot controls rotation speeds around each axis.
 
-**Flight modes involved:** Only angle mode stabilization.
+![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
 
-**Output data:** Acceleration on each axis
+Note: Only gyroscopics data are used: there is no need for a data merging filter.
 
-**Computed data:** Attitude angles are computed from accelerations:
+## 4. Angle mode (aka automatic leveling mode) <a id="angleMode"></a>
 
-when UAV is not moving, or if it is moving at constant speed, accelerometers measure gravity, ie
+The first step for auto-leveling mode is to compute UAV attitude: the angles from the horizontal (roll, pitch, yaw) and the rotation speeds.
+UAV attitude is an entry for automatic stabilization, computed from IMU data.
+
+### 4.1 Compute angle feedback
+
+Both angles speed and angles are required to compute reliable attitude angle feedback along time.
+
+Both gyroscopes and accelerometers are involved.
+
+#### 4.1.1 IMU gyroscopes
+
+Angles speed are computed from raw gyroscope data integration.
+
+#### 4.1.1 IMU accelerometers
+
+Attitude angles are computed from accelerations:
+
+When UAV is not moving, or if it is moving at constant speed, accelerometers measure gravity, ie
 vertical acceleration.
 Angle between UAV and the gravity vector is computed by trigonometry.
 Be carefull, this measure is faulty when UAV accelerates.
@@ -171,45 +188,48 @@ Be carefull, this measure is faulty when UAV accelerates.
 Exemple of pitch attitude angl ecomputation using accelerometers:
     _pos[0] = atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI);
 
-## 2.2 Data merging: the complementary filter
+#### 4.1.2 Data merging: the complementary filter
 
-**Flight modes involved:** Data mergin is only needed for angle mode stabilization: it is use to compute attitude angles.
+Complementary filter merges gyroscopes and accelerometers data, to get both sensors benefits, and to reduce theirs drawbacks:
 
-**Explanation:** The gyroscope sensor drift.
+* The gyroscope if fast but it drifts along time.
 
-Accelerometers are not fast enougth, they are noizy, and they are usable only when the UAV is not moving, and when UAV receive only earth acceleration.
+* Accelerometers are not fast enougth, they are noizy, and they are usable only when the UAV is not moving, and when UAV receive only earth acceleration.
 
-The complementary filter is a very simple filter which allows to merge data from gyroscopes and accelerometers, and mask their respective errors:
+The complementary filter mask their respective errors:
 
 - A low-pass filter is applied on accelerometer data to filter the noize and the unwanted accelerations: these data are usefull on a long time period, fast changes have to be eliminated.
 - A high-pass filter is applied on the gyrosope data: these data are usefull on short time period, but they drift and accumulate errors on long time periods.
 
 ![FiltreComplementaire](/ReadmePictures/FiltreComplementaire.jpg "FiltreComplementaire")
 
-Complementary filter time constant is a compromise between UAV acceleration filtering, and gyroscopes drift:
-* Too low, accelerometer noize are not eliminated
-* Too high, gyroscopes drift is not compensated
 
-**Computation:**
+
+**Coding exemple**
 
   ```
  _pos[0] = HighPassFilterCoeff*(_pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time) +
  (LowPassFilterCoeff)*((atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI));
 ```
-Remark: LowPassFilterCoeff = 1 - HighPassFilterCoeff
+Note: LowPassFilterCoeff = 1 - HighPassFilterCoeff
 
-Time constant in this project is set to 5 seconds. It implies a coefficient "HighPassFilterCoeff" of 0.9995 for a loop time of 2.49 ms.
+**Coefficients comutation**
+
+Filter time constant is a compromise between UAV acceleration filtering, and gyroscopes drift:
+* Too low, accelerometer noize are not eliminated
+* Too high, gyroscopes drift is not compensated
+
+```
+timeConstant = (HighPassFilterCoeff*dt) / (1-HighPassFilterCoeff)
+=> HighPassFilterCoeff = timeConstant / (dt + timeConstant)
+```
+
+
+Time constant in this project is set to 5 milliseconds. It implies a coefficient "HighPassFilterCoeff" of 0.9995 for a loop time of 2.49 ms.
 
 **Note:** More efficient filters like the Kalman one are used in UAV, but they are more complicated to understand, and we want a very simple DIY software!
 
-## 3. Stabilization  <a id="stabilization"></a>
-### 3.1 Accro mode (gyroscopes only)
-It is a speed control loop. The pilot controls rotation speeds around each axis.
-Only gyroscopics data are used: there is no need for a complementary filter.
-
-![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
-
-### 3.2 Angle mode (gyroscopes and accelerometers)
+### 4.2 Stabilization
 
 It is a position control loop. The pilot controls each attitude angle. If transmitter sticks are
 centered, command is 0°, and UAV automatically goes back to horizontal.
@@ -220,7 +240,7 @@ Attitude is computed using a complementary filter, merging gyroscope dans accele
 
 ![AsservissementAngle](/ReadmePictures/AsservissementAngle.jpg "AsservissementAngle")
 
-## 4. State machine <a id="stateMachine"></a>
+## 5. State machine <a id="stateMachine"></a>
 
 The system has 6 states:
 
@@ -230,7 +250,7 @@ After 5 secondes of power idle, the system is set into "security" state: throttl
 
 To arm again the system, pilot has to disarm it, and then he has to choose a flight mode "angle" or "accro".
 
-## 5. CPPM reception <a id="cppmReception"></a>
+## 6. CPPM reception <a id="cppmReception"></a>
 
 CPPM (Pulse Position Modulation) reception  allows to receive all channels using only one entry pin. Each rising edge correpond to the end of the previous channel impulsion, and at the beginning of the next channel impulsion.
 Elapsed time between two rising edge correspond to the pulse width of a given channel.
@@ -239,7 +259,7 @@ Elapsed time between two rising edge correspond to the pulse width of a given ch
 
 In this projet, each pulse width is measured using INT0, and then stored in the correponding channel of an array.
 
-## 6. Source code organization « CodeDroneDIY » <a id="sourceCodeOrganization"></a>
+## 7. Source code organization « CodeDroneDIY » <a id="sourceCodeOrganization"></a>
 
 ![DiagrammeUML](/ReadmePictures/DiagrammeUML.jpg "DiagrammeUML")
 
@@ -256,9 +276,9 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 | Math.h | Mathermatical functions: mean and delta max computations|
 | checkIMU.cpp/h | To check IMU sensors |
 
-## 7. Hardware configuration <a id="hardwareConfiguration"></a>
+## 8. Hardware configuration <a id="hardwareConfiguration"></a>
 
-### 7.1 Components list
+### 8.1 Components list
 
 | Component      | Reference      |
 | -------------- | -------------- |
@@ -273,7 +293,7 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 | **Buzzer** | Matek lost model beeper - Built-in MCU |
 | **Frame** | Diatone Q450 Quad 450 V3. 450 mm wide frame choosen for better stability and higher autonomy (the lower the size, the lower the stability).|
 
-### 7.2 Connexions
+### 8.2 Connexions
 TODO: add receiver in schematic
 
 **Full view:**
@@ -298,7 +318,7 @@ TODO: add receiver in schematic
 ![flightConfiguration](/ReadmePictures/flightConfiguration.jpg "flightConfiguration")
 
 
-### 7.3 Failsafe
+### 8.3 Failsafe
 
 For security, you must set the failsafe to cut motors power when radio link is lost.
 
@@ -308,22 +328,22 @@ To set the failsafe:
 
 Transmitter configuration used during the « bind » operation defines the « failsafe. »
 
-### 7.4 The benchtest
+### 8.4 The benchtest
 
 <img src="/ReadmePictures/BenchTest01.jpg" width="40%"/>
 
-## 8.Project setup <a id="projectSetup"></a>
+## 9.Project setup <a id="projectSetup"></a>
 
-### 8.1 Using Arduino IDE
+### 9.1 Using Arduino IDE
 With minor modifications, project can be build using Arduino IDE:
 * rename "main.cpp" to "CodeDroneDIY.ino"
 * copy all source files from "CodeDroneDIY/src" to "CodeDroneDIY"
 * Launch and compile "CodeDroneDIY.ino" using Arduino IDE
 
-### 8.2. Using PlatformIO
+### 9.2. Using PlatformIO
 PlatformIO is an open source ecosystem for IoT development.
 
-#### 8.2.1. PlatformIO installation
+#### 9.2.1. PlatformIO installation
 ```sudo apt-get update
 sudo apt-get install python-pip
 sudo pip install --upgrade pip && sudo pip install -U platformio==3.5.2
@@ -336,13 +356,13 @@ Optional, for code format:
 
 ```sudo apt-get install -y clang-format```
 
-#### 8.2.2. Build project
+#### 9.2.2. Build project
 ```platformio run```
 
-#### 8.2.3. Flash target
+#### 9.2.3. Flash target
 ```platformio upload --upload-port/ttyACM0 ```
 
-### 8.3. Using Docker
+### 9.3. Using Docker
 The development tool "Docker" is a container platoform: it is a stand-alone, executable package
 of a piece of software that includes everything needed to run it: code, runtime, system tools,
  system libraries, settings. It isolates software from its surroundings.
@@ -352,7 +372,7 @@ of a piece of software that includes everything needed to run it: code, runtime,
 * Format code: ```make format-all```
 * build project: ```make build-codedronediy```
 
-## 9. FPV - First Person View  <a id="firstPersonView"></a>
+## 10. FPV - First Person View  <a id="firstPersonView"></a>
 | Component      | Reference      |
 | -------------- | -------------- |
 | **Googgles** | Quanum DIY FPV Goggle V2 Pro |
@@ -363,7 +383,7 @@ of a piece of software that includes everything needed to run it: code, runtime,
 | **Camera antenna** | Realacc 5.8G 5dBi 50W RHCP Omnidirectional 3 Leaf Clover FPV Antenna Red |
 | **Video transmitter** | Upgrade Aomway Mini 5.8Ghz 200mW 32CH AV Wireless Transmitter Module |
 
-## 10. Bibliography <a id="bibliography"></a>
+## 11. Bibliography <a id="bibliography"></a>
 
 * Arduino
 
