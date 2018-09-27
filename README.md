@@ -185,8 +185,11 @@ vertical acceleration.
 Angle between UAV and the gravity vector is computed by trigonometry.
 Be carefull, this measure is faulty when UAV accelerates.
 
-Exemple of pitch attitude angl ecomputation using accelerometers:
-    _pos[0] = atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI);
+Exemple of pitch attitude angle computation using accelerometers:
+
+```
+_pos[0] = atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI);
+```
 
 #### 4.1.2 Data merging: the complementary filter
 
@@ -211,11 +214,12 @@ The complementary filter mask their respective errors:
  _pos[0] = HighPassFilterCoeff*(_pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time) +
  (LowPassFilterCoeff)*((atan(accGyroRaw[1]/accGyroRaw[2]))*(180/PI));
 ```
+
 Note: LowPassFilterCoeff = 1 - HighPassFilterCoeff
 
-**Coefficients comutation**
+**Coefficients computation**
 
-Filter time constant is a compromise between UAV acceleration filtering, and gyroscopes drift:
+Time constant is a compromise between UAV acceleration filtering, and gyroscopes drift:
 * Too low, accelerometer noize are not eliminated
 * Too high, gyroscopes drift is not compensated
 
@@ -224,15 +228,14 @@ timeConstant = (HighPassFilterCoeff*dt) / (1-HighPassFilterCoeff)
 => HighPassFilterCoeff = timeConstant / (dt + timeConstant)
 ```
 
-
 Time constant in this project is set to 5 milliseconds. It implies a coefficient "HighPassFilterCoeff" of 0.9995 for a loop time of 2.49 ms.
 
 **Note:** More efficient filters like the Kalman one are used in UAV, but they are more complicated to understand, and we want a very simple DIY software!
 
 ### 4.2 Stabilization
 
-It is a position control loop. The pilot controls each attitude angle. If transmitter sticks are
-centered, command is 0°, and UAV automatically goes back to horizontal.
+Angles computed by complementary filter, and speed angles data are used by the position control loop.
+The pilot controls each attitude angle. If transmitter sticks are centered, command is 0°, and UAV automatically goes back to horizontal.
 
 It consists in a speed control loop inside a position control loop.
 
