@@ -269,7 +269,7 @@ TODO: add receiver in schematic
 
 ![flightConfiguration](/ReadmePictures/flightConfiguration.jpg "flightConfiguration")
 
-## 6.Software setup <a id="softwareDetailedDesign"></a>
+## 6.Software setup <a id="softwareSetup"></a>
 
 ### 6.1 Using Arduino IDE
 With minor modifications, project can be build using Arduino IDE:
@@ -309,9 +309,9 @@ of a piece of software that includes everything needed to run it: code, runtime,
 * Format code: ```make format-all```
 * build project: ```make build-codedronediy```
 
-## 7. Software detailed design
+## 7. Software detailed design <a id="softwareDetailedDesign"></a>
 
-### 7.1 Source code overview <a id="sourceCodeOrganization"></a>
+### 7.1 Source code overview
 
 ![DiagrammeUML](/ReadmePictures/DiagrammeUML.jpg "DiagrammeUML")
 
