@@ -1,6 +1,6 @@
 #include <avr/wdt.h>
 #include "Attitude.h"
-#include "CheckIMU.h"
+//#include "CheckIMU.h"
 
 void Attitude::Init() {
     // Initialize MPU 6050
@@ -13,11 +13,11 @@ void Attitude::Init() {
     if (!accelgyro.testConnection())
         Serial.println(F("Test failed"));
 
-    Serial.println(F("/********* IMU self-test *********/"));
-    if (!checkIMU.All(accelgyro, AcceleroSensitivity))
-        Serial.println(F("IMU SELF TEST FAILED !!!!!"));
-    else
-        Serial.println(F("IMU self test succeed"));
+//    Serial.println(F("/********* IMU self-test *********/"));
+//    if (!checkIMU.All(accelgyro, AcceleroSensitivity))
+//        Serial.println(F("IMU SELF TEST FAILED !!!!!"));
+//    else
+//        Serial.println(F("IMU self test succeed"));
 }
 
 inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]) {

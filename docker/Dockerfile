@@ -18,7 +18,7 @@ RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
 	&& ln -s /usr/bin/clang-format-6.0 /usr/local/bin/clang-format
 
 RUN pip install --upgrade pip==9.0.3 && pip install -U platformio==3.5.2
-RUN platformio platform install atmelavr --with-package=framework-arduinoavr
+RUN platformio platform install atmelavr
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

@@ -6,9 +6,9 @@
 #include "Wire.h"
 // I2Cdev and MPU6050 must be installed as libraries, or else the .cpp/.h files
 // for both classes must be in the include path of your project
-#include "I2Cdev.h"
-#include "MPU6050.h"
-#include "CheckIMU.h"
+#include "libraries/I2Cdev/I2Cdev.h"
+#include "libraries/MPU6050/MPU6050.h"
+//#include "CheckIMU.h"
 
 #define AXIS_NB 3
 #define SAMPLES_NB 10
@@ -39,7 +39,7 @@ class Attitude : public Math {
     bool offsetComputed = false;
 
   private:
-    CheckIMU checkIMU;
+ //   CheckIMU checkIMU;
     MPU6050 accelgyro; // IMU
     void GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]);
     void Normalize(float _acc[]);

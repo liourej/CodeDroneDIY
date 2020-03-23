@@ -10,11 +10,11 @@ void *initState() {
         stabilization.AttitudeComputeOffsets();
 
     if (Rx.GetFlyingMode() != disarmed)
-        return initState;
+        return (void *) &initState;
     else if (stabilization.AreAttitudeOffsetsComputed())
-        return startingState;
+        return (void *) &startingState;
 
-    return initState;
+    return (void *) &initState;
 }
 void *startingState() {
     stabilization.Idle();
@@ -22,16 +22,16 @@ void *startingState() {
     int state = Rx.GetFlyingMode();
     delay(500);
     if (state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
-        return startingState;
+        return (void *) &startingState;
     if ((state == angle) || (state == accro)) {
         Serial.println(F("stateMachine.state != disarmed MODE"));
         // PrintSettings();
         if (state == angle)
-            return angleState;
+            return (void *) &angleState;
         if (state == accro)
-            return accroState;
+            return (void *) &accroState;
     }
-    return startingState;
+    return (void *) &startingState;
 }
 
 void *angleState() {
@@ -44,15 +44,15 @@ void *angleState() {
         // Allow to change flying mode during flight
         if (Rx.GetFlyingMode() == accro) {
             Serial.println(F("Flying mode changed from angle to accro"));
-            return accroState;
+            return (void *) &accroState;
         }
     } else {
         // after 20s without pwr
         stabilization.ResetPID(throttle);
         if (stateMachine.IsSafetyStateNeeded()) // Safety cut mngt: set safety cut
-            return safetyState;
+            return (void *) &safetyState;
     }
-    return angleState;
+    return (void *) &angleState;
 }
 
 void *accroState() {
@@ -66,15 +66,15 @@ void *accroState() {
         // Allow to change flying mode during flight
         if (Rx.GetFlyingMode() == angle) {
             Serial.println(F("Flying mode changed from accro to angle"));
-            return angleState;
+            return (void *) &angleState;
         }
     } else {
         // after 5s without pwr
         stabilization.ResetPID(throttle);
         if (stateMachine.IsSafetyStateNeeded()) // Safety cut mngt: set safety cut
-            return safetyState;
+            return (void *) &safetyState;
     }
-    return accroState;
+    return (void *) &accroState;
 }
 
 void *safetyState() {
@@ -83,9 +83,9 @@ void *safetyState() {
     Rx.GetFlyingMode();
     if (Rx.GetFlyingMode() != disarmed) {
         stabilization.Idle();
-        return safetyState;
+        return (void *) &safetyState;
     } else {
-        return disarmedState;
+        return (void *) &disarmedState;
     }
 }
 
@@ -96,18 +96,18 @@ void *disarmedState() {
     delay(500);
     // Check it was not a transitory switch state
     if (state != Rx.GetFlyingMode())
-        return disarmedState;
+        return (void *) &disarmedState;
     if (state != disarmed) {
         stateMachine.throttleWasHigh = true;
         if (state == angle) {
             Serial.println(F("ANGLE MODE"));
-            return angleState;
+            return (void *) &angleState;
         } else if (state == accro) {
             Serial.println(F("ACCRO MODE"));
-            return accroState;
+            return (void *) &accroState;
         }
     }
-    return disarmedState;
+    return (void *) &disarmedState;
 }
 
 void StateMachine::Init() {
