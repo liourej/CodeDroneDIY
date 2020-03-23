@@ -5,21 +5,19 @@
 
 class Time {
   private:
-    static const int COUNTER_NB = 2;
-    float startTime[COUNTER_NB] = {0.0, 0.0};
-    float prev_time[COUNTER_NB] = {0.0, 0.0};
-    float loop_time[COUNTER_NB] = {0.0, 0.0}; // sec
-    bool first_loop[COUNTER_NB] = {true, true};
+    float startTime = 0.0;
+    float prev_time = 0.0;
+    float loop_time = 0.0;
+    bool first_loop = true;
 
   public:
-    void InitAllCounters();
-    void Init(int _counter);
+    void Init();
 
-    float GetloopTimeSeconds(int _counter);
-    float GetExecutionTimeSeconds(int _counter);
+    float GetloopTimeSeconds();
+    float GetExecutionTimeSeconds();
 
-    float GetloopTimeMilliseconds(int _counter);
-    float GetExecutionTimeMilliseconds(int _counter);
+    float GetloopTimeMilliseconds();
+    float GetExecutionTimeMilliseconds();
 };
 
 #endif // TIME_H_

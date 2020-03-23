@@ -109,13 +109,13 @@ void StateMachine::Init() {
     // Buzzer
     pinMode(BUZZER_PIN, OUTPUT);
 
-    elapsedTime.Init(0);
-    timeBuzzer.Init(0);
+    elapsedTime.Init();
+    timeBuzzer.Init();
 }
 
 // Activate buzzer after x minutes of power idle
 void StateMachine::ActivateBuzzer(int _durationSec) {
-    if (timeBuzzer.GetExecutionTimeSeconds(0) > _durationSec) {
+    if (timeBuzzer.GetExecutionTimeSeconds() > _durationSec) {
         while (true) {
             digitalWrite(BUZZER_PIN, HIGH);
             delayMicroseconds(1800); // Dirty, it would be better to use timer interrupt
@@ -133,7 +133,7 @@ bool StateMachine::IsSafetyStateNeeded() {
         Serial.println(F("Throttle just setted low!"));
         Init();
         throttleWasHigh = false;
-    } else if (elapsedTime.GetExecutionTimeSeconds(0) > delayThresholdSec) {
+    } else if (elapsedTime.GetExecutionTimeSeconds() > delayThresholdSec) {
         Serial.print(delayThresholdSec);
         Serial.println(F(" sec without power, system DISARMED!"));
         return true;

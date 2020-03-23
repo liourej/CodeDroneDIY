@@ -69,7 +69,7 @@ void setup() {
 
     stabilization.Init();
 
-    time.InitAllCounters();
+    time.Init();
 
     stateMachine.Init();
 
@@ -99,7 +99,7 @@ void loop() {
     StateFunc statefunc = initState;
     uint16_t loopNb = 0;
 
-    loopTimeSec = time.GetloopTimeMilliseconds(0);
+    loopTimeSec = time.GetloopTimeMilliseconds();
 
     // State Machine initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
     statefunc = (StateFunc)(*statefunc)(loopTimeSec);
