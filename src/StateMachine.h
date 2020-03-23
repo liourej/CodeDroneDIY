@@ -5,7 +5,6 @@
 #include "Reception.h"
 #include "Stabilization.h"
 
-extern Reception Rx;
 extern Stabilization stabilization;
 
 // States functions
@@ -23,7 +22,6 @@ class StateMachine {
     const int delayThresholdSec = 5; // (s)
     Time elapsedTime;
     Time timeBuzzer;
-    bool setBuzzer = false;
 
   public:
     bool throttleWasHigh = true;

@@ -7,7 +7,7 @@
 #include "StateMachine.h"
 
 Time time;
-Reception Rx;
+
 Stabilization stabilization;
 StateMachine stateMachine;
 
@@ -36,7 +36,7 @@ void InitTimer1() {
 
 // Interrupt to decode cppm signal received from RC transmitter
 void RxInterrupt() {
-    Rx.GetWidth();
+    stabilization.ComputeRxImpulsionWidth();
 }
 
 void PrintConfig() {
@@ -67,7 +67,7 @@ void setup() {
 
     Serial.begin(230400); // Console print: initialize serial communication
 
-    stabilization.Init(Rx);
+    stabilization.Init();
 
     time.InitAllCounters();
 
@@ -93,11 +93,6 @@ void ComputeMeanLoopTime(const float _loopTimeSec, uint16_t &_loopNb) {
     }
 }
 
-bool IsThrottleIdle() {
-    int throttle = Rx.GetThrottle(stabilization.GetESCsMinPower(), stabilization.GetESCsMaxThrottle());
-    return throttle < stabilization.GetESCIdleThreshold();
-}
-
 // Main loop
 void loop() {
     float loopTimeSec = 0.0;
@@ -110,9 +105,9 @@ void loop() {
     statefunc = (StateFunc)(*statefunc)(loopTimeSec);
 
     // Compute mean loop time and complementary filter time constant
-    int flyingMode = Rx.GetFlyingMode();
+    int flyingMode = stabilization.GetFlyingMode();
     if ((flyingMode == angle) || (flyingMode == accro)){
-        if (!IsThrottleIdle()) {
+        if (!stabilization.IsThrottleIdle()) {
             ComputeMeanLoopTime(loopTimeSec, loopNb);
         }
     }

@@ -36,16 +36,17 @@ class Stabilization {
     PID rollSpeedPID_Angle, pitchSpeedPID_Angle, yawSpeedPID_Angle;
     PID rollSpeedPID_Accro, pitchSpeedPID_Accro, yawSpeedPID_Accro;
     Attitude attitude;
+    Reception Rx;
 
   public:
-    void SetMotorsPwrXConfig(const int _throttle);
-    void Init(Reception &_Rx);
+    void SetMotorsPwrXConfig();
+    void Init();
     void Idle();
-    void Accro(float _loopTimeSec, Reception &_Rx, const int _throttle);
-    void Angle(float _loopTimeSec, Reception &_Rx, const int _throttle);
+    void Accro(float _loopTimeSec);
+    void Angle(float _loopTimeSec);
     void PrintAccroModeParameters();
     void PrintAngleModeParameters();
-    void ResetPID(const int _throttle);
+    void ResetPID();
     void SetESCsPWM(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA) {
         ESCs.SetPWM_f5(TCNTn, OCRnA);
     }
@@ -69,6 +70,21 @@ class Stabilization {
     }
     void AttitudeComputeOffsets() {
         attitude.ComputeOffsets();
+    }
+    inline void ComputeRxImpulsionWidth()
+    {
+      Rx.GetWidth();
+    }
+    inline int GetFlyingMode()
+    {
+      return Rx.GetFlyingMode();
+    }
+    inline int GetThrottle() {
+        return Rx.GetThrottle(GetESCsMinPower(), GetESCsMaxThrottle());
+    }
+
+    bool IsThrottleIdle() {
+        return GetThrottle() < GetESCIdleThreshold();
     }
 };
 #endif // STABILIZATION_H_

@@ -9,7 +9,7 @@ void *initState(const float) {
     while (!stabilization.AreAttitudeOffsetsComputed())
         stabilization.AttitudeComputeOffsets();
 
-    if (Rx.GetFlyingMode() != disarmed)
+    if (stabilization.GetFlyingMode() != disarmed)
         return (void *)&initState;
     else if (stabilization.AreAttitudeOffsetsComputed())
         return (void *)&startingState;
@@ -18,10 +18,9 @@ void *initState(const float) {
 }
 void *startingState(const float) {
     stabilization.Idle();
-    stateMachine.ActivateBuzzer(500);
-    int state = Rx.GetFlyingMode();
+    int state = stabilization.GetFlyingMode();
     delay(500);
-    if (state != Rx.GetFlyingMode()) // Check it was not a transitory switch state
+    if (state != stabilization.GetFlyingMode()) // Check it was not a transitory switch state
         return (void *)&startingState;
     if ((state == angle) || (state == accro)) {
         Serial.println(F("stateMachine.state != disarmed MODE"));
@@ -35,20 +34,18 @@ void *startingState(const float) {
 }
 
 void *angleState(const float _loopTimeSec) {
-    uint8_t throttle =
-            Rx.GetThrottle(stabilization.GetESCsMinPower(), stabilization.GetESCsMaxThrottle());
-    if (throttle > stabilization.GetESCIdleThreshold()) {
+    if (!stabilization.IsThrottleIdle()) {
         stateMachine.throttleWasHigh = true;
-        stabilization.Angle(_loopTimeSec, Rx, throttle);
+        stabilization.Angle(_loopTimeSec);
 
         // Allow to change flying mode during flight
-        if (Rx.GetFlyingMode() == accro) {
+        if (stabilization.GetFlyingMode() == accro) {
             Serial.println(F("Flying mode changed from angle to accro"));
             return (void *)&accroState;
         }
     } else {
         // after 20s without pwr
-        stabilization.ResetPID(throttle);
+        stabilization.ResetPID();
         if (stateMachine.IsSafetyStateNeeded()) // Safety cut mngt: set safety cut
             return (void *)&safetyState;
     }
@@ -56,21 +53,19 @@ void *angleState(const float _loopTimeSec) {
 }
 
 void *accroState(const float _loopTimeSec) {
-    uint8_t throttle =
-            Rx.GetThrottle(stabilization.GetESCsMinPower(), stabilization.GetESCsMaxThrottle());
-    if (throttle > stabilization.GetESCIdleThreshold()) {
+    if (!stabilization.IsThrottleIdle()) {
         stateMachine.throttleWasHigh = true;
 
-        stabilization.Accro(_loopTimeSec, Rx, throttle);
+        stabilization.Accro(_loopTimeSec);
 
         // Allow to change flying mode during flight
-        if (Rx.GetFlyingMode() == angle) {
+        if (stabilization.GetFlyingMode() == angle) {
             Serial.println(F("Flying mode changed from accro to angle"));
             return (void *)&angleState;
         }
     } else {
         // after 5s without pwr
-        stabilization.ResetPID(throttle);
+        stabilization.ResetPID();
         if (stateMachine.IsSafetyStateNeeded()) // Safety cut mngt: set safety cut
             return (void *)&safetyState;
     }
@@ -79,9 +74,9 @@ void *accroState(const float _loopTimeSec) {
 
 void *safetyState(const float) {
     stabilization.Idle();
-    stateMachine.ActivateBuzzer(500);
-    Rx.GetFlyingMode();
-    if (Rx.GetFlyingMode() != disarmed) {
+    stateMachine.ActivateBuzzer(120);
+    stabilization.GetFlyingMode();
+    if (stabilization.GetFlyingMode() != disarmed) {
         stabilization.Idle();
         return (void *)&safetyState;
     } else {
@@ -91,11 +86,11 @@ void *safetyState(const float) {
 
 void *disarmedState(const float) {
     stabilization.Idle();
-    stateMachine.ActivateBuzzer(500);
-    int state = Rx.GetFlyingMode();
+    stateMachine.ActivateBuzzer(120);
+    int state = stabilization.GetFlyingMode();
     delay(500);
     // Check it was not a transitory switch state
-    if (state != Rx.GetFlyingMode())
+    if (state != stabilization.GetFlyingMode())
         return (void *)&disarmedState;
     if (state != disarmed) {
         stateMachine.throttleWasHigh = true;
@@ -116,24 +111,19 @@ void StateMachine::Init() {
 
     elapsedTime.Init(0);
     timeBuzzer.Init(0);
-    setBuzzer = false;
 }
 
 // Activate buzzer after x minutes of power idle
-void StateMachine::ActivateBuzzer(int _duration) {
-    if (setBuzzer) {
-        Time time;
-        time.Init(0);
-        while ((time.GetExecutionTimeMilliseconds(0)) < _duration) {
-            digitalWrite(BUZZER_PIN, HIGH);
-            delayMicroseconds(1800);
-            digitalWrite(BUZZER_PIN, LOW);
-            delay(10);
-            wdt_reset();
-            Serial.println(F("BUZZZZZ"));
-        }
-    } else if (timeBuzzer.GetExecutionTimeSeconds(0) > 120) { // Activate buzzer after 2 minutes
-        setBuzzer = true;
+void StateMachine::ActivateBuzzer(int _durationSec) {
+    if (timeBuzzer.GetExecutionTimeSeconds(0) > _durationSec) {
+        while (true) {
+           digitalWrite(BUZZER_PIN, HIGH);
+           delayMicroseconds(1800); // Dirty, it would be better to use timer interrupt
+           digitalWrite(BUZZER_PIN, LOW);
+           delay(10);
+           wdt_reset();
+           Serial.println(F("BUZZZZZ"));
+      }
     }
 }
 

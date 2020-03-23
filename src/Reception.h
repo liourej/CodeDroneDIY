@@ -52,18 +52,18 @@ class Reception {
     }
 
     // Angle Mode:
-    inline float GetAileronsAngle() {
+    inline int GetAileronsAngle() {
         return -(map(cPPM[0], 1080, 1900, -MAX_ANGLE, MAX_ANGLE));
     }
-    inline float GetElevatorAngle() {
+    inline int GetElevatorAngle() {
         return (map(cPPM[1], 1080, 1900, -MAX_ANGLE, MAX_ANGLE));
     }
 
     // Accro mode:
-    inline float GetAileronsSpeed() {
+    inline int GetAileronsSpeed() {
         return -(map(cPPM[0], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED));
     }
-    inline float GetElevatorSpeed() {
+    inline int GetElevatorSpeed() {
         return (map(cPPM[1], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED));
     }
     inline int GetThrottle(const int _minPower, const int _maxThrottle) {
@@ -100,7 +100,7 @@ class Reception {
                 cPPM[channel] = PWM_Width;
         }
 
-        if (PWM_Width > 4000) { // If delay more than 4ms
+        if (PWM_Width > 4000) { // If delay more than 4ms, it is a new sequence
             channel = 0;
             initialized = true;
         } else if ((channel + 1) < CHANNELS_NB) {
