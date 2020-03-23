@@ -26,7 +26,7 @@ class ESC {
     const int MAX_POWER = 1860;
     const int MAX_THROTTLE_PERCENT = 100.0;
     // Threshold on max throttle command (percent of max motor power)
-    uint8_t MAX_THROTTLE = MAX_POWER * (MAX_THROTTLE_PERCENT / 100.0);
+    uint16_t MAX_THROTTLE = MAX_POWER * (MAX_THROTTLE_PERCENT / 100.0);
     int IDLE_THRESHOLD = 1100;
 
   public:

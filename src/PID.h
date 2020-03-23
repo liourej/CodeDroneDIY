@@ -7,10 +7,6 @@ class PID {
   private:
     float G = 0;
     float Kp, Kd, Ki = 0;
-    float speedCmd = 0;
-
-    float posErrorPrev = 0;
-    float posIntegrator = 0;
 
     float error = 0;
     float errorPrev = 0;

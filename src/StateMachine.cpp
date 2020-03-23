@@ -117,13 +117,13 @@ void StateMachine::Init() {
 void StateMachine::ActivateBuzzer(int _durationSec) {
     if (timeBuzzer.GetExecutionTimeSeconds(0) > _durationSec) {
         while (true) {
-           digitalWrite(BUZZER_PIN, HIGH);
-           delayMicroseconds(1800); // Dirty, it would be better to use timer interrupt
-           digitalWrite(BUZZER_PIN, LOW);
-           delay(10);
-           wdt_reset();
-           Serial.println(F("BUZZZZZ"));
-      }
+            digitalWrite(BUZZER_PIN, HIGH);
+            delayMicroseconds(1800); // Dirty, it would be better to use timer interrupt
+            digitalWrite(BUZZER_PIN, LOW);
+            delay(10);
+            wdt_reset();
+            Serial.println(F("BUZZZZZ"));
+        }
     }
 }
 

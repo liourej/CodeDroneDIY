@@ -106,7 +106,7 @@ void loop() {
 
     // Compute mean loop time and complementary filter time constant
     int flyingMode = stabilization.GetFlyingMode();
-    if ((flyingMode == angle) || (flyingMode == accro)){
+    if ((flyingMode == angle) || (flyingMode == accro)) {
         if (!stabilization.IsThrottleIdle()) {
             ComputeMeanLoopTime(loopTimeSec, loopNb);
         }

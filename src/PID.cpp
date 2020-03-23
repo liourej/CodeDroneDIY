@@ -12,10 +12,10 @@ void PID::Reset() {
 }
 
 int PID::ComputeCorrection(float _cmd, float _pos, float _loopTime) {
-    float correction = 0;
     error = _cmd - _pos;
     integrator = integrator + error;
-    correction = G * (Kp * error + Kd * ((error - errorPrev) / (_loopTime)) + Ki * integrator);
+    int correction =
+            (int)(G * (Kp * error + Kd * ((error - errorPrev) / (_loopTime)) + Ki * integrator));
 
     errorPrev = error;
 

@@ -56,8 +56,8 @@ void Stabilization::Accro(float _loopTimeSec) {
     attitude.GetCurrPos(posCurr, speedCurr, _loopTimeSec);
 
     // Compute new speed commandi for each axis
-    rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection(Rx.GetAileronsSpeed(), speedCurr[0],
-                                                        _loopTimeSec);
+    rollMotorPwr =
+            rollSpeedPID_Accro.ComputeCorrection(Rx.GetAileronsSpeed(), speedCurr[0], _loopTimeSec);
     pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection(Rx.GetElevatorSpeed(), speedCurr[1],
                                                           _loopTimeSec);
     yawMotorPwr = yawSpeedPID_Accro.ComputeCorrection(Rx.GetRudder(), speedCurr[2], _loopTimeSec);

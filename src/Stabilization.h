@@ -30,7 +30,7 @@ class Stabilization {
     int rollMotorPwr, pitchMotorPwr, yawMotorPwr = 0;
     float speedCurr[3] = {0.0, 0.0, 0.0}; // Teta speed (°/s) (only use gyro)
     float posCurr[3] = {0.0, 0.0, 0.0};   // Teta position (°) (use gyro + accelero)
-    uint8_t throttle = 0;
+    uint16_t throttle = 0;
     ESC ESCs;
     PID rollPosPID_Angle, pitchPosPID_Angle, yawPosPID_Angle;
     PID rollSpeedPID_Angle, pitchSpeedPID_Angle, yawSpeedPID_Angle;
@@ -71,13 +71,11 @@ class Stabilization {
     void AttitudeComputeOffsets() {
         attitude.ComputeOffsets();
     }
-    inline void ComputeRxImpulsionWidth()
-    {
-      Rx.GetWidth();
+    inline void ComputeRxImpulsionWidth() {
+        Rx.GetWidth();
     }
-    inline int GetFlyingMode()
-    {
-      return Rx.GetFlyingMode();
+    inline int GetFlyingMode() {
+        return Rx.GetFlyingMode();
     }
     inline int GetThrottle() {
         return Rx.GetThrottle(GetESCsMinPower(), GetESCsMaxThrottle());
