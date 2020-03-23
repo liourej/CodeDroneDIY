@@ -39,36 +39,7 @@ void RxInterrupt() {
     Rx.GetWidth();
 }
 
-void PrintSettings() {
-    Serial.println(F("/********* settings *********/"));
-    Serial.println(F("FLYING_MODE_ANGLE"));
-    stabilization.PrintAngleModeParameters();
-    Serial.println(F("FLYING_MODE_ACCRO"));
-    stabilization.PrintAccroModeParameters();
-
-    Serial.println(F("/********* Receiver settings *********/"));
-    Rx.PrintCmd();
-    Serial.println(F("/********* MPU 6050 Configuration *********/"));
-}
-
-// Initialiaze all sensors and communication pipes
-void setup() {
-    InitTimer1();
-
-    // Receiver
-    attachInterrupt(0, RxInterrupt, RISING); // Receiver interrupt on PD2 (INT0)
-
-    // Console print: initialize serial communication
-    Serial.begin(230400);
-
-    stabilization.Init(Rx);
-
-    time.InitAllCounters();
-    stateMachine.Init();
-
-    // Set watchdog reset
-    wdt_enable(WDTO_1S);
-
+void PrintConfig() {
     if ((stabilization.GetESCsMaxPower() == 1860)
         && (stabilization.GetESCsMaxThrottle() >= (1860 * 0.8)))
         Serial.println(
@@ -87,32 +58,62 @@ void setup() {
     Serial.println(F("Setup Finished"));
 }
 
-float loopTimeSec = 0;
-typedef void *(*StateFunc)();
+// Initialiaze all sensors and communication pipes
+void setup() {
+
+    InitTimer1();
+
+    attachInterrupt(0, RxInterrupt, RISING); // Receiver interrupt on PD2 (INT0)
+
+    Serial.begin(230400); // Console print: initialize serial communication
+
+    stabilization.Init(Rx);
+
+    time.InitAllCounters();
+
+    stateMachine.Init();
+
+    wdt_enable(WDTO_1S); // Set watchdog reset
+
+    PrintConfig();
+}
+
+typedef void *(*StateFunc)(const float);
+
+void ComputeMeanLoopTime(const float _loopTimeSec, uint16_t &_loopNb) {
+    float meanLoopTime = 0;
+    if (_loopNb > 1000) {
+        meanLoopTime = meanLoopTime / _loopNb;
+        Serial.println(meanLoopTime, 2);
+        meanLoopTime = 0;
+        _loopNb = 0;
+    } else {
+        meanLoopTime += _loopTimeSec;
+        _loopNb++;
+    }
+}
+
+bool IsThrottleIdle() {
+    int throttle = Rx.GetThrottle(stabilization.GetESCsMinPower(), stabilization.GetESCsMaxThrottle());
+    return throttle < stabilization.GetESCIdleThreshold();
+}
 
 // Main loop
 void loop() {
+    float loopTimeSec = 0.0;
     StateFunc statefunc = initState;
-    static uint8_t loopNb = 0;
-    static float meanLoopTime = 0;
+    uint16_t loopNb = 0;
+
     loopTimeSec = time.GetloopTimeMilliseconds(0);
 
     // State Machine initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
-    statefunc = (StateFunc)(*statefunc)();
+    statefunc = (StateFunc)(*statefunc)(loopTimeSec);
 
     // Compute mean loop time and complementary filter time constant
     int flyingMode = Rx.GetFlyingMode();
-    if (((flyingMode == angle) || (flyingMode == accro))
-        && (Rx.GetThrottle(stabilization.GetESCsMinPower(), stabilization.GetESCsMaxThrottle())
-            > stabilization.GetESCIdleThreshold())) {
-        if (loopNb > 1000) {
-            meanLoopTime = meanLoopTime / loopNb;
-            Serial.println(meanLoopTime, 2);
-            meanLoopTime = 0;
-            loopNb = 0;
-        } else {
-            meanLoopTime += loopTimeSec;
-            loopNb++;
+    if ((flyingMode == angle) || (flyingMode == accro)){
+        if (!IsThrottleIdle()) {
+            ComputeMeanLoopTime(loopTimeSec, loopNb);
         }
     }
     wdt_reset();

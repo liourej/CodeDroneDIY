@@ -1,9 +1,6 @@
 #include "Arduino.h"
 #include "ESC.h"
 
-extern unsigned int MIN_POWER;
-extern unsigned int MAX_POWER;
-
 void ESC::Init() {
     attach(ESC0, 4);
     attach(ESC1, 5);

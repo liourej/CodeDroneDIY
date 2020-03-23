@@ -20,19 +20,19 @@ void Stabilization::Init(Reception &_Rx) {
 
     attitude.Init();
 
-    if ((ESCs.MAX_POWER == 1860) && (ESCs.MAX_THROTTLE >= (1860 * 0.8)))
+    if ((ESCs.GetESCsMaxPower() == 1860) && (ESCs.GetESCsMaxThrottle() >= (1860 * 0.8)))
         Serial.println(
                 F("!!!!!!!!!!!!!!!!!!!!FLYING MODE "
                   "POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "));
-    else if ((ESCs.MAX_POWER <= 1300))
+    else if ((ESCs.GetESCsMaxPower() <= 1300))
         Serial.println(F("DEBUG MODE POWER!!! "));
     else
         Serial.println(F("UNEXPECTED POWER "));
 
     Serial.print(F("MAX_POWER: "));
-    Serial.print(ESCs.MAX_POWER);
+    Serial.print(ESCs.GetESCsMaxPower());
     Serial.print(F(" MAX_THROTTLE_PERCENT: "));
-    Serial.println(ESCs.MAX_THROTTLE_PERCENT);
+    Serial.println(ESCs.GetESCsMaxThrottlePercent());
     // Angle mode PID config
     rollPosPID_Angle.SetGains(anglePosPIDParams);
     pitchPosPID_Angle.SetGains(anglePosPIDParams);

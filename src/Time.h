@@ -3,10 +3,9 @@
 
 #include <Arduino.h>
 
-#define COUNTER_NB 2
-
 class Time {
   private:
+    static const int COUNTER_NB = 2;
     float startTime[COUNTER_NB] = {0.0, 0.0};
     float prev_time[COUNTER_NB] = {0.0, 0.0};
     float loop_time[COUNTER_NB] = {0.0, 0.0}; // sec

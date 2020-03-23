@@ -50,19 +50,19 @@ class Stabilization {
         ESCs.SetPWM_f5(TCNTn, OCRnA);
     }
     int GetESCsMaxPower() {
-        return ESCs.MAX_POWER;
+        return ESCs.GetESCsMaxPower();
     }
     int GetESCsMinPower() {
-        return ESCs.MIN_POWER;
+        return ESCs.GetESCsMinPower();
     }
     int GetESCsMaxThrottlePercent() {
-        return ESCs.MAX_THROTTLE_PERCENT;
+        return ESCs.GetESCsMaxThrottlePercent();
     }
     int GetESCsMaxThrottle() {
-        return ESCs.MAX_THROTTLE;
+        return ESCs.GetESCsMaxThrottle();
     }
     int GetESCIdleThreshold() {
-        return ESCs.IDLE_THRESHOLD;
+        return ESCs.GetESCIdleThreshold();
     }
     bool AreAttitudeOffsetsComputed() {
         return attitude.AreOffsetComputed();
