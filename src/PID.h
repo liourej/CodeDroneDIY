@@ -13,7 +13,7 @@ class PID {
     float integrator = 0;
 
   public:
-    void SetGains(float _params[4]);
+    void SetGains(const float _params[4]);
     void Reset();
     int ComputeCorrection(float _cmd, float _pos, float _loopTime);
     void PrintGains(void);

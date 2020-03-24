@@ -1,5 +1,5 @@
 #include "PID.h"
-void PID::SetGains(float _params[4]) {
+void PID::SetGains(const float _params[4]) {
     G = _params[0];
     Kp = _params[1];
     Kd = _params[2];

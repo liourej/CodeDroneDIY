@@ -5,26 +5,11 @@
 #include "ESC.h"
 #include "PID.h"
 #include "Reception.h"
+#include "PIDConstants.h"
 
 class Stabilization {
   private:
     const float mixing = 0.5;
-
-    // PID setup
-    const float GAIN = 0.010;
-
-    // Angle mode
-    // These parameters are very important for flight success
-    // They must be tuned for each frame type, motors, and propeller used
-    float anglePosPIDParams[4] = {0.010, 268, 0.5, 0.0}; // G, Kp, Kd, Ki
-    float angleSpeedPIDParams[4] = {0.010, 192, 0.0, 0.0};
-
-    // Accro mode
-    // 450mm frame, 10x4.5" 2 blades propellers - Tested during flight test: OK
-    float accroSpeedPIDParams[4] = {0.010, 192, 0.0, 0.0};
-
-    // Yaw PID
-    float yawSpeedPIDParams[4] = {0.010, 150.0, 0.0, 0.0}; // G, Kp, Kd, Ki
 
     int rollPosCmd, pitchPosCmd = 0;
     int rollMotorPwr, pitchMotorPwr, yawMotorPwr = 0;

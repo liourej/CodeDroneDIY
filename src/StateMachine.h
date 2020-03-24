@@ -6,16 +6,6 @@
 #include "Stabilization.h"
 #include "states/IState.h"
 
-//extern Stabilization stabilization;
-
-// States functions
-//void *initState(const float = 0.0);
-void *startingState(const float = 0.0);
-void *angleState(const float);
-void *accroState(const float);
-void *safetyState(const float = 0.0);
-void *disarmedState(const float = 0.0);
-
 class StateMachine {
   private:
     // Buzzer for lost model alarm

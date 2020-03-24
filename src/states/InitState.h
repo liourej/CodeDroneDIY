@@ -14,7 +14,7 @@ public:
 
 private:
     InitState(){};
-    AngleState(InitState const&);// Don't Implement
+    InitState(InitState const&);// Don't Implement
     void operator=(InitState const&); // Don't implement
 
 public:

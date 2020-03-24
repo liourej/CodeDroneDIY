@@ -34,21 +34,22 @@ void Stabilization::Init() {
     Serial.print(F(" MAX_THROTTLE_PERCENT: "));
     Serial.println(ESCs.GetESCsMaxThrottlePercent());
     // Angle mode PID config
-    rollPosPID_Angle.SetGains(anglePosPIDParams);
-    pitchPosPID_Angle.SetGains(anglePosPIDParams);
-    rollSpeedPID_Angle.SetGains(angleSpeedPIDParams);
-    pitchSpeedPID_Angle.SetGains(angleSpeedPIDParams);
+
+    rollPosPID_Angle.SetGains(PIDConstants::GetInstance()->anglePosPIDParams);
+    pitchPosPID_Angle.SetGains(PIDConstants::GetInstance()->anglePosPIDParams);
+    rollSpeedPID_Angle.SetGains(PIDConstants::GetInstance()->angleSpeedPIDParams);
+    pitchSpeedPID_Angle.SetGains(PIDConstants::GetInstance()->angleSpeedPIDParams);
 
     // Adjust Kp from potentiometer on A0
-    yawSpeedPIDParams[1] = map(analogRead(0), 0, 1023, 0, 500);
+    PIDConstants::GetInstance()->yawSpeedPIDParams[1] = map(analogRead(0), 0, 1023, 0, 500);
     Serial.print("Yaw kP: ");
-    Serial.println(yawSpeedPIDParams[1]);
-    yawSpeedPID_Angle.SetGains(yawSpeedPIDParams);
+    Serial.println(PIDConstants::GetInstance()->yawSpeedPIDParams[1]);
+    yawSpeedPID_Angle.SetGains(PIDConstants::GetInstance()->yawSpeedPIDParams);
 
     // Accro mode PID config
-    rollSpeedPID_Accro.SetGains(accroSpeedPIDParams);
-    pitchSpeedPID_Accro.SetGains(accroSpeedPIDParams);
-    yawSpeedPID_Accro.SetGains(yawSpeedPIDParams);
+    rollSpeedPID_Accro.SetGains(PIDConstants::GetInstance()->accroSpeedPIDParams);
+    pitchSpeedPID_Accro.SetGains(PIDConstants::GetInstance()->accroSpeedPIDParams);
+    yawSpeedPID_Accro.SetGains(PIDConstants::GetInstance()->yawSpeedPIDParams);
 }
 
 void Stabilization::Accro(float _loopTimeSec) {
