@@ -1,17 +1,11 @@
-#include "PID.h"
-void PID::SetGains(float _params[4]) {
-    G = _params[0];
-    Kp = _params[1];
-    Kd = _params[2];
-    Ki = _params[3];
-}
+#include "IPID.h"
 
-void PID::Reset() {
+void IPID::Reset() {
     errorPrev = 0;
     integrator = 0;
 }
 
-int PID::ComputeCorrection(float _cmd, float _pos, float _loopTime) {
+int IPID::ComputeCorrection(float _cmd, float _pos, float _loopTime) {
     error = _cmd - _pos;
     integrator = integrator + error;
     int correction =
@@ -23,7 +17,7 @@ int PID::ComputeCorrection(float _cmd, float _pos, float _loopTime) {
     return correction;
 }
 
-void PID::PrintGains(void) {
+void IPID::PrintGains(void) {
     Serial.print("G: ");
     Serial.print(G);
     Serial.print(" Kp: ");

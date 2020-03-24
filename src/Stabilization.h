@@ -10,9 +10,6 @@ class Stabilization {
   private:
     const float mixing = 0.5;
 
-    // PID setup
-    const float GAIN = 0.010;
-
     // Angle mode
     // These parameters are very important for flight success
     // They must be tuned for each frame type, motors, and propeller used
@@ -32,7 +29,7 @@ class Stabilization {
     float posCurr[3] = {0.0, 0.0, 0.0};   // Teta position (°) (use gyro + accelero)
     uint16_t throttle = 0;
     ESC ESCs;
-    PID rollPosPID_Angle, pitchPosPID_Angle, yawPosPID_Angle;
+    PID rollPosPID_Angle, pitchPosPID_Angle;
     PID rollSpeedPID_Angle, pitchSpeedPID_Angle, yawSpeedPID_Angle;
     PID rollSpeedPID_Accro, pitchSpeedPID_Accro, yawSpeedPID_Accro;
     Attitude attitude;
