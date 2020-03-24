@@ -1,16 +1,17 @@
-#include "StateMachine.h"
+#include "SafetyState.h"
+#include "DisarmedState.h"
+#include "../Stabilization.h"
 
-extern StateMachine stateMachine;
-extern float loopTimeSec;
+extern Stabilization stabilization;
 
-void *safetyState(const float) {
-    stabilization.Idle();
-    stateMachine.ActivateBuzzer(120);
+void SafetyState::Run(StateMachine *_stateMachine, const float){
+   stabilization.Idle();
+    _stateMachine->ActivateBuzzer(120);
     stabilization.GetFlyingMode();
     if (stabilization.GetFlyingMode() != disarmed) {
         stabilization.Idle();
-        return (void *)&safetyState;
+        SetState(_stateMachine, this);
     } else {
-        return (void *)&disarmedState;
+        SetState(_stateMachine, DisarmedState::GetInstance());
     }
 }

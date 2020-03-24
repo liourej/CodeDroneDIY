@@ -1,8 +1,5 @@
 #include "StateMachine.h"
 
-extern StateMachine stateMachine;
-extern float loopTimeSec;
-
 void StateMachine::Init() {
     // Buzzer
     pinMode(BUZZER_PIN, OUTPUT);

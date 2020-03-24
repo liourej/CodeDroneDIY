@@ -1,18 +1,18 @@
-#include "StateMachine.h"
+#include "InitState.h"
+#include "StartingState.h"
+#include "../Stabilization.h"
 
-extern StateMachine stateMachine;
-extern float loopTimeSec;
+extern Stabilization stabilization;
 
-// States
-void *initState(const float) {
+void InitState::Run(StateMachine *_stateMachine, const float) {
     stabilization.Idle();
     while (!stabilization.AreAttitudeOffsetsComputed())
         stabilization.AttitudeComputeOffsets();
 
     if (stabilization.GetFlyingMode() != disarmed)
-        return (void *)&initState;
+        SetState(_stateMachine,this);
     else if (stabilization.AreAttitudeOffsetsComputed())
-        return (void *)&startingState;
+        SetState(_stateMachine, StartingState::GetInstance());
 
-    return (void *)&initState;
+    SetState(_stateMachine, this);
 }

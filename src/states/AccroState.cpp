@@ -1,24 +1,26 @@
-#include "StateMachine.h"
+#include "AccroState.h"
+#include "AngleState.h"
+#include "SafetyState.h"
+#include "../Stabilization.h"
 
-extern StateMachine stateMachine;
-extern float loopTimeSec;
+extern Stabilization stabilization;
 
-void *accroState(const float _loopTimeSec) {
+void AccroState::Run(StateMachine *_stateMachine, const float _loopTimeSec) {
     if (!stabilization.IsThrottleIdle()) {
-        stateMachine.throttleWasHigh = true;
+        _stateMachine->throttleWasHigh = true;
 
         stabilization.Accro(_loopTimeSec);
 
         // Allow to change flying mode during flight
         if (stabilization.GetFlyingMode() == angle) {
             Serial.println(F("Flying mode changed from accro to angle"));
-            return (void *)&angleState;
+            SetState(_stateMachine, AngleState::GetInstance());
         }
     } else {
         // after 5s without pwr
         stabilization.ResetPID();
-        if (stateMachine.IsSafetyStateNeeded()) // Safety cut mngt: set safety cut
-            return (void *)&safetyState;
+        if (_stateMachine->IsSafetyStateNeeded()) // Safety cut mngt: set safety cut
+            SetState(_stateMachine, SafetyState::GetInstance());
     }
-    return (void *)&accroState;
+    SetState(_stateMachine, this);
 }

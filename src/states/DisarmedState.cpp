@@ -1,25 +1,27 @@
-#include "StateMachine.h"
+#include "DisarmedState.h"
+#include "AccroState.h"
+#include "AngleState.h"
+#include "../Stabilization.h"
 
-extern StateMachine stateMachine;
-extern float loopTimeSec;
+extern Stabilization stabilization;
 
-void *disarmedState(const float) {
+void DisarmedState::Run(StateMachine *_stateMachine, const float _loopTimeSec) {
     stabilization.Idle();
-    stateMachine.ActivateBuzzer(120);
+    _stateMachine->ActivateBuzzer(120);
     int state = stabilization.GetFlyingMode();
     delay(500);
     // Check it was not a transitory switch state
     if (state != stabilization.GetFlyingMode())
-        return (void *)&disarmedState;
+        SetState(_stateMachine, DisarmedState::GetInstance());
     if (state != disarmed) {
-        stateMachine.throttleWasHigh = true;
+        _stateMachine->throttleWasHigh = true;
         if (state == angle) {
             Serial.println(F("ANGLE MODE"));
-            return (void *)&angleState;
+            SetState(_stateMachine, AngleState::GetInstance());
         } else if (state == accro) {
             Serial.println(F("ACCRO MODE"));
-            return (void *)&accroState;
+            SetState(_stateMachine, AccroState::GetInstance());
         }
     }
-    return (void *)&disarmedState;
+      SetState(_stateMachine, this);
 }

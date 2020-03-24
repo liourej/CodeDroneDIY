@@ -4,11 +4,12 @@
 #include "Time.h"
 #include "Reception.h"
 #include "Stabilization.h"
+#include "states/IState.h"
 
-extern Stabilization stabilization;
+//extern Stabilization stabilization;
 
 // States functions
-void *initState(const float = 0.0);
+//void *initState(const float = 0.0);
 void *startingState(const float = 0.0);
 void *angleState(const float);
 void *accroState(const float);
@@ -22,6 +23,7 @@ class StateMachine {
     const int delayThresholdSec = 5; // (s)
     Time elapsedTime;
     Time timeBuzzer;
+    IState* currentState;
 
   public:
     bool throttleWasHigh = true;
@@ -33,6 +35,14 @@ class StateMachine {
 
     // Auto Disarm when throttle is idle since a long period
     bool IsSafetyStateNeeded();
+
+    void SetState(IState *_newState){
+      currentState = _newState;
+    }
+
+    void Run (const float _loopTimeSec){
+      currentState->Run(this, _loopTimeSec);
+    }
 };
 
 #endif // STATEMACHINE_H_

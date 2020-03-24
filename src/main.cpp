@@ -96,13 +96,14 @@ void ComputeMeanLoopTime(const float _loopTimeSec, uint16_t &_loopNb) {
 // Main loop
 void loop() {
     float loopTimeSec = 0.0;
-    StateFunc statefunc = initState;
+    //StateFunc statefunc = initState;
     uint16_t loopNb = 0;
 
     loopTimeSec = time.GetloopTimeMilliseconds();
 
     // State Machine initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
-    statefunc = (StateFunc)(*statefunc)(loopTimeSec);
+    //statefunc = (StateFunc)(*statefunc)(loopTimeSec);
+    stateMachine.Run(loopTimeSec);
 
     // Compute mean loop time and complementary filter time constant
     int flyingMode = stabilization.GetFlyingMode();
