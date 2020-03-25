@@ -1,24 +1,22 @@
-#ifndef ESC_H_
-#define ESC_H_
+#ifndef MOTORSPEEDCONTROL_H_
+#define MOTORSPEEDCONTROL_H_
 
 // converts microseconds to tick (assumes prescale of 8)  // 12 Aug 2009
 #define usToTicks(_us) ((clockCyclesPerMicrosecond() * _us))
 // converts from ticks back to microseconds
 #define ticksToUs(_ticks) (((unsigned)_ticks) / clockCyclesPerMicrosecond())
 
-//#define ESCNb 4
-
 typedef struct {
     int pin;
     float PWM;
     uint16_t ticks;
-} typeESC;
+} typeMotorSpeedControl;
 
-enum ESCId { ESC0, ESC1, ESC2, ESC3 };
+enum MotorId { Motor0, Motor1, Motor2, Motor3 };
 
-class ESC {
+class MotorsSpeedControl {
   private:
-    static const int nbESC = 4;
+    static const int nbMotors = 4;
     // Power setup
     const int MIN_POWER = 1060;
     // Max power available to stabilize quardirotors - Set to 1860 to reach max
@@ -30,28 +28,28 @@ class ESC {
     int IDLE_THRESHOLD = 1100;
 
   public:
-    typeESC ESCList[nbESC];
-    int currESC = -1;
+    typeMotorSpeedControl motorsList[nbMotors];
+    int currMotor = -1;
     void Init();
     void attach(int _id, int _pin); // set servo pin to output};
     void write(int _id, float _PWM);
     void Idle();
-    void SetPWM_f5(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA);
-    const int GetESCsMaxPower() {
+    void SetMotorsSpeed(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA);
+    const int GetMotorsMaxPower() {
         return MAX_POWER;
     }
-    const int GetESCsMinPower() {
+    const int GetMotorsMinPower() {
         return MIN_POWER;
     }
-    const int GetESCsMaxThrottlePercent() {
+    const int GetMotorsMaxThrottlePercent() {
         return MAX_THROTTLE_PERCENT;
     }
-    const int GetESCsMaxThrottle() {
+    const int GetMotorsMaxThrottle() {
         return MAX_THROTTLE;
     }
-    int GetESCIdleThreshold() {
+    int GetMotorsIdleThreshold() {
         return IDLE_THRESHOLD;
     }
 };
 
-#endif // ESC_H_
+#endif // MOTORSPEEDCONTROL_H_

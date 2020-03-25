@@ -2,12 +2,11 @@
 #include <math.h>
 
 #include "customLibs/Time.h"
-#include "stabilization/Reception.h"
+#include "stabilization/hardware/Reception.h"
 #include "stabilization/Stabilization.h"
 #include "stateMachine/StateMachine.h"
 
 Time time;
-
 Stabilization stabilization;
 StateMachine stateMachine;
 
@@ -16,7 +15,7 @@ typedef enum { _timer1, _Nbr_16timers } timer16_Sequence_t;
 
 static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t *TCNTn,
                                      volatile uint16_t *OCRnA) {
-    stabilization.SetESCsPWM(TCNTn, OCRnA);
+    stabilization.SetMotorsSpeed(TCNTn, OCRnA);
 }
 
 SIGNAL(TIMER1_COMPA_vect) {
@@ -24,11 +23,10 @@ SIGNAL(TIMER1_COMPA_vect) {
 }
 
 void InitTimer1() {
-    // Timer
     TCCR1A = 0;         // normal counting mode
     TCCR1B = _BV(CS10); // no prescaler
     TCNT1 = 0;          // clear the timer count
-    OCR1A = usToTicks(stabilization.GetESCsMinPower());
+    OCR1A = usToTicks(stabilization.GetMotorsMinPower());
 
     TIFR1 |= _BV(OCF1A);   // clear any pending interrupts;
     TIMSK1 |= _BV(OCIE1A); // enable the output compare interrupt
@@ -40,20 +38,20 @@ void RxInterrupt() {
 }
 
 void PrintConfig() {
-    if ((stabilization.GetESCsMaxPower() == 1860)
-        && (stabilization.GetESCsMaxThrottle() >= (1860 * 0.8)))
+    if ((stabilization.GetMotorsMaxPower() == 1860)
+        && (stabilization.GetMotorsMaxThrottle() >= (1860 * 0.8)))
         Serial.println(
                 F("!!!!!!!!!!!!!!!!!!!!FLYING MODE "
                   "POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "));
-    else if ((stabilization.GetESCsMaxPower() <= 1300))
+    else if ((stabilization.GetMotorsMaxPower() <= 1300))
         Serial.println(F("DEBUG MODE POWER!!! "));
     else
         Serial.println(F("UNEXPECTED POWER "));
 
     Serial.print(F("MAX_POWER: "));
-    Serial.print(stabilization.GetESCsMaxPower());
+    Serial.print(stabilization.GetMotorsMaxPower());
     Serial.print(F(" MAX_THROTTLE_PERCENT: "));
-    Serial.println(stabilization.GetESCsMaxThrottlePercent());
+    Serial.println(stabilization.GetMotorsMaxThrottlePercent());
 
     Serial.println(F("Setup Finished"));
 }
@@ -78,15 +76,14 @@ void setup() {
     PrintConfig();
 }
 
-void ComputeMeanLoopTime(const float _loopTimeSec, uint16_t &_loopNb) {
-    float meanLoopTime = 0;
+void ComputeMeanLoopTime(const float _loopTimeSec, float &_meanLoopTime, uint16_t &_loopNb) {
     if (_loopNb > 1000) {
-        meanLoopTime = meanLoopTime / _loopNb;
-        Serial.println(meanLoopTime, 2);
-        meanLoopTime = 0;
+        _meanLoopTime = _meanLoopTime / _loopNb;
+        Serial.println(_meanLoopTime, 2);
+        _meanLoopTime = 0;
         _loopNb = 0;
     } else {
-        meanLoopTime += _loopTimeSec;
+        _meanLoopTime += _loopTimeSec;
         _loopNb++;
     }
 }
@@ -95,6 +92,7 @@ void ComputeMeanLoopTime(const float _loopTimeSec, uint16_t &_loopNb) {
 void loop() {
     float loopTimeSec = 0.0;
     uint16_t loopNb = 0;
+    float meanLoopTime = 0.0;
 
     loopTimeSec = time.GetloopTimeMilliseconds();
 
@@ -105,7 +103,7 @@ void loop() {
     int flyingMode = stabilization.GetFlyingMode();
     if ((flyingMode == angle) || (flyingMode == accro)) {
         if (!stabilization.IsThrottleIdle()) {
-            ComputeMeanLoopTime(loopTimeSec, loopNb);
+            ComputeMeanLoopTime(loopTimeSec, meanLoopTime, loopNb);
         }
     }
     wdt_reset();

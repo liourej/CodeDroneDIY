@@ -40,9 +40,8 @@ int Reception::GetRudder() {
 int Reception::GetSwitchH() {
     if (cPPM[5] > 1500) {
         return true;
-    } else {
-        return false;
     }
+    return false;
 } // 1900 inter H en bas, 1090 inter H en haut
 
 int Reception::GetFlyingMode() {

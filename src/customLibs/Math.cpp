@@ -5,7 +5,7 @@ bool Math::ComputeDelta(int16_t _list[], int _size, int16_t *_delta) {
     int16_t minVal = INT_MAX;
 
     if (_size <= 2)
-        return -1;
+        return false;
 
     for (int sample = 0; sample < _size; sample++) {
         if (_list[sample] > maxVal)
@@ -15,7 +15,7 @@ bool Math::ComputeDelta(int16_t _list[], int _size, int16_t *_delta) {
     }
     (*_delta) = maxVal - minVal;
 
-    return 0;
+    return true;
 }
 
 bool Math::ComputeMean(int16_t _list[], int _size, int16_t _deltaThreshold, float *_mean) {
@@ -37,4 +37,15 @@ bool Math::ComputeMean(int16_t _list[], int _size, int16_t _deltaThreshold, floa
     (*_mean) = (*_mean) / _size;
 
     return true;
+}
+
+inline void Math::Normalize(float _vector[], const int vectorSize) {
+    float sumSquares = 0.0;
+    for (int index = 0; index < vectorSize; index++)
+        sumSquares += _vector[index] * _vector[index];
+
+    float norm = sqrt(sumSquares);
+
+    for (int index = 0; index < vectorSize; index++)
+        _vector[index] = _vector[index] / norm;
 }

@@ -2,7 +2,7 @@
 #define STATEMACHINE_H_
 
 #include "../customLibs/Time.h"
-#include "../stabilization/Reception.h"
+#include "../stabilization/hardware/Reception.h"
 #include "../stabilization/Stabilization.h"
 #include "../stateMachine/states/IState.h"
 

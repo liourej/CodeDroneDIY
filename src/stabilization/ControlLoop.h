@@ -1,9 +1,9 @@
-#ifndef PID_H_
-#define PID_H_
+#ifndef CONTROLLOOP_H_
+#define CONTROLLOOP_H_
 
 #include "Arduino.h"
 
-class PID {
+class ControlLoop {
   private:
     float G = 0;
     float Kp, Kd, Ki = 0;
@@ -19,4 +19,4 @@ class PID {
     void PrintGains(void);
 };
 
-#endif // PID_H_
+#endif // CONTROLLOOP_H_

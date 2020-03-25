@@ -1,6 +1,5 @@
 #include <avr/wdt.h>
 #include "Attitude.h"
-//#include "CheckIMU.h"
 
 void Attitude::Init() {
     // Initialize MPU 6050
@@ -141,38 +140,4 @@ bool Attitude::ComputeAccelOffsets() {
     }
 }
 
-inline void Attitude::Normalize(float _acc[]) {
-    float norm = sqrt(_acc[0] * _acc[0] + _acc[1] * _acc[1] + _acc[2] * _acc[2]);
 
-    _acc[0] = _acc[0] / norm;
-    _acc[1] = _acc[1] / norm;
-    _acc[2] = _acc[2] / norm;
-}
-
-float Attitude::GetFilterTimeConstant(float _loopTimeSec) {
-    return ((HighPassFilterCoeff * _loopTimeSec) / (1 - HighPassFilterCoeff));
-}
-
-// Get position combining acc + gyro
-void Attitude::GetCurrPos(float _pos[], float _speed[], float _loop_time) {
-    // float roll, pitch = 0;
-    float accRaw[AXIS_NB] = {0, 0, 0};
-    float gyroRaw[AXIS_NB] = {0, 0, 0};
-
-    // Get corrected data from gyro and accelero
-    GetCorrectedAccelGyro(accRaw, gyroRaw);
-
-    // Compute rotation speed using gyroscopes
-    _speed[0] = gyroRaw[0];
-    _speed[1] = gyroRaw[1];
-    _speed[2] = gyroRaw[2];
-
-    Normalize(accRaw);
-
-    // Use complementary filter to merge gyro and accelerometer data
-    // High pass filter on gyro, and low pass filter on accelerometer
-    _pos[0] = HighPassFilterCoeff * (_pos[0] + (gyroRaw[0]) * _loop_time)
-              + (1 - HighPassFilterCoeff) * RAD2DEG(atan(accRaw[1] / accRaw[2]));
-    _pos[1] = HighPassFilterCoeff * (_pos[1] + (gyroRaw[1]) * _loop_time)
-              + (1 - HighPassFilterCoeff) * RAD2DEG(-atan(accRaw[0] / accRaw[2]));
-}
