@@ -1,7 +1,7 @@
 #ifndef STABILIZATION_H_
 #define STABILIZATION_H_
 
-#include "hardware/Attitude.h"
+#include "hardware/InertialMeasurementUnit.h"
 #include "hardware/MotorsSpeedControl.h"
 #include "ControlLoop.h"
 #include "hardware/Reception.h"
@@ -34,7 +34,7 @@ class Stabilization : public Math {
     ControlLoop rollSpeedPID_Angle, pitchSpeedPID_Angle;
     ControlLoop rollSpeedPID_Accro, pitchSpeedPID_Accro;
     ControlLoop yawControlLoop;
-    Attitude attitude;
+    InertialMeasurementUnit inertialMeasurementUnit;
     Reception Rx;
 
   public:
@@ -65,10 +65,10 @@ class Stabilization : public Math {
         return motorsSpeedControl.GetMotorsIdleThreshold();
     }
     bool AreAttitudeOffsetsComputed() {
-        return attitude.AreOffsetComputed();
+        return inertialMeasurementUnit.AreOffsetComputed();
     }
     void AttitudeComputeOffsets() {
-        attitude.ComputeOffsets();
+        inertialMeasurementUnit.ComputeOffsets();
     }
     inline void ComputeRxImpulsionWidth() {
         Rx.GetWidth();
@@ -89,6 +89,6 @@ class Stabilization : public Math {
     void SetAccroModeControlLoopConfig();
     void SetYawControlLoopConfig();
     float GetFilterTimeConstant(float _loopTimeSec);
-    void GetCurrPos(float _angularPos[], float _angularSpeed[], float _loop_time);
+    void ComputeAttitude(float _angularPos[], float _angularSpeed[], float _loop_time);
 };
 #endif // STABILIZATION_H_

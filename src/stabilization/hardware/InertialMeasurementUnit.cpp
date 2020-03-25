@@ -1,7 +1,7 @@
 #include <avr/wdt.h>
-#include "Attitude.h"
+#include "InertialMeasurementUnit.h"
 
-void Attitude::Init() {
+void InertialMeasurementUnit::Init() {
     // Initialize MPU 6050
     accelgyro.initialize();
 
@@ -13,7 +13,7 @@ void Attitude::Init() {
         Serial.println(F("Test failed"));
 }
 
-inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]) {
+inline void InertialMeasurementUnit::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]) {
     int16_t accel[AXIS_NB] = {0, 0, 0};
     int16_t speed[AXIS_NB] = {0, 0, 0};
 
@@ -28,7 +28,7 @@ inline void Attitude::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMea
     }
 }
 
-void Attitude::SetAccRange(uint8_t _range) {
+void InertialMeasurementUnit::SetAccRange(uint8_t _range) {
     switch (_range) {
     case MPU6050_ACCEL_FS_2:
         GyroSensitivity = 16384;
@@ -46,7 +46,7 @@ void Attitude::SetAccRange(uint8_t _range) {
     accelgyro.setFullScaleAccelRange(_range);
 }
 
-void Attitude::SetGyroRange(uint8_t _range) {
+void InertialMeasurementUnit::SetGyroRange(uint8_t _range) {
     switch (_range) {
     case MPU6050_GYRO_FS_250:
         GyroSensitivity = 131;
@@ -65,12 +65,12 @@ void Attitude::SetGyroRange(uint8_t _range) {
 }
 
 // Compute accelerometer and gyroscope offsets
-void Attitude::ComputeOffsets() {
+void InertialMeasurementUnit::ComputeOffsets() {
     if (ComputeGyroOffsets() && ComputeAccelOffsets())
         offsetComputed = true;
 }
 
-bool Attitude::ComputeGyroOffsets() {
+bool InertialMeasurementUnit::ComputeGyroOffsets() {
     int16_t gyroRaw[AXIS_NB][SAMPLES_NB];
     float mean = 0;
 
@@ -101,7 +101,7 @@ bool Attitude::ComputeGyroOffsets() {
     return true;
 }
 
-bool Attitude::ComputeAccelOffsets() {
+bool InertialMeasurementUnit::ComputeAccelOffsets() {
     int16_t accRaw[AXIS_NB][SAMPLES_NB];
     float mean = 0.0;
 

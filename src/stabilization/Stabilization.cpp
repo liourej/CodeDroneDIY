@@ -15,7 +15,7 @@ void Stabilization::Init() {
         delay(200);
     }
 
-    attitude.Init();
+    inertialMeasurementUnit.Init();
 
     if ((motorsSpeedControl.GetMotorsMaxPower() == 1860)
         && (motorsSpeedControl.GetMotorsMaxThrottle() >= (1860 * 0.8)))
@@ -59,7 +59,7 @@ void Stabilization::SetYawControlLoopConfig() {
 
 void Stabilization::Accro(float _loopTimeSec) {
     // Get current attitude (roll, pitch, yaw speeds)
-    GetCurrPos(angularPosCurr, angularSpeedCurr, _loopTimeSec);
+    ComputeAttitude(angularPosCurr, angularSpeedCurr, _loopTimeSec);
 
     // Compute new speed command for each axis
     rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection(Rx.GetAileronsSpeed(),
@@ -75,7 +75,7 @@ void Stabilization::Accro(float _loopTimeSec) {
 
 void Stabilization::Angle(float _loopTimeSec) {
     // Get current attitude (roll, pitch, yaw angles and speeds)
-    GetCurrPos(angularPosCurr, angularSpeedCurr, _loopTimeSec);
+    ComputeAttitude(angularPosCurr, angularSpeedCurr, _loopTimeSec);
 
     // Compute roll position command
     int rollPosCmd = rollPosPID_Angle.ComputeCorrection(Rx.GetAileronsAngle(),
@@ -106,12 +106,12 @@ float Stabilization::GetFilterTimeConstant(float _loopTimeSec) {
 }
 
 // Compute attitude (pitch angle & speed and roll angle & speed) combining acc + gyro
-void Stabilization::GetCurrPos(float _angularPos[], float _angularSpeed[], float _loop_time) {
+void Stabilization::ComputeAttitude(float _angularPos[], float _angularSpeed[], float _loop_time) {
     float accRaw[nbAxis] = {0, 0, 0};
     float gyroRaw[nbAxis] = {0, 0, 0};
 
     // Get corrected data from gyro and accelero
-    attitude.GetCorrectedAccelGyro(accRaw, gyroRaw);
+    inertialMeasurementUnit.GetCorrectedAccelGyro(accRaw, gyroRaw);
 
     // Compute rotation speed using gyroscopes
     for (int axis = 0; axis < nbAxis; axis++)

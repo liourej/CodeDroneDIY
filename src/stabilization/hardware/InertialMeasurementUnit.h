@@ -1,12 +1,12 @@
-#ifndef ATTITUDE_H_
-#define ATTITUDE_H_
+#ifndef INERTIALMEASUREMENTUNIT_H_
+#define INERTIALMEASUREMENTUNIT_H_
 
 #include "Wire.h"
 #include "../../libraries/I2Cdev/I2Cdev.h"
 #include "../../libraries/MPU6050/MPU6050.h"
 #include "../../customLibs/Math.h"
 
-class Attitude : public Math {
+class InertialMeasurementUnit : public Math {
   public:
 
 
@@ -37,4 +37,4 @@ class Attitude : public Math {
       void GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]);
 };
 
-#endif // ATTITUDE_H_
+#endif // INERTIALMEASUREMENTUNIT_H_
