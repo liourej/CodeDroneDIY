@@ -2,7 +2,7 @@
 #include <math.h>
 
 #include "customLibs/Time.h"
-#include "stabilization/hardware/Reception.h"
+#include "stabilization/hardware/RadioReception.h"
 #include "stabilization/Stabilization.h"
 #include "stateMachine/StateMachine.h"
 

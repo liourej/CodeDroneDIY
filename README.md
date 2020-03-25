@@ -61,7 +61,9 @@
 
 8.2 Exemple of First Person View configuration(FPV)
 
-[**10. Bibliography**](#bibliography)
+[**10. Glossary**](#glossary)
+
+[**11. Bibliography**](#bibliography)
 
 -------------------------------------------------------------------
 ## Warning
@@ -234,7 +236,7 @@ As exemple, my hardware configuration for a 450mm quad:
 
 | Component      | Reference      |
 | -------------- | -------------- |
-| **Microcontroller board** | Arduino Nano/Uno |
+| **Microcontroller board** | Arduino Nano/Uno (ATmega328P MCU) |
 | **ESC** | Afro 20A-Simonk firmware 500Hz, BEC 0.5A 1060 to 1860 us pulse width |
 | **Motors** | Multistar 2216-800Kv 14 Poles - 222W Current max: 20A Shaft: 3mm 2-4S|
 | **Propellers** | 10x4.5 SF Props 2pc CW 2 pc CCW Rotation (Orange) |
@@ -269,7 +271,7 @@ TODO: add receiver in schematic
 
 ![flightConfiguration](/ReadmePictures/flightConfiguration.jpg "flightConfiguration")
 
-## 6.Software setup <a id="softwareSetup"></a>
+## 6. Software setup <a id="softwareSetup"></a>
 
 ### 6.1 Using Arduino IDE
 With minor modifications, project can be build using Arduino IDE:
@@ -277,7 +279,15 @@ With minor modifications, project can be build using Arduino IDE:
 * copy all source files from "CodeDroneDIY/src" to "CodeDroneDIY"
 * launch and compile "CodeDroneDIY.ino" using Arduino IDE
 
-### 6.2. Using PlatformIO
+### 6.2. Using Visual Studio Code IDE and PlatformIO
+
+* Install Visual Studio code
+
+* Start VSCode and click on "Extensions" icon
+
+* Install PlatformIO IDE
+
+### 6.3. Using  Linux terminal and PlatformIO
 PlatformIO is an open source ecosystem for IoT development.
 
 #### 6.2.1. PlatformIO installation
@@ -299,7 +309,7 @@ Optional, for code format:
 #### 6.2.3. Flash target
 ```platformio upload --upload-port/ttyACM0 ```
 
-### 6.3. Using Docker
+### 6.4. Using Docker and PlatformIO
 The development tool "Docker" is a container platoform: it is a stand-alone, executable package
 of a piece of software that includes everything needed to run it: code, runtime, system tools,
  system libraries, settings. It isolates software from its surroundings.
@@ -318,15 +328,14 @@ of a piece of software that includes everything needed to run it: code, runtime,
 | File      | Description      |
 | -------------- | -------------- |
 | main.cpp | Contains initialization function "setup()" and main loop "loop()" |
-| Attitude.cpp/h | Attitude angles computation (roll, pitch, yaw angles) |
-| Stabilization.cpp/h | Closed loop correction: computes new command from tx sticks and attitude |
-| PID.cpp/h | Proportionnal, integral, derivative loop correction |
-| Reception.h | Receiver CPPM signal acquisition using INT0 |
-| ESC.cpp/h | Manage an ESC: pin, PWM to set |
+| InertialMeasurementUnit.cpp/h | Read roll, pitch, yaw angles from MPU6050 |
+| Stabilization.cpp/h | Computes and apply new command from tx sticks and attitude |
+| ControlLoop.cpp/h | Proportionnal, integral, derivative loop correction |
+| RadioReception.h | Receiver CPPM signal acquisition using INT0 |
+| MotorsSpeedControl.cpp/h | Manage an ESC: pin, PWM to set |
 | StateMachine.h | State machine |
 | Time.h | To measure loop time and elapsed time |
 | Math.h | Mathermatical functions: mean and delta max computations|
-| checkIMU.cpp/h | To check IMU sensors |
 
 ### 7.2 The state machine
 
@@ -385,7 +394,20 @@ My cheap configuration:
 | **Camera antenna** | Realacc 5.8G 5dBi 50W RHCP Omnidirectional 3 Leaf Clover FPV Antenna Red |
 | **Video transmitter** | Upgrade Aomway Mini 5.8Ghz 200mW 32CH AV Wireless Transmitter Module |
 
-## 10. Bibliography <a id="bibliography"></a>
+
+## 10. Glossary <a id="glossary"></a>
+
+**ESC** Electronic Speed Control
+
+**PID** It is a Proportionnal Integral Derivative control loop
+
+**IMU** Inertial Measurement Unit
+
+**MPU** Motion Processor Unit
+
+**FPV** First Person View
+
+## 11. Bibliography <a id="bibliography"></a>
 
 * Arduino
 

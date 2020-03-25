@@ -1,6 +1,6 @@
-#include "Reception.h"
+#include "RadioReception.h"
 
-void Reception::PrintCmd(void) {
+void RadioReception::PrintCmd(void) {
     Serial.print(F("Aile: "));
     Serial.print(cPPM[0]);
     Serial.print(F(" Elev: "));
@@ -16,35 +16,35 @@ void Reception::PrintCmd(void) {
 }
 
 // Angle Mode:
-int Reception::GetAileronsAngle() {
+int RadioReception::GetAileronsAngle() {
     return -(map(cPPM[0], 1080, 1900, -MAX_ANGLE, MAX_ANGLE));
 }
-int Reception::GetElevatorAngle() {
+int RadioReception::GetElevatorAngle() {
     return (map(cPPM[1], 1080, 1900, -MAX_ANGLE, MAX_ANGLE));
 }
 
 // Accro mode:
-int Reception::GetAileronsSpeed() {
+int RadioReception::GetAileronsSpeed() {
     return -(map(cPPM[0], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED));
 }
-int Reception::GetElevatorSpeed() {
+int RadioReception::GetElevatorSpeed() {
     return (map(cPPM[1], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED));
 }
-int Reception::GetThrottle(const int _minPower, const int _maxThrottle) {
+int RadioReception::GetThrottle(const int _minPower, const int _maxThrottle) {
     return map(cPPM[2], 1080, 1900, _minPower, _maxThrottle);
 }
 
-int Reception::GetRudder() {
+int RadioReception::GetRudder() {
     return map(cPPM[3], 1080, 1900, -MAX_YAW_SPEED, MAX_YAW_SPEED);
 }
-int Reception::GetSwitchH() {
+int RadioReception::GetSwitchH() {
     if (cPPM[5] > 1500) {
         return true;
     }
     return false;
 } // 1900 inter H en bas, 1090 inter H en haut
 
-int Reception::GetFlyingMode() {
+int RadioReception::GetFlyingMode() {
     if (cPPM[4] > 1800)
         return disarmed;
     else if (cPPM[4] < 1200)
@@ -53,7 +53,7 @@ int Reception::GetFlyingMode() {
         return accro;
 } // G switch: pos0=1900, pos1=1500, pos2=1092
 
-void Reception::GetWidth(void) {
+void RadioReception::GetWidth(void) {
     PWM_Stop = micros();
     PWM_Width = PWM_Stop - PWM_Start;
     PWM_Start = PWM_Stop;

@@ -4,7 +4,7 @@
 #include "hardware/InertialMeasurementUnit.h"
 #include "hardware/MotorsSpeedControl.h"
 #include "ControlLoop.h"
-#include "hardware/Reception.h"
+#include "hardware/RadioReception.h"
 #include "ControlLoopConstants.h"
 #include "../customLibs/Math.h"
 
@@ -35,7 +35,7 @@ class Stabilization : public Math {
     ControlLoop rollSpeedPID_Accro, pitchSpeedPID_Accro;
     ControlLoop yawControlLoop;
     InertialMeasurementUnit inertialMeasurementUnit;
-    Reception Rx;
+    RadioReception radioReception;
 
   public:
     void SetMotorsPwrXConfig();
@@ -71,13 +71,13 @@ class Stabilization : public Math {
         inertialMeasurementUnit.ComputeOffsets();
     }
     inline void ComputeRxImpulsionWidth() {
-        Rx.GetWidth();
+        radioReception.GetWidth();
     }
     inline int GetFlyingMode() {
-        return Rx.GetFlyingMode();
+        return radioReception.GetFlyingMode();
     }
     inline int GetThrottle() {
-        return Rx.GetThrottle(GetMotorsMinPower(), GetMotorsMaxThrottle());
+        return radioReception.GetThrottle(GetMotorsMinPower(), GetMotorsMaxThrottle());
     }
 
     bool IsThrottleIdle() {
