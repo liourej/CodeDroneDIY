@@ -2,8 +2,8 @@
 # <p align="center">DIY flight controller from scratch</p>
 
 <p align="center">
-    <img src="/ReadmePictures/Drone.jpg">
-    <img src="/ReadmePictures/v1_v2_boards.jpg">
+    <img src="/readmePictures/Drone.jpg">
+    <img src="/readmePictures/v1_v2_boards.jpg">
     Pictures: First hardware version using Arduino Uno board and second hardware version using Arduino Nano board
 </p>
 
@@ -68,13 +68,13 @@
 -------------------------------------------------------------------
 ## Warning
 
-![Danger.jpg](/ReadmePictures/Danger.jpg "Danger")
+![Danger.jpg](/readmePictures/Danger.jpg "Danger")
 
 Before starting this project, you must know that spinning propellers are very dangerous for your eyes and people around.
 When using the benchtest indoor, you must wear large protective glasses, and set up a power limit.
 For outside tests, choose a very large area, with nobody around.
 
-![Protection_glasses.jpg](/ReadmePictures/Protection_glasses.jpg "Protection_glasses")
+![Protection_glasses.jpg](/readmePictures/Protection_glasses.jpg "Protection_glasses")
 
 ## 1. Introduction <a id="intro"></a>
 ### 1.1 Purpose
@@ -119,7 +119,7 @@ An « Inertial Measurement Unit » is a MEMS, "Microelectromechanical system",
 | Accelerometer | Measure linear acceleration on each axis (g) | Slow |  Noizy and not usable when UAV is moving |
 
 <p align="center">
-<img src="/ReadmePictures/IMU.jpg" width="24%" />
+<img src="/readmePictures/IMU.jpg" width="24%" />
 </p>
 
 ## 3. Accro mode (aka manual) <a id="accroMode"></a>
@@ -143,7 +143,7 @@ A closed-loop system is needed to control angular spesoftwareDetailedDesigneds.
 
 This system compares angular speed command to angular speed feedback, and computes a new motor power to apply.
 
-![AsservissementAccro](/ReadmePictures/AsservissementAccro.jpg "AsservissementAccro")
+![AsservissementAccro](/readmePictures/AsservissementAccro.jpg "AsservissementAccro")
 
 
 ## 4. Angle mode (aka automatic leveling mode) <a id="angleMode"></a>
@@ -190,7 +190,7 @@ The complementary filter mask their respective errors:
 - A low-pass filter is applied on accelerometer data to filter the noize and the unwanted accelerations: these data are usefull on a long time period, fast changes have to be eliminated.
 - A high-pass filter is applied on the gyrosope data: these data are usefull on short time period, but they drift and accumulate errors on long time periods.
 
-![FiltreComplementaire](/ReadmePictures/FiltreComplementaire.jpg "FiltreComplementaire")
+![FiltreComplementaire](/readmePictures/FiltreComplementaire.jpg "FiltreComplementaire")
 
 **Coding exemple**
 
@@ -226,7 +226,7 @@ This system compares angle command to angle feedback, and computes a new motor p
 
 The pilot controls each attitude angle, and if transmitter sticks are centered, command is 0°, and UAV automatically goes back to horizontal.
 
-![AsservissementAngle](/ReadmePictures/AsservissementAngle.jpg "AsservissementAngle")
+![AsservissementAngle](/readmePictures/AsservissementAngle.jpg "AsservissementAngle")
 
 ## 5. Hardware configuration <a id="hardwareConfiguration"></a>
 
@@ -252,11 +252,11 @@ TODO: add receiver in schematic
 
 **Full view:**
 
-<img src="/ReadmePictures/schemaElectriqueDroneFull.jpg" width="80%"/>
+<img src="/readmePictures/schemaElectriqueDroneFull.jpg" width="80%"/>
 
 **Zoomed view:**
 
-<img src="/ReadmePictures/SchemaElectriqueDroneZoom.jpg" width="50%"/>
+<img src="/readmePictures/SchemaElectriqueDroneZoom.jpg" width="50%"/>
 
 | Arduino pin      | Component      |
 | -------------- | -------------- |
@@ -269,7 +269,7 @@ TODO: add receiver in schematic
 | PC4 | SDA MPU6050 |
 | PC5 | SCL MPU6050 |
 
-![flightConfiguration](/ReadmePictures/flightConfiguration.jpg "flightConfiguration")
+![flightConfiguration](/readmePictures/flightConfiguration.jpg "flightConfiguration")
 
 ## 6. Software setup <a id="softwareSetup"></a>
 
@@ -323,7 +323,7 @@ of a piece of software that includes everything needed to run it: code, runtime,
 
 ### 7.1 Source code overview
 
-![DiagrammeUML](/ReadmePictures/DiagrammeUML.jpg "DiagrammeUML")
+![DiagrammeUML](/readmePictures/DiagrammeUML.jpg "DiagrammeUML")
 
 | File      | Description      |
 | -------------- | -------------- |
@@ -343,7 +343,7 @@ Due to security reasons, the UAV cannot start running with a flight mode enabled
 
 The six states StateMachine:
 
-![MachineEtats](/ReadmePictures/MachineEtats.jpg "MachineEtats")
+![MachineEtats](/readmePictures/MachineEtats.jpg "MachineEtats")
 
 | State      | Description      |
 | -------------- | -------------- |
@@ -360,7 +360,7 @@ A CPPM receiver is used to fly the UAV using a remote control.
 CPPM (Pulse Position Modulation) reception  allows to receive all channels using only one entry pin. Each rising edge correpond to the end of the previous channel impulsion, and at the beginning of the next channel impulsion.
 Elapsed time between two rising edge correspond to the pulse width of a given channel.
 
-![CPPM](/ReadmePictures/CPPM.jpg "CPPM")
+![CPPM](/readmePictures/CPPM.jpg "CPPM")
 
 In this projet, each pulse width is measured using INT0, and then stored in the correponding channel of an array.
 
@@ -378,7 +378,7 @@ Transmitter configuration used during the « bind » operation defines the «�
 
 ### 8.1 The benchtest
 
-<img src="/ReadmePictures/BenchTest01.jpg" width="40%"/>
+<img src="/readmePictures/BenchTest01.jpg" width="40%"/>
 
 ### 8.2 FPV - First Person View  <a id="firstPersonView"></a>
 
