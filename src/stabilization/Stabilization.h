@@ -26,7 +26,7 @@ class Stabilization : public CustomMath {
            coeff = timeCste/(dt + timeCste) If we want 0.5sec, coeff = 0.5/(0.003 +
           0.5) = 0.994
         */
-    float HighPassFilterCoeff = 0.9995;
+    static constexpr float HighPassFilterCoeff = 0.9995;
 
     uint16_t throttle = 0;
     MotorsSpeedControl motorsSpeedControl;
@@ -43,8 +43,6 @@ class Stabilization : public CustomMath {
     void Idle();
     void Accro(float _loopTimeSec);
     void Angle(float _loopTimeSec);
-    void PrintAccroModeParameters();
-    void PrintAngleModeParameters();
     void ResetPID();
     void SetMotorsSpeed(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA) {
         motorsSpeedControl.SetMotorsSpeed(TCNTn, OCRnA);
@@ -85,10 +83,13 @@ class Stabilization : public CustomMath {
     }
 
   private:
+    void PrintAccroModeParameters();
+    void PrintAngleModeParameters();
     void SetAngleModeControlLoopConfig();
     void SetAccroModeControlLoopConfig();
     void SetYawControlLoopConfig();
     float GetFilterTimeConstant(float _loopTimeSec);
     void ComputeAttitude(float _angularPos[], float _angularSpeed[], float _loop_time);
+    float ApplyComplementaryFilter(float _angularPos, float gyroRaw, float _angleDegrees, float _loopTime);
 };
 #endif // STABILIZATION_H_

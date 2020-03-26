@@ -51,9 +51,9 @@ void Stabilization::SetAccroModeControlLoopConfig() {
 
 void Stabilization::SetYawControlLoopConfig() {
     // Adjust Kp from potentiometer on A0
-    ControlLoopConstants::GetInstance()->yawSpeed[1] = map(analogRead(0), 0, 1023, 0, 500);
+    ControlLoopConstants::GetInstance()->yawSpeed.Kp = (float)map(analogRead(0), 0, 1023, 0, 500);
     Serial.print("Yaw kP: ");
-    Serial.println(ControlLoopConstants::GetInstance()->yawSpeed[1]);
+    Serial.println(ControlLoopConstants::GetInstance()->yawSpeed.Kp);
     yawControlLoop.SetGains(ControlLoopConstants::GetInstance()->yawSpeed);
 }
 
@@ -66,8 +66,8 @@ void Stabilization::Accro(float _loopTimeSec) {
                                                         angularSpeedCurr[XAXIS], _loopTimeSec);
     pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection(radioReception.GetElevatorSpeed(),
                                                           angularSpeedCurr[YAXIS], _loopTimeSec);
-    yawMotorPwr = yawControlLoop.ComputeCorrection(radioReception.GetRudder(), angularSpeedCurr[ZAXIS],
-                                                      _loopTimeSec);
+    yawMotorPwr = yawControlLoop.ComputeCorrection(radioReception.GetRudder(),
+                                                   angularSpeedCurr[ZAXIS], _loopTimeSec);
 
     // Apply computed speed command to motors
     SetMotorsPwrXConfig();
@@ -94,8 +94,8 @@ void Stabilization::Angle(float _loopTimeSec) {
                                                           _loopTimeSec);
 
     // Compute yaw speed command
-    yawMotorPwr = yawControlLoop.ComputeCorrection(radioReception.GetRudder(), angularSpeedCurr[ZAXIS],
-                                                      _loopTimeSec);
+    yawMotorPwr = yawControlLoop.ComputeCorrection(radioReception.GetRudder(),
+                                                   angularSpeedCurr[ZAXIS], _loopTimeSec);
 
     // Apply computed command to motors
     SetMotorsPwrXConfig();
@@ -106,7 +106,7 @@ float Stabilization::GetFilterTimeConstant(float _loopTimeSec) {
 }
 
 // Compute attitude (pitch angle & speed and roll angle & speed) combining acc + gyro
-void Stabilization::ComputeAttitude(float _angularPos[], float _angularSpeed[], float _loop_time) {
+void Stabilization::ComputeAttitude(float _angularPos[], float _angularSpeed[], float _loopTime) {
     float accRaw[nbAxis] = {0, 0, 0};
     float gyroRaw[nbAxis] = {0, 0, 0};
 
@@ -119,12 +119,21 @@ void Stabilization::ComputeAttitude(float _angularPos[], float _angularSpeed[], 
 
     Normalize(accRaw, nbAxis);
 
-    // Use complementary filter to merge gyro and accelerometer data
-    // High pass filter on gyro, and low pass filter on accelerometer
-    _angularPos[0] = HighPassFilterCoeff * (_angularPos[0] + (gyroRaw[0]) * _loop_time)
-              + (1 - HighPassFilterCoeff) * RAD2DEG(atan(accRaw[1] / accRaw[2]));
-    _angularPos[1] = HighPassFilterCoeff * (_angularPos[1] + (gyroRaw[1]) * _loop_time)
-              + (1 - HighPassFilterCoeff) * RAD2DEG(-atan(accRaw[0] / accRaw[2]));
+    float rollAngleDeg = RAD2DEG(atan(accRaw[YAXIS] / accRaw[ZAXIS]));
+    _angularPos[XAXIS] =
+            ApplyComplementaryFilter(_angularPos[XAXIS], gyroRaw[XAXIS], rollAngleDeg, _loopTime);
+
+    float pitchAngleDeg = RAD2DEG(-atan(accRaw[XAXIS] / accRaw[ZAXIS]));
+    _angularPos[YAXIS] =
+            ApplyComplementaryFilter(_angularPos[YAXIS], gyroRaw[YAXIS], pitchAngleDeg, _loopTime);
+}
+
+// Use complementary filter to merge gyro and accelerometer data
+// High pass filter on gyro, and low pass filter on accelerometer
+float Stabilization::ApplyComplementaryFilter(float _angularPos, float _gyroRaw,
+                                              float _angleDegrees, float _loopTime) {
+    return HighPassFilterCoeff * (_angularPos + _gyroRaw * _loopTime)
+           + (1 - HighPassFilterCoeff) * _angleDegrees;
 }
 
 void Stabilization::PrintAccroModeParameters() {

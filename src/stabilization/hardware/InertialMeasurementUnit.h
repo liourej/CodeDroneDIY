@@ -7,9 +7,6 @@
 #include "../../customLibs/CustomMath.h"
 
 class InertialMeasurementUnit : public CustomMath {
-  public:
-
-
   private:
     static const int AXIS_NB = 3;
     static const int SAMPLES_NB = 10;
@@ -22,7 +19,6 @@ class InertialMeasurementUnit : public CustomMath {
     MPU6050 accelgyro; // IMU
 
   private:
-  
     bool ComputeGyroOffsets();
     bool ComputeAccelOffsets();
     void SetAccRange(uint8_t _range);

@@ -17,21 +17,16 @@ enum MotorId { Motor0, Motor1, Motor2, Motor3 };
 class MotorsSpeedControl {
   private:
     static const int nbMotors = 4;
-    // Power setup
     const int MIN_POWER = 1060;
-    // Max power available to stabilize quardirotors - Set to 1860 to reach max
-    // power
-    const int MAX_POWER = 1860;
-    const int MAX_THROTTLE_PERCENT = 100.0;
-    // Threshold on max throttle command (percent of max motor power)
-    uint16_t MAX_THROTTLE = MAX_POWER * (MAX_THROTTLE_PERCENT / 100.0);
+    const int MAX_POWER = 1860; // Max pwr available. Set to 1860 to reach max
+    const int MAX_THROTTLE_PERCENT = 100.0; // Percent to restrain max motor power
+    uint16_t MAX_THROTTLE = MAX_POWER * (MAX_THROTTLE_PERCENT / 100.0); // Restrained max power
     int IDLE_THRESHOLD = 1100;
-
-  public:
     typeMotorSpeedControl motorsList[nbMotors];
     int currMotor = -1;
+
+  public:
     void Init();
-    void attach(int _id, int _pin); // set servo pin to output};
     void write(int _id, float _PWM);
     void Idle();
     void SetMotorsSpeed(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA);
@@ -50,6 +45,9 @@ class MotorsSpeedControl {
     int GetMotorsIdleThreshold() {
         return IDLE_THRESHOLD;
     }
+
+  private:
+    void attach(int _id, int _pin); // set servo pin to output};
 };
 
 #endif // MOTORSPEEDCONTROL_H_
