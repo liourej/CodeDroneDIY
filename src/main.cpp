@@ -1,12 +1,12 @@
 #include <avr/wdt.h>
 #include <math.h>
 
-#include "customLibs/Time.h"
+#include "customLibs/CustomTime.h"
 #include "stabilization/hardware/RadioReception.h"
 #include "stabilization/Stabilization.h"
 #include "stateMachine/StateMachine.h"
 
-Time time;
+CustomTime time;
 Stabilization stabilization;
 StateMachine stateMachine;
 

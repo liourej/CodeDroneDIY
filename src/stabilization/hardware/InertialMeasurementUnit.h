@@ -4,9 +4,9 @@
 #include "Wire.h"
 #include "../../libraries/I2Cdev/I2Cdev.h"
 #include "../../libraries/MPU6050/MPU6050.h"
-#include "../../customLibs/Math.h"
+#include "../../customLibs/CustomMath.h"
 
-class InertialMeasurementUnit : public Math {
+class InertialMeasurementUnit : public CustomMath {
   public:
 
 

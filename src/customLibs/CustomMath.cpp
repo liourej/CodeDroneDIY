@@ -1,6 +1,6 @@
-#include "Math.h"
+#include "CustomMath.h"
 
-bool Math::ComputeDelta(int16_t _list[], int _size, int16_t *_delta) {
+bool CustomMath::ComputeDelta(int16_t _list[], int _size, int16_t *_delta) {
     int16_t maxVal = 0;
     int16_t minVal = INT_MAX;
 
@@ -18,7 +18,7 @@ bool Math::ComputeDelta(int16_t _list[], int _size, int16_t *_delta) {
     return true;
 }
 
-bool Math::ComputeMean(int16_t _list[], int _size, int16_t _deltaThreshold, float *_mean) {
+bool CustomMath::ComputeMean(int16_t _list[], int _size, int16_t _deltaThreshold, float *_mean) {
     if (_size <= 0)
         return false;
 
@@ -39,7 +39,7 @@ bool Math::ComputeMean(int16_t _list[], int _size, int16_t _deltaThreshold, floa
     return true;
 }
 
-inline void Math::Normalize(float _vector[], const int vectorSize) {
+inline void CustomMath::Normalize(float _vector[], const int vectorSize) {
     float sumSquares = 0.0;
     for (int index = 0; index < vectorSize; index++)
         sumSquares += _vector[index] * _vector[index];

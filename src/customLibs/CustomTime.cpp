@@ -1,26 +1,26 @@
 #include <Arduino.h>
-#include "Time.h"
+#include "CustomTime.h"
 
-void Time::Init() {
+void CustomTime::Init() {
     startTime = millis();
     prev_time = millis();
 }
 
-float Time::GetloopTimeSeconds() {
+float CustomTime::GetloopTimeSeconds() {
     return GetloopTimeMilliseconds() / 1000;
 }
 
-float Time::GetExecutionTimeSeconds() {
+float CustomTime::GetExecutionTimeSeconds() {
     return GetExecutionTimeMilliseconds() / 1000;
 }
 
-float Time::GetloopTimeMilliseconds() {
+float CustomTime::GetloopTimeMilliseconds() {
     loop_time = millis() - prev_time;
     prev_time = millis();
 
     return loop_time;
 }
 
-float Time::GetExecutionTimeMilliseconds() {
+float CustomTime::GetExecutionTimeMilliseconds() {
     return millis() - startTime;
 }

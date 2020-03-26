@@ -6,9 +6,9 @@
 #include "ControlLoop.h"
 #include "hardware/RadioReception.h"
 #include "ControlLoopConstants.h"
-#include "../customLibs/Math.h"
+#include "../customLibs/CustomMath.h"
 
-class Stabilization : public Math {
+class Stabilization : public CustomMath {
   private:
     const float mixing = 0.5;
     static const int nbAxis = 3;

@@ -1,9 +1,9 @@
-#ifndef TIME_H_
-#define TIME_H_
+#ifndef CUSTOMTIME_H_
+#define CUSTOMTIME_H_
 
 #include <Arduino.h>
 
-class Time {
+class CustomTime {
   private:
     float startTime = 0.0;
     float prev_time = 0.0;
@@ -20,4 +20,4 @@ class Time {
     float GetExecutionTimeMilliseconds();
 };
 
-#endif // TIME_H_
+#endif // CUSTOMTIME_H_
