@@ -3,19 +3,9 @@
 
 #include "IState.h"
 #include "../StateMachine.h"
+#include "../../Singleton.h"
 
-class DisarmedState : public IState {
-  public:
-    static DisarmedState *GetInstance() {
-        static DisarmedState instance;
-        return &instance;
-    }
-
-  private:
-    DisarmedState(){};
-    DisarmedState(DisarmedState const &);  // Don't Implement
-    void operator=(DisarmedState const &); // Don't implement
-
+class DisarmedState : public Singleton<DisarmedState, IState>{
   public:
     void Run(StateMachine *_stateMachine, const float);
 };

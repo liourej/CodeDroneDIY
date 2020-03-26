@@ -3,19 +3,9 @@
 
 #include "IState.h"
 #include "../StateMachine.h"
+#include "../../Singleton.h"
 
-class AngleState : public IState {
-  public:
-    static AngleState *GetInstance() {
-        static AngleState instance;
-        return &instance;
-    }
-
-  private:
-    AngleState(){};
-    AngleState(AngleState const &);     // Don't Implement
-    void operator=(AngleState const &); // Don't implement
-
+class AngleState : public Singleton<AngleState, IState>{
   public:
     void Run(StateMachine *_stateMachine, const float);
 };

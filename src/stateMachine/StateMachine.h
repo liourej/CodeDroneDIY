@@ -21,7 +21,6 @@ class StateMachine {
 
     // Activate buzzer after x minutes of power idle
     void ActivateBuzzer(int _duration);
-    void Print();
 
     // Auto Disarm when throttle is idle since a long period
     bool IsSafetyStateNeeded();
@@ -33,6 +32,9 @@ class StateMachine {
     void Run(const float _loopTimeSec) {
         currentState->Run(this, _loopTimeSec);
     }
+
+  private:
+    void Print();
 };
 
 #endif // STATEMACHINE_H_

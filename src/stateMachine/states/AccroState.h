@@ -3,19 +3,9 @@
 
 #include "IState.h"
 #include "../StateMachine.h"
+#include "../../Singleton.h"
 
-class AccroState : public IState {
-  public:
-    static AccroState *GetInstance() {
-        static AccroState instance;
-        return &instance;
-    }
-
-  private:
-    AccroState(){};
-    AccroState(AccroState const &);     // Don't Implement
-    void operator=(AccroState const &); // Don't implement
-
+class AccroState : public Singleton<AccroState, IState>{
   public:
     void Run(StateMachine *_stateMachine, const float);
 };

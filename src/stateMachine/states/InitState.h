@@ -3,19 +3,9 @@
 
 #include "IState.h"
 #include "../StateMachine.h"
+#include "../../Singleton.h"
 
-class InitState : public IState {
-  public:
-    static InitState *GetInstance() {
-        static InitState instance;
-        return &instance;
-    }
-
-  private:
-    InitState(){};
-    InitState(InitState const &);      // Don't Implement
-    void operator=(InitState const &); // Don't implement
-
+class InitState : public Singleton<InitState, IState>{
   public:
     void Run(StateMachine *_stateMachine, const float);
 };
