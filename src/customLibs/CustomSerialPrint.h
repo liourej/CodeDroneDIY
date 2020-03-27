@@ -7,6 +7,11 @@
 
 class CustomSerialPrint {
   public:
+    static void begin(unsigned long _baudRate) {
+#ifdef LOG_DEBUG
+        Serial.begin(_baudRate);
+#endif
+    }
     static void print(int _number) {
 #ifdef LOG_DEBUG
         Serial.print(_number);
@@ -28,6 +33,12 @@ class CustomSerialPrint {
     static void println(String _string) {
 #ifdef LOG_DEBUG
         Serial.println(_string);
+#endif
+    }
+
+    static void println(double _string, int significantNb) {
+#ifdef LOG_DEBUG
+        Serial.println(_string, significantNb);
 #endif
     }
 };

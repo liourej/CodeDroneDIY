@@ -1,6 +1,8 @@
 #ifndef CONTROLLOOPCONSTANTS_H_
 #define CONTROLLOOPCONSTANTS_H_
 
+#include "../Singleton.h"
+
 typedef struct {
     float G;
     float Kp;
@@ -8,18 +10,7 @@ typedef struct {
     float Ki;
 } Constants;
 
-class ControlLoopConstants { // Singleton class
-  public:
-    static ControlLoopConstants *GetInstance() {
-        static ControlLoopConstants instance;
-        return &instance;
-    }
-
-  private:
-    ControlLoopConstants(){};
-    ControlLoopConstants(ControlLoopConstants const &); // Don't Implement
-    void operator=(ControlLoopConstants const &);       // Don't implement
-
+class ControlLoopConstants : public SingletonSimple<ControlLoopConstants> {
   public:
     // Angle mode
     // These parameters are very important for flight success
