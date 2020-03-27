@@ -10,7 +10,7 @@ void Stabilization::Init() {
     Wire.setClock(400000L); // Communication with MPU-6050 at 400KHz
 
     while (!radioReception.IsReady()) {
-        Serial.println(F("radioReception not ready, try again, please wait. "));
+        CustomSerialPrint::println(F("radioReception not ready, try again, please wait. "));
         motorsSpeedControl.Idle();
         wdt_reset();
         delay(200);
@@ -20,18 +20,18 @@ void Stabilization::Init() {
 
     if ((motorsSpeedControl.GetMotorsMaxPower() == 1860)
         && (motorsSpeedControl.GetMotorsMaxThrottle() >= (1860 * 0.8)))
-        Serial.println(
+        CustomSerialPrint::println(
                 F("!!!!!!!!!!!!!!!!!!!!FLYING MODE "
                   "POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "));
     else if ((motorsSpeedControl.GetMotorsMaxPower() <= 1300))
-        Serial.println(F("DEBUG MODE POWER!!! "));
+        CustomSerialPrint::println(F("DEBUG MODE POWER!!! "));
     else
-        Serial.println(F("UNEXPECTED POWER "));
+        CustomSerialPrint::println(F("UNEXPECTED POWER "));
 
-    Serial.print(F("MAX_POWER: "));
-    Serial.print(motorsSpeedControl.GetMotorsMaxPower());
-    Serial.print(F(" MAX_THROTTLE_PERCENT: "));
-    Serial.println(motorsSpeedControl.GetMotorsMaxThrottlePercent());
+    CustomSerialPrint::print(F("MAX_POWER: "));
+    CustomSerialPrint::print(motorsSpeedControl.GetMotorsMaxPower());
+    CustomSerialPrint::print(F(" MAX_THROTTLE_PERCENT: "));
+    CustomSerialPrint::println(motorsSpeedControl.GetMotorsMaxThrottlePercent());
 
     SetAngleModeControlLoopConfig();
     SetAccroModeControlLoopConfig();
@@ -53,8 +53,8 @@ void Stabilization::SetAccroModeControlLoopConfig() {
 void Stabilization::SetYawControlLoopConfig() {
     // Adjust Kp from potentiometer on A0
     ControlLoopConstants::GetInstance()->yawSpeed.Kp = (float)map(analogRead(0), 0, 1023, 0, 500);
-    Serial.print("Yaw kP: ");
-    Serial.println(ControlLoopConstants::GetInstance()->yawSpeed.Kp);
+    CustomSerialPrint::print("Yaw kP: ");
+    CustomSerialPrint::println(ControlLoopConstants::GetInstance()->yawSpeed.Kp);
     yawControlLoop.SetGains(ControlLoopConstants::GetInstance()->yawSpeed);
 }
 
@@ -118,7 +118,7 @@ void Stabilization::ComputeAttitude(float _angularPos[], float _angularSpeed[], 
     for (int axis = 0; axis < nbAxis; axis++)
         _angularSpeed[axis] = gyroRaw[axis];
 
-    Normalize(accRaw, nbAxis);
+    CustomMath::Normalize(accRaw, nbAxis);
 
     float rollAngleDeg = RAD2DEG(atan(accRaw[YAXIS] / accRaw[ZAXIS]));
     _angularPos[XAXIS] =
@@ -138,29 +138,29 @@ float Stabilization::ApplyComplementaryFilter(float _angularPos, float _gyroRaw,
 }
 
 void Stabilization::PrintAccroModeParameters() {
-    Serial.println(F("/********* PID settings *********/"));
+    CustomSerialPrint::println(F("/********* PID settings *********/"));
     rollSpeedPID_Accro.PrintGains();
     pitchSpeedPID_Accro.PrintGains();
     yawControlLoop.PrintGains();
-    Serial.print(F("Mixing: "));
-    Serial.println(mixing);
+    CustomSerialPrint::print(F("Mixing: "));
+    CustomSerialPrint::println(mixing);
 }
 
 void Stabilization::PrintAngleModeParameters() {
-    Serial.println(F("/********* PID settings *********/"));
+    CustomSerialPrint::println(F("/********* PID settings *********/"));
     rollPosPID_Angle.PrintGains();
     pitchPosPID_Angle.PrintGains();
 
     rollSpeedPID_Angle.PrintGains();
     pitchSpeedPID_Angle.PrintGains();
     yawControlLoop.PrintGains();
-    Serial.println(F("/********* Complementary filter *********/"));
-    Serial.print("Coefficient: ");
-    Serial.print(HighPassFilterCoeff);
-    Serial.print(" Time constant: ");
-    Serial.println(GetFilterTimeConstant(0.00249));
-    Serial.print(F("Mixing: "));
-    Serial.println(mixing);
+    CustomSerialPrint::println(F("/********* Complementary filter *********/"));
+    CustomSerialPrint::print("Coefficient: ");
+    CustomSerialPrint::print(HighPassFilterCoeff);
+    CustomSerialPrint::print(" Time constant: ");
+    CustomSerialPrint::println(GetFilterTimeConstant(0.00249));
+    CustomSerialPrint::print(F("Mixing: "));
+    CustomSerialPrint::println(mixing);
 }
 
 void Stabilization::ResetPID() {

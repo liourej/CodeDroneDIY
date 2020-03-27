@@ -10,7 +10,7 @@
 #include "ControlLoopConstants.h"
 #include "../customLibs/CustomMath.h"
 
-class Stabilization : public CustomMath {
+class Stabilization {
   private:
     const float mixing = 0.5;
     static const int nbAxis = 3;

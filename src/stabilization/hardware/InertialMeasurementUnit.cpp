@@ -9,10 +9,10 @@ void InertialMeasurementUnit::Init() {
 
     wdt_reset();
     if (!accelgyro.testConnection())
-        Serial.println(F("Test failed"));
+    CustomSerialPrint::println(F("InertialMeasurementUnit: Function testConnection failed"));
 }
 
-inline void InertialMeasurementUnit::GetCorrectedAccelGyro(float _accMeasures[],
+void InertialMeasurementUnit::GetCorrectedAccelGyro(float _accMeasures[],
                                                            float _gyroMeasures[]) {
     int16_t accel[AXIS_NB] = {0, 0, 0};
     int16_t speed[AXIS_NB] = {0, 0, 0};
@@ -83,25 +83,29 @@ bool InertialMeasurementUnit::ComputeGyroOffsets() {
     // Get 10 samples during 2 sec
     for (int sample = 0; sample < 10; sample++) {
         accelgyro.getRotation(&gyroRaw[0][sample], &gyroRaw[1][sample], &gyroRaw[2][sample]);
-        wdt_reset();
+        CustomSerialPrint::print(gyroRaw[0][sample]);
+        CustomSerialPrint::print("\t");
+        CustomSerialPrint::print(gyroRaw[1][sample]);
+        CustomSerialPrint::print("\t");
+        CustomSerialPrint::println(gyroRaw[2][sample]);
         delay(200);
     }
 
     // Compute mean
     for (int axis = 0; axis < AXIS_NB; axis++) {
-        if (!ComputeMean(gyroRaw[axis], SAMPLES_NB, (10 * GyroSensitivity), &mean)) {
-            Serial.println(F("ERROR DURING SPEED OFFSETS COMPUTATION !!"));
+        if (!CustomMath::ComputeMean(gyroRaw[axis], SAMPLES_NB, (10 * GyroSensitivity), &mean)) {
+            CustomSerialPrint::println(F("ERROR DURING SPEED OFFSETS COMPUTATION !!"));
             return false;
         }
         gyroOffsets[axis] = static_cast<int16_t>(mean);
     }
 
-    Serial.print(F("Gyroscope offsets Computed :"));
+    CustomSerialPrint::print(F("Gyroscope offsets Computed :"));
     for (int axis = 0; axis < AXIS_NB; axis++) {
-        Serial.print(gyroOffsets[axis] / GyroSensitivity);
-        Serial.print(" ");
+        CustomSerialPrint::print(gyroOffsets[axis] / GyroSensitivity);
+        CustomSerialPrint::print(" ");
     }
-    Serial.println("(deg.s-1) ");
+    CustomSerialPrint::println("(deg.s-1) ");
     return true;
 }
 
@@ -116,14 +120,20 @@ bool InertialMeasurementUnit::ComputeAccelOffsets() {
     // Get 10 samples during 2 sec
     for (int sample = 0; sample < 10; sample++) {
         accelgyro.getAcceleration(&accRaw[0][sample], &accRaw[1][sample], &accRaw[2][sample]);
+        CustomSerialPrint::print(accRaw[0][sample]);
+        CustomSerialPrint::print("\t");
+        CustomSerialPrint::print(accRaw[1][sample]);
+        CustomSerialPrint::print("\t");
+        CustomSerialPrint::println(accRaw[2][sample]);
         wdt_reset();
         delay(200);
     }
 
     // Mean computation
     for (int axis = 0; axis < AXIS_NB; axis++) {
-        if (!ComputeMean(accRaw[axis], SAMPLES_NB, (0.2 * AcceleroSensitivity), &mean)) {
-            Serial.println(F("ERROR DURING ACCELERATION OFFSETS COMPUTATION !!"));
+        if (!CustomMath::ComputeMean(accRaw[axis], SAMPLES_NB, (0.2 * AcceleroSensitivity),
+                                     &mean)) {
+            CustomSerialPrint::println(F("ERROR DURING ACCELERATION OFFSETS COMPUTATION !!"));
             return false;
         }
         accOffsets[axis] = static_cast<int16_t>(mean);
@@ -132,11 +142,11 @@ bool InertialMeasurementUnit::ComputeAccelOffsets() {
     // Zacc is gravity, it should be 1G ie 4096 LSB/g at -+8g sensitivity
     accOffsets[2] = accOffsets[2] - AcceleroSensitivity;
 
-    Serial.print(F("Acceleration offsets Computed :"));
+    CustomSerialPrint::print(F("Acceleration offsets Computed :"));
     for (int axis = 0; axis < AXIS_NB; axis++) {
-        Serial.print(accOffsets[axis] / AcceleroSensitivity);
-        Serial.print(" ");
+        CustomSerialPrint::print(accOffsets[axis] / AcceleroSensitivity);
+        CustomSerialPrint::print(" ");
     }
-    Serial.print("(m.s-2) ");
+    CustomSerialPrint::print("(m.s-2) ");
     return true;
 }

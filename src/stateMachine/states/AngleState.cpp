@@ -20,7 +20,7 @@ void AngleState::Run(StateMachine *_stateMachine, const float _loopTimeSec) {
 
         // Allow to change flying mode during flight
         if (stabilization.GetFlyingMode() == accro) {
-            Serial.println(F("Flying mode changed from angle to accro"));
+            CustomSerialPrint::println(F("Flying mode changed from angle to accro"));
             SetState(_stateMachine, AccroState::GetInstance());
             return;
         }

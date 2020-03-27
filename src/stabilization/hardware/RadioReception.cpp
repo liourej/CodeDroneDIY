@@ -1,18 +1,18 @@
 #include "RadioReception.h"
 
 void RadioReception::PrintCmd(void) {
-    Serial.print(F("Aile: "));
-    Serial.print(cPPM[0]);
-    Serial.print(F(" Elev: "));
-    Serial.print(cPPM[1]);
-    Serial.print(F(" Throt: "));
-    Serial.print(cPPM[2]);
-    Serial.print(F(" Rudd: "));
-    Serial.println(cPPM[3]);
-    Serial.print(F("Switch1: "));
-    Serial.print(cPPM[4]);
-    Serial.print(F(" Switch2: "));
-    Serial.println(cPPM[5]);
+    CustomSerialPrint::print(F("Aile: "));
+    CustomSerialPrint::print(cPPM[0]);
+    CustomSerialPrint::print(F(" Elev: "));
+    CustomSerialPrint::print(cPPM[1]);
+    CustomSerialPrint::print(F(" Throt: "));
+    CustomSerialPrint::print(cPPM[2]);
+    CustomSerialPrint::print(F(" Rudd: "));
+    CustomSerialPrint::println(cPPM[3]);
+    CustomSerialPrint::print(F("Switch1: "));
+    CustomSerialPrint::print(cPPM[4]);
+    CustomSerialPrint::print(F(" Switch2: "));
+    CustomSerialPrint::println(cPPM[5]);
 }
 
 // Angle Mode:

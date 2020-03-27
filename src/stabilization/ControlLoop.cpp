@@ -22,12 +22,12 @@ int ControlLoop::ComputeCorrection(float _cmd, float _pos, float _loopTime) {
 }
 
 void ControlLoop::PrintGains(void) {
-    Serial.print("G: ");
-    Serial.print(constants.G);
-    Serial.print(" Kp: ");
-    Serial.print(constants.Kp);
-    Serial.print(" Kd: ");
-    Serial.print(constants.Kd);
-    Serial.print(" Ki: ");
-    Serial.println(constants.Ki);
+    CustomSerialPrint::print("G: ");
+    CustomSerialPrint::print(constants.G);
+    CustomSerialPrint::print(" Kp: ");
+    CustomSerialPrint::print(constants.Kp);
+    CustomSerialPrint::print(" Kd: ");
+    CustomSerialPrint::print(constants.Kd);
+    CustomSerialPrint::print(" Ki: ");
+    CustomSerialPrint::println(constants.Ki);
 }

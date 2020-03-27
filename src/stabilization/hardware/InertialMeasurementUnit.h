@@ -5,8 +5,9 @@
 #include "../../libraries/I2Cdev/I2Cdev.h"
 #include "../../libraries/MPU6050/MPU6050.h"
 #include "../../customLibs/CustomMath.h"
+#include "../../customLibs/CustomSerialPrint.h"
 
-class InertialMeasurementUnit : public CustomMath {
+class InertialMeasurementUnit{
   private:
     static const int AXIS_NB = 3;
     static const int SAMPLES_NB = 10;

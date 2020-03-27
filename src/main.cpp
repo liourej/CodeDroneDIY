@@ -42,20 +42,20 @@ void RxInterrupt() {
 void PrintConfig() {
     if ((stabilization.GetMotorsMaxPower() == 1860)
         && (stabilization.GetMotorsMaxThrottle() >= (1860 * 0.8)))
-        Serial.println(
+        CustomSerialPrint::println(
                 F("!!!!!!!!!!!!!!!!!!!!FLYING MODE "
                   "POWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "));
     else if ((stabilization.GetMotorsMaxPower() <= 1300))
-        Serial.println(F("DEBUG MODE POWER!!! "));
+        CustomSerialPrint::println(F("DEBUG MODE POWER!!! "));
     else
-        Serial.println(F("UNEXPECTED POWER "));
+        CustomSerialPrint::println(F("UNEXPECTED POWER "));
 
-    Serial.print(F("MAX_POWER: "));
-    Serial.print(stabilization.GetMotorsMaxPower());
-    Serial.print(F(" MAX_THROTTLE_PERCENT: "));
-    // Serial.println(stabilization.GetMotorsMaxThrottlePercent());
+    CustomSerialPrint::print(F("MAX_POWER: "));
+    CustomSerialPrint::print(stabilization.GetMotorsMaxPower());
+    CustomSerialPrint::print(F(" MAX_THROTTLE_PERCENT: "));
+    // CustomSerialPrint::println(stabilization.GetMotorsMaxThrottlePercent());
 
-    Serial.println(F("Setup Finished"));
+    CustomSerialPrint::println(F("Setup Finished"));
 }
 
 // Initialiaze all sensors and communication pipes
@@ -65,7 +65,7 @@ void setup() {
 
     attachInterrupt(0, RxInterrupt, RISING); // Receiver interrupt on PD2 (INT0)
 
-    Serial.begin(230400); // Console print: initialize serial communication
+    CustomSerialPrint::begin(230400); // Console print: initialize serial communication
 
     stabilization.Init();
 
@@ -81,7 +81,7 @@ void setup() {
 void ComputeMeanLoopTime(const float _loopTimeSec, float &_meanLoopTime, uint16_t &_loopNb) {
     if (_loopNb > 1000) {
         _meanLoopTime = _meanLoopTime / _loopNb;
-        Serial.println(_meanLoopTime, 2);
+        CustomSerialPrint::println(_meanLoopTime, 2);
         _meanLoopTime = 0;
         _loopNb = 0;
     } else {

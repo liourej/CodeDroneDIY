@@ -24,7 +24,7 @@ void StartingState::Run(StateMachine *_stateMachine, const float) {
         return;
     }
     if ((state == angle) || (state == accro)) {
-        Serial.println(F("stateMachine.state != disarmed MODE"));
+        CustomSerialPrint::println(F("stateMachine.state != disarmed MODE"));
         // PrintSettings();
         if (state == angle)
             SetState(_stateMachine, AngleState::GetInstance());

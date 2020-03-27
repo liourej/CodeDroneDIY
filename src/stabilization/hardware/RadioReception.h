@@ -2,6 +2,7 @@
 #define RADIORECEPTION_H_
 
 #include "Arduino.h"
+#include "../../customLibs/CustomSerialPrint.h"
 
 enum Mode { initialization, starting, safety, disarmed, accro, angle };
 

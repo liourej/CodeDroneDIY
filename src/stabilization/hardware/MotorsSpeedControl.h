@@ -1,6 +1,8 @@
 #ifndef MOTORSPEEDCONTROL_H_
 #define MOTORSPEEDCONTROL_H_
 
+#include "../../customLibs/CustomSerialPrint.h"
+
 // converts microseconds to tick (assumes prescale of 8)  // 12 Aug 2009
 #define usToTicks(_us) ((clockCyclesPerMicrosecond() * _us))
 // converts from ticks back to microseconds

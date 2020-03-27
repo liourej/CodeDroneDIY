@@ -26,11 +26,11 @@ void DisarmedState::Run(StateMachine *_stateMachine, const float _loopTimeSec) {
     if (state != disarmed) {
         _stateMachine->throttleWasHigh = true;
         if (state == angle) {
-            Serial.println(F("ANGLE MODE"));
+            CustomSerialPrint::println(F("ANGLE MODE"));
             SetState(_stateMachine, AngleState::GetInstance());
             return;
         } else if (state == accro) {
-            Serial.println(F("ACCRO MODE"));
+            CustomSerialPrint::println(F("ACCRO MODE"));
             SetState(_stateMachine, AccroState::GetInstance());
             return;
         }

@@ -25,7 +25,7 @@ void MotorsSpeedControl::write(int _id, float _PWM) {
     if (_PWM < MIN_POWER) {
         motorsList[_id].PWM = MIN_POWER;
     } else if (_PWM > MAX_POWER) { // Check max power
-        Serial.println(F("WARNING, MAX POWER REACHED!!"));
+        CustomSerialPrint::println(F("WARNING, MAX POWER REACHED!!"));
         motorsList[_id].PWM = MAX_POWER;
     } else {
         motorsList[_id].PWM = _PWM;

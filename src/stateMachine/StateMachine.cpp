@@ -18,7 +18,7 @@ void StateMachine::ActivateBuzzer(int _durationSec) {
             digitalWrite(BUZZER_PIN, LOW);
             delay(10);
             wdt_reset();
-            Serial.println(F("BUZZZZZ"));
+            CustomSerialPrint::println(F("BUZZZZZ"));
         }
     }
 }
@@ -26,12 +26,12 @@ void StateMachine::ActivateBuzzer(int _durationSec) {
 // Auto disarm when throttle is idle since a long period
 bool StateMachine::IsSafetyStateNeeded() {
     if (throttleWasHigh) {
-        Serial.println(F("Throttle just setted low!"));
+        CustomSerialPrint::println(F("Throttle just setted low!"));
         Init();
         throttleWasHigh = false;
     } else if (elapsedTime.GetExecutionTimeSeconds() > delayThresholdSec) {
-        Serial.print(delayThresholdSec);
-        Serial.println(F(" sec without power, system DISARMED!"));
+        CustomSerialPrint::print(delayThresholdSec);
+        CustomSerialPrint::println(F(" sec without power, system DISARMED!"));
         return true;
     }
     return false;
