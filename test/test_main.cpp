@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <unity.h>
 
-#include "../src/stabilization/StabilizationStub.h"
+#include "StabilizationStub.h"
 
 #include "../src/stateMachine/StateMachine.h"
 #include "../src/stateMachine/states/StartingState.h"
@@ -60,6 +60,32 @@ void test_ComputeDelta(void) {
     TEST_ASSERT_EQUAL(1094, delta);
 }
 
+void test_ComputeMean() {
+    float mean = 0.0;
+    static const int size = 4;
+    int16_t deltaThreshold = 0.1;
+    int16_t samples1[size] = {0, 0, 0, 0};
+    TEST_ASSERT_TRUE(CustomMath::ComputeMean(samples1, size, deltaThreshold, &mean));
+    TEST_ASSERT_EQUAL(0, mean);
+
+    int16_t samples2[size] = {90, 276, 0, 4};
+    TEST_ASSERT_FALSE(CustomMath::ComputeMean(samples2, size, deltaThreshold, &mean));
+
+    deltaThreshold = 277;
+    TEST_ASSERT_TRUE(CustomMath::ComputeMean(samples2, size, deltaThreshold, &mean));
+
+    int16_t samples3[size] = {11, 12, 12, 13};
+    TEST_ASSERT_TRUE(CustomMath::ComputeMean(samples3, size, deltaThreshold, &mean));
+    TEST_ASSERT_EQUAL(12, mean);
+}
+
+/* void test_Normalize()
+{
+    static const int vectorSize = 3;
+    float vector[vectorSize] = {};
+    CustomMath::Normalize(vector[], vectorSize);
+} */
+
 void setup() {
     // NOTE!!! Wait for >2 secs
     // if board doesn't support software reset via Serial.DTR/RTS
@@ -73,5 +99,7 @@ void loop() {
     RUN_TEST(test_stateMachine_startingState);
     RUN_TEST(test_InertialMeasurementUnit);
     RUN_TEST(test_ComputeDelta);
+    RUN_TEST(test_ComputeMean);
+    //RUN_TEST(test_Normalize);
     UNITY_END(); // stop unit testing
 }

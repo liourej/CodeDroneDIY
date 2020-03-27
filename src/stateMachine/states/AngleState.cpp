@@ -4,7 +4,7 @@
 #ifndef UNIT_TEST
 #include "../../stabilization/Stabilization.h"
 #else
-#include "../../stabilization/StabilizationStub.h"
+#include "../../../test/StabilizationStub.h"
 #endif
 
 #ifndef UNIT_TEST

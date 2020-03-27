@@ -2,8 +2,8 @@
 #ifndef STABILIZATIONSTUB_H_
 #define STABILIZATIONSTUB_H_
 
-#include "../customLibs/CustomMath.h"
-#include "hardware/RadioReception.h"
+#include "../src/customLibs/CustomMath.h"
+#include "../src/stabilization/hardware/RadioReception.h"
 
 class StabilizationStub : public CustomMath {
   private:

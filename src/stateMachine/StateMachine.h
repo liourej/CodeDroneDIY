@@ -6,7 +6,7 @@
 #ifndef UNIT_TEST
 #include "../stabilization/Stabilization.h"
 #else
-#include "../stabilization/StabilizationStub.h"
+#include "../../test/StabilizationStub.h"
 #endif
 #include "states/IState.h"
 #include "states/InitState.h"

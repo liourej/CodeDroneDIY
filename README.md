@@ -309,6 +309,12 @@ Optional, for code format:
 #### 6.2.3. Flash target
 ```platformio upload --upload-port/ttyACM0 ```
 
+#### 6.2.4. Run unit tests
+
+```
+platformio test -e uno --verbose
+```
+
 ### 6.4. Using Docker and PlatformIO
 The development tool "Docker" is a container platoform: it is a stand-alone, executable package
 of a piece of software that includes everything needed to run it: code, runtime, system tools,
