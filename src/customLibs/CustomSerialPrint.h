@@ -7,40 +7,47 @@
 
 class CustomSerialPrint {
   public:
-    static void begin(unsigned long _baudRate) {
 #ifdef LOG_DEBUG
+    static void begin(unsigned long _baudRate) {
         Serial.begin(_baudRate);
-#endif
     }
     static void print(int _number) {
-#ifdef LOG_DEBUG
         Serial.print(_number);
-#endif
     }
 
     static void println(int _number) {
-#ifdef LOG_DEBUG
         Serial.println(_number);
-#endif
     }
 
     static void print(String _string) {
-#ifdef LOG_DEBUG
         Serial.print(_string);
-#endif
     }
 
     static void println(String _string) {
-#ifdef LOG_DEBUG
         Serial.println(_string);
-#endif
     }
 
     static void println(double _string, int significantNb) {
-#ifdef LOG_DEBUG
         Serial.println(_string, significantNb);
-#endif
     }
+#else
+    static void begin(unsigned long _baudRate) {
+    }
+    static void print(int _number) {
+    }
+
+    static void println(int _number) {
+    }
+
+    static void print(String _string) {
+    }
+
+    static void println(String _string) {
+    }
+
+    static void println(double _string, int significantNb) {
+    }
+#endif
 };
 
 #endif // CUSTOMSERIALPRINT_H_
