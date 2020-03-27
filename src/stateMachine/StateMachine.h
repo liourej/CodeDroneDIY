@@ -3,8 +3,13 @@
 
 #include "../customLibs/CustomTime.h"
 #include "../stabilization/hardware/RadioReception.h"
+#ifndef UNIT_TEST
 #include "../stabilization/Stabilization.h"
-#include "../stateMachine/states/IState.h"
+#else
+#include "../stabilization/StabilizationStub.h"
+#endif
+#include "states/IState.h"
+#include "states/InitState.h"
 
 class StateMachine {
   private:
@@ -19,22 +24,27 @@ class StateMachine {
     bool throttleWasHigh = true;
     void Init();
 
-    // Activate buzzer after x minutes of power idle
-    void ActivateBuzzer(int _duration);
+     // Activate buzzer after x minutes of power idle
+     void ActivateBuzzer(int _duration);
 
-    // Auto Disarm when throttle is idle since a long period
-    bool IsSafetyStateNeeded();
+     // Auto Disarm when throttle is idle since a long period
+     bool IsSafetyStateNeeded();
 
-    void SetState(IState *_newState) {
-        currentState = _newState;
-    }
+     void SetState(IState *_newState) {
+         currentState = _newState;
+     }
 
-    void Run(const float _loopTimeSec) {
-        currentState->Run(this, _loopTimeSec);
-    }
+     int GetStateName()
+     {
+       return currentState->GetName();
+     }
 
-  private:
-    void Print();
+     void Run(const float _loopTimeSec) {
+         currentState->Run(this, _loopTimeSec);
+     }
+
+   private:
+     void Print();
 };
 
 #endif // STATEMACHINE_H_

@@ -5,8 +5,11 @@
 #include "../StateMachine.h"
 #include "../../Singleton.h"
 
-class AngleState : public Singleton<AngleState, IState>{
+class AngleState : public Singleton<AngleState, IState> {
   public:
+    int GetName() {
+        return Mode::angle;
+    }
     void Run(StateMachine *_stateMachine, const float);
 };
 #endif

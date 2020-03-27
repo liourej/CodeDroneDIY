@@ -1,3 +1,5 @@
+#ifndef UNIT_TEST
+
 #ifndef STABILIZATION_H_
 #define STABILIZATION_H_
 
@@ -93,3 +95,4 @@ class Stabilization : public CustomMath {
     float ApplyComplementaryFilter(float _angularPos, float gyroRaw, float _angleDegrees, float _loopTime);
 };
 #endif // STABILIZATION_H_
+#endif
