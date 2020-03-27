@@ -5,8 +5,11 @@
 #include "../StateMachine.h"
 #include "../../Singleton.h"
 
-class StartingState : public Singleton<StartingState, IState>{
+class StartingState : public Singleton<StartingState, IState> {
   public:
+    int GetName() {
+        return Mode::starting;
+    }
     void Run(StateMachine *_stateMachine, const float);
 };
 #endif

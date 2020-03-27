@@ -1,3 +1,4 @@
+#ifndef UNIT_TEST
 #include <avr/wdt.h>
 #include "Stabilization.h"
 
@@ -196,3 +197,4 @@ void Stabilization::SetMotorsPwrXConfig() {
 void Stabilization::Idle() {
     motorsSpeedControl.Idle();
 }
+#endif

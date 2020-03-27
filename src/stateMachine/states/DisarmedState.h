@@ -5,8 +5,11 @@
 #include "../StateMachine.h"
 #include "../../Singleton.h"
 
-class DisarmedState : public Singleton<DisarmedState, IState>{
+class DisarmedState : public Singleton<DisarmedState, IState> {
   public:
+    int GetName() {
+        return Mode::disarmed;
+    }
     void Run(StateMachine *_stateMachine, const float);
 };
 #endif

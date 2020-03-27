@@ -30,7 +30,7 @@ class InertialMeasurementUnit : public CustomMath {
         return offsetComputed;
     }
     void ComputeOffsets();
-      void GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]);
+    void GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]);
 };
 
 #endif // INERTIALMEASUREMENTUNIT_H_

@@ -1,8 +1,16 @@
 #include "SafetyState.h"
 #include "DisarmedState.h"
+#ifndef UNIT_TEST
 #include "../../stabilization/Stabilization.h"
+#else
+#include "../../stabilization/StabilizationStub.h"
+#endif
 
+#ifndef UNIT_TEST
 extern Stabilization stabilization;
+#else
+extern StabilizationStub stabilization;
+#endif
 
 void SafetyState::Run(StateMachine *_stateMachine, const float) {
     stabilization.Idle();

@@ -1,8 +1,10 @@
+#ifndef UNIT_TEST
 #include <avr/wdt.h>
 #include <math.h>
 
 #include "customLibs/CustomTime.h"
 #include "stabilization/hardware/RadioReception.h"
+
 #include "stabilization/Stabilization.h"
 #include "stateMachine/StateMachine.h"
 
@@ -51,7 +53,7 @@ void PrintConfig() {
     Serial.print(F("MAX_POWER: "));
     Serial.print(stabilization.GetMotorsMaxPower());
     Serial.print(F(" MAX_THROTTLE_PERCENT: "));
-    Serial.println(stabilization.GetMotorsMaxThrottlePercent());
+    // Serial.println(stabilization.GetMotorsMaxThrottlePercent());
 
     Serial.println(F("Setup Finished"));
 }
@@ -108,3 +110,4 @@ void loop() {
     }
     wdt_reset();
 }
+#endif

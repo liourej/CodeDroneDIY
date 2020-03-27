@@ -6,6 +6,7 @@ void StateMachine::Init() {
 
     elapsedTime.Init();
     timeBuzzer.Init();
+    // SetState(InitState::GetInstance());
 }
 
 // Activate buzzer after x minutes of power idle
