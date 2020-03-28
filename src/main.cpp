@@ -20,10 +20,12 @@ static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t
     stabilization.SetMotorsSpeed(TCNTn, OCRnA);
 }
 
+// Timer 1 is use to drive motors using PWM
 SIGNAL(TIMER1_COMPA_vect) {
     handle_interrupts(_timer1, &TCNT1, &OCR1A);
 }
 
+// Timer 1 is use to drive motors using PWM
 void InitTimer1() {
     TCCR1A = 0;         // normal counting mode
     TCCR1B = _BV(CS10); // no prescaler
@@ -34,7 +36,7 @@ void InitTimer1() {
     TIMSK1 |= _BV(OCIE1A); // enable the output compare interrupt
 }
 
-// Interrupt to decode cppm signal received from RC transmitter
+// Interrupt to decode cppm signal received from radio reception
 void RxInterrupt() {
     stabilization.ComputeRxImpulsionWidth();
 }

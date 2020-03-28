@@ -79,12 +79,21 @@ void test_ComputeMean() {
     TEST_ASSERT_EQUAL(12, mean);
 }
 
-/* void test_Normalize()
-{
+void test_VectorNormalize() {
     static const int vectorSize = 3;
-    float vector[vectorSize] = {};
-    CustomMath::Normalize(vector[], vectorSize);
-} */
+    float vector[vectorSize] = {2.886, 0.897, 9.736};
+    const float expectedVector[vectorSize] = {0.283, 0.088, 0.955};
+
+    CustomMath::VectorNormalize(vector, vectorSize);
+    for (int coord = 0; coord < vectorSize; coord++)
+        TEST_ASSERT_FLOAT_WITHIN(0.001, expectedVector[coord], vector[coord]);
+
+    float vector2[vectorSize] = {0.0, 0.0, 0.0};
+    const float expectedVector2[vectorSize] = {0.0, 0.0, 0.0};
+
+    for (int coord = 0; coord < vectorSize; coord++)
+        TEST_ASSERT_FLOAT_WITHIN(0.001, expectedVector2[coord], vector2[coord]);
+}
 
 void setup() {
     // NOTE!!! Wait for >2 secs
@@ -95,11 +104,11 @@ void setup() {
 }
 
 void loop() {
-    RUN_TEST(test_stateMachine_initState);
+/*     RUN_TEST(test_stateMachine_initState);
     RUN_TEST(test_stateMachine_startingState);
     RUN_TEST(test_InertialMeasurementUnit);
     RUN_TEST(test_ComputeDelta);
-    RUN_TEST(test_ComputeMean);
-    //RUN_TEST(test_Normalize);
+    RUN_TEST(test_ComputeMean); */
+    RUN_TEST(test_VectorNormalize);
     UNITY_END(); // stop unit testing
 }

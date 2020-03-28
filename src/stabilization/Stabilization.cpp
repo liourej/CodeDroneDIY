@@ -118,7 +118,7 @@ void Stabilization::ComputeAttitude(float _angularPos[], float _angularSpeed[], 
     for (int axis = 0; axis < nbAxis; axis++)
         _angularSpeed[axis] = gyroRaw[axis];
 
-    CustomMath::Normalize(accRaw, nbAxis);
+    CustomMath::VectorNormalize(accRaw, nbAxis);
 
     float rollAngleDeg = RAD2DEG(atan(accRaw[YAXIS] / accRaw[ZAXIS]));
     _angularPos[XAXIS] =

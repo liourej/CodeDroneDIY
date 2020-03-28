@@ -51,13 +51,17 @@ bool CustomMath::ComputeMean(int16_t _list[], int _size, int16_t _deltaThreshold
     return true;
 }
 
-inline void CustomMath::Normalize(float _vector[], const int vectorSize) {
+void CustomMath::VectorNormalize(float _vectorIn[], const int vectorSize) {
     float sumSquares = 0.0;
     for (int index = 0; index < vectorSize; index++)
-        sumSquares += _vector[index] * _vector[index];
+        sumSquares += _vectorIn[index] * _vectorIn[index];
 
     float norm = sqrt(sumSquares);
 
-    for (int index = 0; index < vectorSize; index++)
-        _vector[index] = _vector[index] / norm;
+    if (norm > 0.0)
+        for (int index = 0; index < vectorSize; index++)
+            _vectorIn[index] = _vectorIn[index] / norm;
+    else
+        for (int index = 0; index < vectorSize; index++)
+            _vectorIn[index] = 0.0;
 }

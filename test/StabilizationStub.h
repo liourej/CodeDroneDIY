@@ -8,7 +8,7 @@
 class StabilizationStub : public CustomMath {
   private:
     int callNb = 0;
-
+ 
   public:
     void SetMotorsPwrXConfig(){};
     void Init() {
