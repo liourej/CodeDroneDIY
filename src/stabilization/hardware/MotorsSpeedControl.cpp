@@ -2,10 +2,10 @@
 #include "MotorsSpeedControl.h"
 
 void MotorsSpeedControl::Init() {
-    attach(Motor0, 4);
-    attach(Motor1, 5);
-    attach(Motor2, 6);
-    attach(Motor3, 7);
+    attach(Motor0, motor0Pin);
+    attach(Motor1, motor1Pin);
+    attach(Motor2, motor2Pin);
+    attach(Motor3, motor3Pin);
     Idle();
 }
 

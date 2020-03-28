@@ -3,7 +3,7 @@
 
 #include "../../customLibs/CustomSerialPrint.h"
 
-// converts microseconds to tick (assumes prescale of 8)  // 12 Aug 2009
+// converts microseconds to tick (assumes prescale of 8)
 #define usToTicks(_us) ((clockCyclesPerMicrosecond() * _us))
 // converts from ticks back to microseconds
 #define ticksToUs(_ticks) (((unsigned)_ticks) / clockCyclesPerMicrosecond())
@@ -19,8 +19,13 @@ enum MotorId { Motor0, Motor1, Motor2, Motor3 };
 class MotorsSpeedControl {
   private:
     static const int nbMotors = 4;
+    static const int motor0Pin = 4; // PD4
+    static const int motor1Pin = 5; // PD5
+    static const int motor2Pin = 6; // PD6
+    static const int motor3Pin = 7; // PD7
+
     const int MIN_POWER = 1060;
-    const int MAX_POWER = 1860; // Max pwr available. Set to 1860 to reach max
+    const int MAX_POWER = 1860;             // Max pwr available. Set to 1860 to reach max
     const int MAX_THROTTLE_PERCENT = 100.0; // Percent to restrain max motor power
     uint16_t MAX_THROTTLE = MAX_POWER * (MAX_THROTTLE_PERCENT / 100.0); // Restrained max power
     int IDLE_THRESHOLD = 1100;
