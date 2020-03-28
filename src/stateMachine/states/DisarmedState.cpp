@@ -15,7 +15,6 @@ extern StabilizationStub stabilization;
 
 void DisarmedState::Run(StateMachine *_stateMachine, const float _loopTimeSec) {
     stabilization.Idle();
-    _stateMachine->ActivateBuzzer(120);
     int state = stabilization.GetFlyingMode();
     delay(500);
     // Check it was not a transitory switch state

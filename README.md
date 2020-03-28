@@ -53,7 +53,9 @@
 
 7.3 CPPM Reception
 
-7.4 Failsafe
+7.4 Motors speed control
+
+7.5 Failsafe
 
 [**8. Appendix**](#appendix)
 
@@ -370,7 +372,21 @@ Elapsed time between two rising edge correspond to the pulse width of a given ch
 
 In this projet, each pulse width is measured using INT0, and then stored in the correponding channel of an array.
 
-### 7.4 Failsafe
+### 7.4 Motors speed control
+
+Motor speed is tuned by modifying the pulse width on the signal wire. A pulse must be send at least every 20ms.
+
+* Max motor speed is set by a pulse of 1860ms
+
+* Motor is stopped by a pulse of 1060ms
+
+All speeds between this two values are possible.
+
+Each timer1 interrupt call the function "SetMotorsSpeed", which generate a falling edge on the previous motor and a falling edge on the current motor:
+
+<img src="/readmePictures/MotorsControl.jpg" width="100%"/>
+
+### 7.5 Failsafe
 
 For security, you must set the failsafe to cut motors power when radio link is lost.
 

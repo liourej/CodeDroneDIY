@@ -14,7 +14,6 @@ extern StabilizationStub stabilization;
 
 void SafetyState::Run(StateMachine *_stateMachine, const float) {
     stabilization.Idle();
-    _stateMachine->ActivateBuzzer(120);
     stabilization.GetFlyingMode();
     if (stabilization.GetFlyingMode() != disarmed) {
         stabilization.Idle();

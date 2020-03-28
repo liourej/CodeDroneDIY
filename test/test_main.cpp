@@ -17,7 +17,6 @@ StabilizationStub stabilization;
 
 void test_stateMachine_initState(void) {
     float loopTimeSec = 1.0;
-    stateMachine.SetState(InitState::GetInstance());
     TEST_ASSERT_EQUAL(Mode::initialization, stateMachine.GetStateName());
     stateMachine.Run(loopTimeSec);
     delay(500);
@@ -104,11 +103,11 @@ void setup() {
 }
 
 void loop() {
-/*     RUN_TEST(test_stateMachine_initState);
+     RUN_TEST(test_stateMachine_initState);
     RUN_TEST(test_stateMachine_startingState);
     RUN_TEST(test_InertialMeasurementUnit);
     RUN_TEST(test_ComputeDelta);
-    RUN_TEST(test_ComputeMean); */
+    RUN_TEST(test_ComputeMean);
     RUN_TEST(test_VectorNormalize);
     UNITY_END(); // stop unit testing
 }
