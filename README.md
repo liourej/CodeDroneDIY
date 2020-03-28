@@ -384,7 +384,7 @@ All speeds between this two values are possible.
 
 Each timer1 interrupt call the function "SetMotorsSpeed", which generate a falling edge on the previous motor and a rising edge on the current motor:
 
-<img src="/readmePictures/MotorsControl.jpg" width="80%"/>
+<img src="/readmePictures/MotorsControl.jpg" width="60%"/>
 
 ### 7.5 Failsafe
 
