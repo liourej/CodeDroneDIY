@@ -382,9 +382,9 @@ Motor speed is tuned by modifying the pulse width on the signal wire. A pulse mu
 
 All speeds between this two values are possible.
 
-Each timer1 interrupt call the function "SetMotorsSpeed", which generate a falling edge on the previous motor and a falling edge on the current motor:
+Each timer1 interrupt call the function "SetMotorsSpeed", which generate a falling edge on the previous motor and a rising edge on the current motor:
 
-<img src="/readmePictures/MotorsControl.jpg" width="100%"/>
+<img src="/readmePictures/MotorsControl.jpg" width="80%"/>
 
 ### 7.5 Failsafe
 
