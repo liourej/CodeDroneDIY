@@ -1,17 +1,30 @@
 #include "RadioReception.h"
 
 // Initialize static members
-int RadioReception::cPPM[CHANNELS_NB] = {
-        0, 0, 0, 0, 0, 0, 0,
+unsigned long RadioReception::cPPM[CHANNELS_NB] = {
+        0, 0, 0, 0, 0, 0,
 };
 bool RadioReception::initialized = false;
+int RadioReception::nbSpacingEncountered = 0;
 int RadioReception::channel = 0;
-float RadioReception::PWM_Start = 0;
-float RadioReception::PWM_Stop = 0;
-float RadioReception::PWM_Width = 0;
+unsigned long RadioReception::PWM_Start = 0;
+unsigned long RadioReception::PWM_Stop = 0;
+unsigned long RadioReception::PWM_Width = 0;
 
-void RadioReception::Init() {
+bool RadioReception::Init() {
     attachInterrupt(0, &GetWidth, RISING); // Receiver interrupt on PD2 (INT0)
+
+    CustomTime timeout;
+    timeout.Init();
+    while (!initialized) {
+        CustomSerialPrint::println(F("RadioReception not ready, try again, please wait. "));
+        delay(200);
+        if (timeout.IsTimeout(2000)) {
+            CustomSerialPrint::println(F("RadioReception - Timeout during initialization!!"));
+            return false;
+        }
+    }
+    return true;
 }
 
 void RadioReception::PrintCmd(void) {
@@ -30,28 +43,28 @@ void RadioReception::PrintCmd(void) {
 }
 
 // Angle Mode:
-int RadioReception::GetAileronsAngle() {
-    return -(map(cPPM[0], 1080, 1900, -MAX_ANGLE, MAX_ANGLE));
+long RadioReception::GetRollAngle() {
+    return -(map(static_cast<long>(cPPM[0]), 1080, 1900, -MAX_ANGLE, MAX_ANGLE));
 }
-int RadioReception::GetElevatorAngle() {
+long RadioReception::GetPitchAngle() {
     return (map(cPPM[1], 1080, 1900, -MAX_ANGLE, MAX_ANGLE));
 }
 
 // Accro mode:
-int RadioReception::GetAileronsSpeed() {
-    return -(map(cPPM[0], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED));
+long RadioReception::GetRollSpeed() {
+    return -(map(static_cast<long>(cPPM[0]), 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED));
 }
-int RadioReception::GetElevatorSpeed() {
-    return (map(cPPM[1], 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED));
+long RadioReception::GetPitchSpeed() {
+    return (map(static_cast<long>(cPPM[1]), 1080, 1900, -MAX_ROT_SPEED, MAX_ROT_SPEED));
 }
-int RadioReception::GetThrottle(const int _minPower, const int _maxThrottle) {
-    return map(cPPM[2], 1080, 1900, _minPower, _maxThrottle);
+long RadioReception::GetThrottle(const int _minPower, const int _maxThrottle) {
+    return map(static_cast<long>(cPPM[2]), 1080, 1900, _minPower, _maxThrottle);
 }
 
-int RadioReception::GetRudder() {
-    return map(cPPM[3], 1080, 1900, -MAX_YAW_SPEED, MAX_YAW_SPEED);
+long RadioReception::GetYawSpeed() {
+    return map(static_cast<long>(cPPM[3]), 1080, 1900, -MAX_YAW_SPEED, MAX_YAW_SPEED);
 }
-int RadioReception::GetSwitchH() {
+bool RadioReception::GetSwitchH() {
     if (cPPM[5] > 1500) {
         return true;
     }
@@ -72,15 +85,19 @@ void RadioReception::GetWidth(void) {
     PWM_Width = PWM_Stop - PWM_Start;
     PWM_Start = PWM_Stop;
 
-    if (initialized) {
-        if (channel < CHANNELS_NB)
-            cPPM[channel] = PWM_Width;
+    if (PWM_Width >= 4000) { // If delay more than 4ms, it is a new sequence
+        if (nbSpacingEncountered >= 10)
+            initialized = true; // Starting sequence encountered AND all channels received
+        channel = 0;
+        nbSpacingEncountered++;
+        return;
     }
 
-    if (PWM_Width > 4000) { // If delay more than 4ms, it is a new sequence
-        channel = 0;
-        initialized = true;
-    } else if ((channel + 1) < CHANNELS_NB) {
+    if (nbSpacingEncountered == 0) // When application starts, it must wait for a starting sequence
+        return;
+
+    if (channel < CHANNELS_NB) {
+        cPPM[channel] = PWM_Width;
         channel++;
     }
 }

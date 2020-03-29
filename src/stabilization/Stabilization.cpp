@@ -5,14 +5,6 @@
 void Stabilization::Init() {
     motorsSpeedControl.Init();
     radioReception.Init();
-
-    while (!radioReception.IsReady()) {
-        CustomSerialPrint::println(F("radioReception not ready, try again, please wait. "));
-        motorsSpeedControl.Idle();
-        wdt_reset();
-        delay(200);
-    }
-
     inertialMeasurementUnit.Init();
 
     if ((motorsSpeedControl.GetMotorsMaxPower() == 1860)
@@ -60,11 +52,11 @@ void Stabilization::Accro(float _loopTimeSec) {
     ComputeAttitude(angularPosCurr, angularSpeedCurr, _loopTimeSec);
 
     // Compute new speed command for each axis
-    rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection(radioReception.GetAileronsSpeed(),
+    rollMotorPwr = rollSpeedPID_Accro.ComputeCorrection(radioReception.GetRollSpeed(),
                                                         angularSpeedCurr[XAXIS], _loopTimeSec);
-    pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection(radioReception.GetElevatorSpeed(),
+    pitchMotorPwr = pitchSpeedPID_Accro.ComputeCorrection(radioReception.GetPitchSpeed(),
                                                           angularSpeedCurr[YAXIS], _loopTimeSec);
-    yawMotorPwr = yawControlLoop.ComputeCorrection(radioReception.GetRudder(),
+    yawMotorPwr = yawControlLoop.ComputeCorrection(radioReception.GetYawSpeed(),
                                                    angularSpeedCurr[ZAXIS], _loopTimeSec);
 
     // Apply computed speed command to motors
@@ -76,7 +68,7 @@ void Stabilization::Angle(float _loopTimeSec) {
     ComputeAttitude(angularPosCurr, angularSpeedCurr, _loopTimeSec);
 
     // Compute roll position command
-    int rollPosCmd = rollPosPID_Angle.ComputeCorrection(radioReception.GetAileronsAngle(),
+    int rollPosCmd = rollPosPID_Angle.ComputeCorrection(radioReception.GetRollAngle(),
                                                         angularPosCurr[XAXIS], _loopTimeSec);
 
     // Compute roll speed command
@@ -84,7 +76,7 @@ void Stabilization::Angle(float _loopTimeSec) {
             rollSpeedPID_Angle.ComputeCorrection(rollPosCmd, angularSpeedCurr[XAXIS], _loopTimeSec);
 
     // Compute pitch position command
-    int pitchPosCmd = pitchPosPID_Angle.ComputeCorrection(radioReception.GetElevatorAngle(),
+    int pitchPosCmd = pitchPosPID_Angle.ComputeCorrection(radioReception.GetPitchAngle(),
                                                           angularPosCurr[YAXIS], _loopTimeSec);
 
     // Compute pitch speed command
@@ -92,7 +84,7 @@ void Stabilization::Angle(float _loopTimeSec) {
                                                           _loopTimeSec);
 
     // Compute yaw speed command
-    yawMotorPwr = yawControlLoop.ComputeCorrection(radioReception.GetRudder(),
+    yawMotorPwr = yawControlLoop.ComputeCorrection(radioReception.GetYawSpeed(),
                                                    angularSpeedCurr[ZAXIS], _loopTimeSec);
 
     // Apply computed command to motors

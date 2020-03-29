@@ -1,3 +1,4 @@
+#define UNIT_TEST 1
 #ifdef UNIT_TEST
 #include <unity.h>
 
@@ -94,6 +95,18 @@ void test_VectorNormalize() {
         TEST_ASSERT_FLOAT_WITHIN(0.001, expectedVector2[coord], vector2[coord]);
 }
 
+void test_RadioReception() {
+    RadioReception radioReception;
+    TEST_ASSERT_TRUE(radioReception.Init());
+    TEST_ASSERT_UINT32_WITHIN(RadioReception::MAX_ANGLE * 2, 0, radioReception.GetPitchAngle());
+    TEST_ASSERT_UINT32_WITHIN(RadioReception::MAX_ANGLE * 2, 0, radioReception.GetRollAngle());
+    TEST_ASSERT_UINT32_WITHIN(RadioReception::MAX_YAW_SPEED * 2, 0, radioReception.GetYawSpeed());
+    TEST_ASSERT_UINT32_WITHIN(RadioReception::MAX_ROT_SPEED * 2, 0,
+                              radioReception.GetPitchSpeed());
+    TEST_ASSERT_UINT32_WITHIN(RadioReception::MAX_ROT_SPEED * 2, 0,
+                              radioReception.GetRollSpeed());
+}
+
 void setup() {
     // NOTE!!! Wait for >2 secs
     // if board doesn't support software reset via Serial.DTR/RTS
@@ -103,12 +116,15 @@ void setup() {
 }
 
 void loop() {
-     RUN_TEST(test_stateMachine_initState);
+    CustomSerialPrint::println("****************** STARTING TESTS ******************");
+    RUN_TEST(test_stateMachine_initState);
     RUN_TEST(test_stateMachine_startingState);
     RUN_TEST(test_InertialMeasurementUnit);
+    RUN_TEST(test_RadioReception);
     RUN_TEST(test_ComputeDelta);
     RUN_TEST(test_ComputeMean);
     RUN_TEST(test_VectorNormalize);
+    CustomSerialPrint::println("****************** END OF TESTS ******************");
     UNITY_END(); // stop unit testing
 }
 #endif

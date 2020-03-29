@@ -18,6 +18,7 @@ class CustomTime {
 
     float GetloopTimeMilliseconds();
     float GetExecutionTimeMilliseconds();
+    bool IsTimeout(long _maxTimeMilliSec);
     void ComputeMeanLoopTime(const float _loopTimeSec, float &_meanLoopTime, uint16_t &_loopNb);
 };
 

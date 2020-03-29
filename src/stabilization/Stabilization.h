@@ -40,8 +40,8 @@ class Stabilization {
     RadioReception radioReception;
 
   public:
-    void SetMotorsPwrXConfig();
     void Init();
+    void SetMotorsPwrXConfig();
     void Idle();
     void Accro(float _loopTimeSec);
     void Angle(float _loopTimeSec);
