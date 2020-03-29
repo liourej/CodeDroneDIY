@@ -4,10 +4,7 @@
 
 void Stabilization::Init() {
     motorsSpeedControl.Init();
-
-    // MPU6050: join I2C bus
-    Wire.begin();
-    Wire.setClock(400000L); // Communication with MPU-6050 at 400KHz
+    radioReception.Init();
 
     while (!radioReception.IsReady()) {
         CustomSerialPrint::println(F("radioReception not ready, try again, please wait. "));
@@ -184,14 +181,14 @@ void Stabilization::ResetPID() {
 //
 void Stabilization::SetMotorsPwrXConfig() {
     int throttle = GetThrottle();
-    motorsSpeedControl.write(Motor0, throttle - pitchMotorPwr * mixing + rollMotorPwr * mixing
-                                             - yawMotorPwr * mixing);
-    motorsSpeedControl.write(Motor1, throttle - pitchMotorPwr * mixing - rollMotorPwr * mixing
-                                             + yawMotorPwr * mixing);
-    motorsSpeedControl.write(Motor2, throttle + pitchMotorPwr * mixing - rollMotorPwr * mixing
-                                             - yawMotorPwr * mixing);
-    motorsSpeedControl.write(Motor3, throttle + pitchMotorPwr * mixing + rollMotorPwr * mixing
-                                             + yawMotorPwr * mixing);
+    motorsSpeedControl.UpdateSpeed(Motor0, throttle - pitchMotorPwr * mixing + rollMotorPwr * mixing
+                                                   - yawMotorPwr * mixing);
+    motorsSpeedControl.UpdateSpeed(Motor1, throttle - pitchMotorPwr * mixing - rollMotorPwr * mixing
+                                                   + yawMotorPwr * mixing);
+    motorsSpeedControl.UpdateSpeed(Motor2, throttle + pitchMotorPwr * mixing - rollMotorPwr * mixing
+                                                   - yawMotorPwr * mixing);
+    motorsSpeedControl.UpdateSpeed(Motor3, throttle + pitchMotorPwr * mixing + rollMotorPwr * mixing
+                                                   + yawMotorPwr * mixing);
 }
 
 void Stabilization::Idle() {

@@ -24,3 +24,15 @@ float CustomTime::GetloopTimeMilliseconds() {
 float CustomTime::GetExecutionTimeMilliseconds() {
     return millis() - startTime;
 }
+
+void CustomTime::ComputeMeanLoopTime(const float _loopTimeSec, float &_meanLoopTime, uint16_t &_loopNb) {
+    if (_loopNb > 1000) {
+        _meanLoopTime = _meanLoopTime / _loopNb;
+        CustomSerialPrint::println(_meanLoopTime, 2);
+        _meanLoopTime = 0;
+        _loopNb = 0;
+    } else {
+        _meanLoopTime += _loopTimeSec;
+        _loopNb++;
+    }
+}

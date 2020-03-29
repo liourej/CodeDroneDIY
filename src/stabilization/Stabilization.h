@@ -46,8 +46,8 @@ class Stabilization {
     void Accro(float _loopTimeSec);
     void Angle(float _loopTimeSec);
     void ResetPID();
-    void SetMotorsSpeed(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA) {
-        motorsSpeedControl.SetMotorsSpeed(TCNTn, OCRnA);
+    void ApplyMotorsSpeed(volatile uint16_t *TCNTn, volatile uint16_t *OCRnA) {
+        motorsSpeedControl.ApplySpeed(TCNTn, OCRnA);
     }
     int GetMotorsMaxPower() {
         return motorsSpeedControl.GetMotorsMaxPower();

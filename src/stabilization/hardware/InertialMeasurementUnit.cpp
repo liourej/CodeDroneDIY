@@ -1,6 +1,10 @@
 #include <avr/wdt.h>
 #include "InertialMeasurementUnit.h"
 void InertialMeasurementUnit::Init() {
+    // MPU6050: join I2C bus
+    Wire.begin();
+    Wire.setClock(400000L); // Communication with MPU-6050 at 400KHz
+
     // Initialize MPU 6050
     accelgyro.initialize();
 
@@ -9,11 +13,10 @@ void InertialMeasurementUnit::Init() {
 
     wdt_reset();
     if (!accelgyro.testConnection())
-    CustomSerialPrint::println(F("InertialMeasurementUnit: Function testConnection failed"));
+        CustomSerialPrint::println(F("InertialMeasurementUnit: Function testConnection failed"));
 }
 
-void InertialMeasurementUnit::GetCorrectedAccelGyro(float _accMeasures[],
-                                                           float _gyroMeasures[]) {
+void InertialMeasurementUnit::GetCorrectedAccelGyro(float _accMeasures[], float _gyroMeasures[]) {
     int16_t accel[AXIS_NB] = {0, 0, 0};
     int16_t speed[AXIS_NB] = {0, 0, 0};
 

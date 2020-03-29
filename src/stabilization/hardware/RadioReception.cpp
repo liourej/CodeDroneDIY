@@ -1,5 +1,19 @@
 #include "RadioReception.h"
 
+// Initialize static members
+int RadioReception::cPPM[CHANNELS_NB] = {
+        0, 0, 0, 0, 0, 0, 0,
+};
+bool RadioReception::initialized = false;
+int RadioReception::channel = 0;
+float RadioReception::PWM_Start = 0;
+float RadioReception::PWM_Stop = 0;
+float RadioReception::PWM_Width = 0;
+
+void RadioReception::Init() {
+    attachInterrupt(0, &GetWidth, RISING); // Receiver interrupt on PD2 (INT0)
+}
+
 void RadioReception::PrintCmd(void) {
     CustomSerialPrint::print(F("Aile: "));
     CustomSerialPrint::print(cPPM[0]);

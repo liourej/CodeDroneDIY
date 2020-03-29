@@ -1,4 +1,4 @@
-#include <Arduino.h>
+#ifdef UNIT_TEST
 #include <unity.h>
 
 #include "StabilizationStub.h"
@@ -111,3 +111,4 @@ void loop() {
     RUN_TEST(test_VectorNormalize);
     UNITY_END(); // stop unit testing
 }
+#endif
