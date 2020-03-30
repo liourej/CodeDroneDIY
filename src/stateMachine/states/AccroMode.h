@@ -7,10 +7,10 @@
 #include "../StateMachine.h"
 #include "../../Singleton.h"
 
-class AccroState : public Singleton<AccroState, IState> {
+class AccroMode : public Singleton<AccroMode, IState> {
   public:
     virtual int GetName() {
-        return Mode::accro;
+        return Mode::accroMode;
     }
     virtual void Run(StateMachine *_stateMachine, const float);
 };

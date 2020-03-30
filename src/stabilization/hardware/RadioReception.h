@@ -4,7 +4,7 @@
 #include "../../customLibs/CustomSerialPrint.h"
 #include "../../customLibs/CustomTime.h"
 
-enum Mode { initialization, starting, safety, disarmed, accro, angle };
+enum Mode { initialization, safety, disarmed, accroMode, angleMode };
 
 class RadioReception {
   public:

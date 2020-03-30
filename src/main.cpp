@@ -32,12 +32,12 @@ void loop() {
 
     loopTimeSec = time.GetloopTimeMilliseconds();
 
-    // State Machine initialization -> starting -> angle/accro -> safety -> disarmed -> angle/accro
+    // State Machine Initializing -> Ready -> AngleMode/AccroMode -> Safety -> Disarmed -> AngleMode/AccroMode
     stateMachine.Run(loopTimeSec);
 
     // Compute mean loop time and complementary filter time constant
     int flyingMode = stabilization.GetFlyingMode();
-    if ((flyingMode == angle) || (flyingMode == accro)) {
+    if ((flyingMode == angleMode) || (flyingMode == accroMode)) {
         if (!stabilization.IsThrottleIdle()) {
             time.ComputeMeanLoopTime(loopTimeSec, meanLoopTime, loopNb);
         }

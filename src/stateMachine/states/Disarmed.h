@@ -1,11 +1,11 @@
-#ifndef DISARMEDSTATE_H_
-#define DISARMEDSTATE_H_
+#ifndef Disarmed_H_
+#define Disarmed_H_
 
 #include "IState.h"
 #include "../StateMachine.h"
 #include "../../Singleton.h"
 
-class DisarmedState : public Singleton<DisarmedState, IState> {
+class Disarmed : public Singleton<Disarmed, IState> {
   public:
     int GetName() {
         return Mode::disarmed;

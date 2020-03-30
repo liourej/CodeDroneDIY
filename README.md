@@ -51,7 +51,7 @@
 
 7.2 The state machine
 
-7.3 CPPM Reception
+7.3 Radio reception
 
 7.4 Motors speed control
 
@@ -333,35 +333,54 @@ of a piece of software that includes everything needed to run it: code, runtime,
 
 ![DiagrammeUML](/readmePictures/DiagrammeUML.jpg "DiagrammeUML")
 
+**StateMachine folder:**
+
 | File      | Description      |
 | -------------- | -------------- |
-| main.cpp | Contains initialization function "setup()" and main loop "loop()" |
-| InertialMeasurementUnit.cpp/h | Read roll, pitch, yaw angles from MPU6050 |
-| Stabilization.cpp/h | Computes and apply new command from tx sticks and attitude |
+| StateMachine.h | Contains current state |
+| states/IState.h | Interface for the states (mother class)|
+| states/AccroMode.cpp/h | Computes stabilization for accro mode |
+| states/AngleMode.cpp/h | Computes stabilization for angle mode|
+| states/Disarmed.cpp/h | Sets motors to idle |
+| states/Initializing.cpp/h | Computes offsets |
+| states/Safety.cpp/h | Sets motors to idle |
+
+**Stabilization folder:**
+
+| File      | Description      |
+| -------------- | -------------- |
+| hardware/InertialMeasurementUnit.cpp/h | Read roll, pitch, yaw angles from MPU6050 |
+| hardware/MotorsSpeedControl.cpp/h | Manage an ESC: PWM to set |
+| hardware/RadioReception.h | Receives CPPM signal acquisition using INT0 |
+| Stabilization.cpp/h | Computes and apply new command from receiver sticks and current attitude |
 | ControlLoop.cpp/h | Proportionnal, integral, derivative loop correction |
-| RadioReception.h | Receiver CPPM signal acquisition using INT0 |
-| MotorsSpeedControl.cpp/h | Manage an ESC: pin, PWM to set |
-| StateMachine.h | State machine |
-| Time.h | To measure loop time and elapsed time |
-| Math.h | Mathermatical functions: mean and delta max computations|
+
+**customLibs folder:**
+
+| File      | Description      |
+| -------------- | -------------- |
+| CustomMath.h | Mathermatical functions: mean and delta max computations|
+| CustomTime.h | To measure loop time and elapsed time |
+| CustomSerialPrint.h | Custom serial print to enable or disable printing|
+
+
 
 ### 7.2 The state machine
 
-Due to security reasons, the UAV cannot start running with a flight mode enabled. Six states are defined to enable or disable flight mode safely. These states are ruled by a statemachine.
+Due to security reasons, the UAV cannot start running with a flight mode enabled. Five states are defined to enable or disable flight mode safely. These states are ruled by a statemachine.
 
-The six states StateMachine:
+The five StateMachine states:
 
 ![MachineEtats](/readmePictures/MachineEtats.jpg "MachineEtats")
 
 | State      | Description      |
 | -------------- | -------------- |
-| Initialization | UAV must on the ground, horizontal, and not moving. Sensors offsets are computed. Then, if receiver switch is disarmed, the system changes to the next state. |
-| Starting | UAV is ready to be armed using tranceiver switch. When the receiver switch is set to a flight mode, the system changes to the corresponding state. |
-| Angle/Accro | Throttle is enabled, flight can start. After 5 seconds of power idle, the system is set to "safety" state. |
-| Safety | Throttle command is disabled and power cannot be set. Then, if receiver switch is disarmed, the system changes to the next state.|
+| Initialization | UAV must be on the ground, horizontal, and not moving. Sensors offsets are computed. Then, if receiver switch is disarmed, the system changes to the next state. |
 | Disarmed | Throttle is disabled. When the receiver switch is set to a flight mode, the system changes to the corresponding state.|
+| AngleMode/AccroMode | Throttle is enabled, flight can start. After 5 seconds of power idle, the system is set to "safety" state. |
+| Safety | Throttle command is disabled and power is cut. To re-arm, switch to disarmed, then choose the flight mode accroMode or angleMode |
 
-### 7.3. Reception
+### 7.3. Radio reception
 
 A CPPM receiver is used to fly the UAV using a remote control.
 
@@ -374,7 +393,11 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 
 ### 7.4 Motors speed control
 
-Motor speed is tuned by modifying the pulse width on the signal wire. A pulse must be send at least every 20ms.
+Each motor is controlled by an ESC. The microcontroller drive the 4 ESC.
+
+<img src="/readmePictures/Afro20Amp-ESC.jpg" width="50%"/>
+
+Motor speed is tuned by modifying the pulse width on the ESC signal wire. A pulse must be send at least every 20ms.
 
 * Max motor speed is set by a pulse of 1860ms
 

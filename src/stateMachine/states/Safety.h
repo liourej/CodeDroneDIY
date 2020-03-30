@@ -5,7 +5,7 @@
 #include "../StateMachine.h"
 #include "../../Singleton.h"
 
-class SafetyState : public Singleton<SafetyState, IState> {
+class Safety : public Singleton<Safety, IState> {
   public:
     int GetName() {
         return Mode::safety;

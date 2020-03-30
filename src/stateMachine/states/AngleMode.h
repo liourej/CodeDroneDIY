@@ -1,14 +1,14 @@
-#ifndef STARTINGSTATE_H_
-#define STARTINGSTATE_H_
+#ifndef ANGLESTATE_H_
+#define ANGLESTATE_H_
 
 #include "IState.h"
 #include "../StateMachine.h"
 #include "../../Singleton.h"
 
-class StartingState : public Singleton<StartingState, IState> {
+class AngleMode : public Singleton<AngleMode, IState> {
   public:
     int GetName() {
-        return Mode::starting;
+        return Mode::angleMode;
     }
     void Run(StateMachine *_stateMachine, const float);
 };

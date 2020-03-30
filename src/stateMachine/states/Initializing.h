@@ -5,7 +5,7 @@
 #include "../StateMachine.h"
 #include "../../Singleton.h"
 
-class InitState : public Singleton<InitState, IState> {
+class Initializing : public Singleton<Initializing, IState> {
   public:
     int GetName(){
       return Mode::initialization;

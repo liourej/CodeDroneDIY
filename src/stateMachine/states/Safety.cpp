@@ -1,5 +1,5 @@
-#include "SafetyState.h"
-#include "DisarmedState.h"
+#include "Safety.h"
+#include "Disarmed.h"
 #ifndef UNIT_TEST
 #include "../../stabilization/Stabilization.h"
 #else
@@ -12,13 +12,13 @@ extern Stabilization stabilization;
 extern StabilizationStub stabilization;
 #endif
 
-void SafetyState::Run(StateMachine *_stateMachine, const float) {
+void Safety::Run(StateMachine *_stateMachine, const float) {
     stabilization.Idle();
     stabilization.GetFlyingMode();
     if (stabilization.GetFlyingMode() != disarmed) {
         stabilization.Idle();
-        SetState(_stateMachine, this);
     } else {
-        SetState(_stateMachine, DisarmedState::GetInstance());
+        SetState(_stateMachine, Disarmed::GetInstance());
     }
 }
+

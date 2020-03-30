@@ -36,11 +36,11 @@ class StabilizationStub : public CustomMath {
         case 1:
         case 2:
             callNb++;
-            return Mode::angle;
+            return Mode::angleMode;
             break;
         case 3:
             callNb++;
-            return Mode::accro;
+            return Mode::accroMode;
             break;
         case 4:
             callNb++;

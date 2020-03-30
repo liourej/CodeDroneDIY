@@ -5,11 +5,10 @@
 #include "StabilizationStub.h"
 
 #include "../src/stateMachine/StateMachine.h"
-#include "../src/stateMachine/states/StartingState.h"
-#include "../src/stateMachine/states/DisarmedState.h"
-#include "../src/stateMachine/states/SafetyState.h"
-#include "../src/stateMachine/states/AccroState.h"
-#include "../src/stateMachine/states/AngleState.h"
+#include "../src/stateMachine/states/Disarmed.h"
+#include "../src/stateMachine/states/Safety.h"
+#include "../src/stateMachine/states/AccroMode.h"
+#include "../src/stateMachine/states/AngleMode.h"
 
 #include "../src/stabilization/hardware/InertialMeasurementUnit.h"
 
@@ -21,22 +20,22 @@ void test_stateMachine_initState(void) {
     TEST_ASSERT_EQUAL(Mode::initialization, stateMachine.GetStateName());
     stateMachine.Run(loopTimeSec);
     delay(500);
-    TEST_ASSERT_EQUAL(Mode::starting, stateMachine.GetStateName());
+    TEST_ASSERT_EQUAL(Mode::disarmed, stateMachine.GetStateName());
     stateMachine.Run(loopTimeSec);
     delay(500);
-    TEST_ASSERT_EQUAL(Mode::angle, stateMachine.GetStateName());
+    TEST_ASSERT_EQUAL(Mode::angleMode, stateMachine.GetStateName());
     stateMachine.Run(loopTimeSec);
     delay(500);
-    TEST_ASSERT_EQUAL(Mode::accro, stateMachine.GetStateName());
+    TEST_ASSERT_EQUAL(Mode::accroMode, stateMachine.GetStateName());
 }
 
 void test_stateMachine_startingState(void) {
     float loopTimeSec = 1.0;
-    stateMachine.SetState(StartingState::GetInstance());
-    TEST_ASSERT_EQUAL(Mode::starting, stateMachine.GetStateName());
+    stateMachine.SetState(Disarmed::GetInstance());
+    TEST_ASSERT_EQUAL(Mode::disarmed, stateMachine.GetStateName());
     stateMachine.Run(loopTimeSec);
     delay(500);
-    TEST_ASSERT_EQUAL(Mode::starting, stateMachine.GetStateName());
+    TEST_ASSERT_EQUAL(Mode::disarmed, stateMachine.GetStateName());
 }
 
 void test_InertialMeasurementUnit(void) {
@@ -98,6 +97,7 @@ void test_VectorNormalize() {
 void test_RadioReception() {
     RadioReception radioReception;
     TEST_ASSERT_TRUE(radioReception.Init());
+    delay(1000);
     TEST_ASSERT_UINT32_WITHIN(RadioReception::MAX_ANGLE * 2, 0, radioReception.GetPitchAngle());
     TEST_ASSERT_UINT32_WITHIN(RadioReception::MAX_ANGLE * 2, 0, radioReception.GetRollAngle());
     TEST_ASSERT_UINT32_WITHIN(RadioReception::MAX_YAW_SPEED * 2, 0, radioReception.GetYawSpeed());

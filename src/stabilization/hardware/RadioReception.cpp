@@ -75,9 +75,9 @@ int RadioReception::GetFlyingMode() {
     if (cPPM[4] > 1800)
         return disarmed;
     else if (cPPM[4] < 1200)
-        return angle;
+        return angleMode;
     else
-        return accro;
+        return accroMode;
 } // G switch: pos0=1900, pos1=1500, pos2=1092
 
 void RadioReception::GetWidth(void) {
@@ -86,7 +86,7 @@ void RadioReception::GetWidth(void) {
     PWM_Start = PWM_Stop;
 
     if (PWM_Width >= 4000) { // If delay more than 4ms, it is a new sequence
-        if (nbSpacingEncountered >= 10)
+        if (nbSpacingEncountered >= 4)
             initialized = true; // Starting sequence encountered AND all channels received
         channel = 0;
         nbSpacingEncountered++;

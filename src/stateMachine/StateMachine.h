@@ -9,7 +9,7 @@
 #include "../../test/StabilizationStub.h"
 #endif
 #include "states/IState.h"
-#include "states/InitState.h"
+#include "states/Initializing.h"
 
 class StateMachine {
   private:
