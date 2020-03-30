@@ -70,13 +70,17 @@
 -------------------------------------------------------------------
 ## Warning
 
-![Danger.jpg](/readmePictures/Danger.jpg "Danger")
+<p align="center">
+<img src="/readmePictures/Danger.jpg"/>
+</p>
 
 Before starting this project, you must know that spinning propellers are very dangerous for your eyes and people around.
 When using the benchtest indoor, you must wear large protective glasses, and set up a power limit.
 For outside tests, choose a very large area, with nobody around.
 
-![Protection_glasses.jpg](/readmePictures/Protection_glasses.jpg "Protection_glasses")
+<p align="center">
+<img src="/readmePictures/Protection_glasses.jpg"/>
+</p>
 
 ## 1. Introduction <a id="intro"></a>
 ### 1.1 Purpose
@@ -145,8 +149,9 @@ A closed-loop system is needed to control angular spesoftwareDetailedDesigneds.
 
 This system compares angular speed command to angular speed feedback, and computes a new motor power to apply.
 
-![AsservissementAccro](/readmePictures/AsservissementAccro.jpg "AsservissementAccro")
-
+<p align="center">
+<img src="/readmePictures/AsservissementAccro.jpg"/>
+</p>
 
 ## 4. Angle mode (aka automatic leveling mode) <a id="angleMode"></a>
 
@@ -192,7 +197,9 @@ The complementary filter mask their respective errors:
 - A low-pass filter is applied on accelerometer data to filter the noize and the unwanted accelerations: these data are usefull on a long time period, fast changes have to be eliminated.
 - A high-pass filter is applied on the gyrosope data: these data are usefull on short time period, but they drift and accumulate errors on long time periods.
 
-![FiltreComplementaire](/readmePictures/FiltreComplementaire.jpg "FiltreComplementaire")
+<p align="center">
+<img src="/readmePictures/FiltreComplementaire.jpg"/>
+</p>
 
 **Coding exemple**
 
@@ -228,7 +235,9 @@ This system compares angle command to angle feedback, and computes a new motor p
 
 The pilot controls each attitude angle, and if transmitter sticks are centered, command is 0°, and UAV automatically goes back to horizontal.
 
-![AsservissementAngle](/readmePictures/AsservissementAngle.jpg "AsservissementAngle")
+<p align="center">
+<img src="/readmePictures/AsservissementAngle.jpg"/>
+</p>
 
 ## 5. Hardware configuration <a id="hardwareConfiguration"></a>
 
@@ -275,7 +284,9 @@ TODO: add receiver in schematic
 | PC4 | SDA MPU6050 |
 | PC5 | SCL MPU6050 |
 
-![flightConfiguration](/readmePictures/flightConfiguration.jpg "flightConfiguration")
+<p align="center">
+<img src="/readmePictures/flightConfiguration.jpg"/>
+</p>
 
 ## 6. Software setup <a id="softwareSetup"></a>
 
@@ -335,7 +346,9 @@ of a piece of software that includes everything needed to run it: code, runtime,
 
 ### 7.1 Source code overview
 
-![DiagrammeUML](/readmePictures/DiagrammeUML.jpg "DiagrammeUML")
+<p align="center">
+<img src="/readmePictures/DiagrammeUML.jpg"/>
+</p>
 
 **StateMachine folder:**
 
@@ -375,7 +388,9 @@ Due to security reasons, the UAV cannot start running with a flight mode enabled
 
 The five StateMachine states:
 
-![MachineEtats](/readmePictures/MachineEtats.jpg "MachineEtats")
+<p align="center">
+<img src="/readmePictures/MachineEtats.jpg"/>
+</p>
 
 | State      | Description      |
 | -------------- | -------------- |
@@ -391,7 +406,10 @@ A CPPM receiver is used to fly the UAV using a remote control.
 CPPM (Pulse Position Modulation) reception  allows to receive all channels using only one entry pin. Each rising edge correpond to the end of the previous channel impulsion, and at the beginning of the next channel impulsion.
 Elapsed time between two rising edge correspond to the pulse width of a given channel.
 
-![CPPM](/readmePictures/CPPM.jpg "CPPM")
+
+<p align="center">
+<img src="/readmePictures/CPPM.jpg"/>
+</p>
 
 In this projet, each pulse width is measured using INT0, and then stored in the correponding channel of an array.
 
