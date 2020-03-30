@@ -393,9 +393,9 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 
 ### 7.4 Motors speed control
 
-Each motor is controlled by an ESC. The microcontroller drive the 4 ESC.
+Each motor is controlled by an ESC. The microcontroller drives the 4 ESC.
 
-<img src="/readmePictures/Afro20Amp-ESC.jpg" width="50%"/>
+<img src="/readmePictures/Afro20Amp-ESC.jpg" width="20%"/>
 
 Motor speed is tuned by modifying the pulse width on the ESC signal wire. A pulse must be send at least every 20ms.
 
