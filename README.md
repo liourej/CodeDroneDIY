@@ -121,7 +121,7 @@ An « Inertial Measurement Unit » is a MEMS, "Microelectromechanical system",
 | Accelerometer | Measure linear acceleration on each axis (g) | Slow |  Noizy and not usable when UAV is moving |
 
 <p align="center">
-<img src="/readmePictures/IMU.jpg" width="24%" />
+<img src="/readmePictures/IMU.jpg" width="24%" align="center"/>
 </p>
 
 ## 3. Accro mode (aka manual) <a id="accroMode"></a>
@@ -254,11 +254,11 @@ TODO: add receiver in schematic
 
 **Full view:**
 
-<img src="/readmePictures/schemaElectriqueDroneFull.jpg" width="80%"/>
+<img src="/readmePictures/schemaElectriqueDroneFull.jpg" width="80%" align="center"/>
 
 **Zoomed view:**
 
-<img src="/readmePictures/SchemaElectriqueDroneZoom.jpg" width="50%"/>
+<img src="/readmePictures/SchemaElectriqueDroneZoom.jpg" width="50%" align="center"/>
 
 | Arduino pin      | Component      |
 | -------------- | -------------- |
@@ -395,7 +395,7 @@ In this projet, each pulse width is measured using INT0, and then stored in the 
 
 Each motor is controlled by an ESC. The microcontroller drives the 4 ESC.
 
-<img src="/readmePictures/Afro20Amp-ESC.jpg" width="20%"/>
+<img src="/readmePictures/Afro20Amp-ESC.jpg" width="20%" align="center"/>
 
 Motor speed is tuned by modifying the pulse width on the ESC signal wire. A pulse must be send at least every 20ms.
 
@@ -407,7 +407,7 @@ All speeds between this two values are possible.
 
 Each timer1 interrupt call the function "SetMotorsSpeed", which generate a falling edge on the previous motor and a rising edge on the current motor:
 
-<img src="/readmePictures/MotorsControl.jpg" width="60%"/>
+<img src="/readmePictures/MotorsControl.jpg" width="60%" align="center"/>
 
 ### 7.5 Failsafe
 
@@ -423,7 +423,7 @@ Transmitter configuration used during the « bind » operation defines the «�
 
 ### 8.1 The benchtest
 
-<img src="/readmePictures/BenchTest01.jpg" width="40%"/>
+<img src="/readmePictures/BenchTest01.jpg" width="40%" align="center"/>
 
 ### 8.2 FPV - First Person View  <a id="firstPersonView"></a>
 
