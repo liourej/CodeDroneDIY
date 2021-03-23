@@ -145,7 +145,7 @@ _pos[0] = _pos[0] + (accGyroRaw[0+3]/GyroSensitivity)*_loop_time;
 ```
 ### 3.2 Speed stabilization  <a id="stabilization"></a>
 
-A closed-loop system is needed to control angular spesoftwareDetailedDesigneds.
+A closed-loop system is needed to control angular speed.
 
 This system compares angular speed command to angular speed feedback, and computes a new motor power to apply.
 
